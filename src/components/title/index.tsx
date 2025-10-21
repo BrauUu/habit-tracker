@@ -1,10 +1,11 @@
 interface TitleProps {
-    value: string
+    value: string,
+    style?: string
 }
 
-export default function Title({value} : TitleProps) {
+export default function Title({style, value} : TitleProps) {
     return (
-       <h1 className="text-2xl">
+       <h1 className={`${style}`}>
         {value}
        </h1>
     )

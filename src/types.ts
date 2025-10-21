@@ -1,5 +1,6 @@
 export interface Habit {
-  id: string;
-  description: string;
-  done: boolean;
+  id: string,
+  title: string,
+  done: boolean,
+  daysOfTheWeek: number[]
 }

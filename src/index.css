@@ -14,3 +14,12 @@ html {
   font-family: "Google Sans Code", monospace;
   font-style: normal;
 }
+
+@layer base {
+  h1 {
+    @apply text-2xl;
+  }
+  button {
+    @apply cursor-pointer;
+  }
+}
