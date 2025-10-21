@@ -1,16 +1,50 @@
 import { v4 as uuidv4 } from 'uuid';
 import type { Habit } from './types'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useMemo } from 'react'
 import Whiteboard from './components/whiteboard'
 import HabitBox from './components/boxes/habitbox'
 import Title from './components/title'
 import Input from './components/input'
+import Filter from './components/filter'
 
 function App() {
 
   const [habitsList, setHabitsList] = useState<Habit[]>([])
+  const [habitFilter, setHabitFilter] = useState<number | null>(1)
   const initialLoadRef = useRef(true)
+
+  useEffect(() => {
+    let timeoutId: number
+
+    const checkMidnight = () => {
+      let now = new Date();
+      let midnight = new Date(now);
+      // comment to test 'daily check'
+      midnight.setHours(24, 0, 0, 0);
+
+      //to test 'daily check'
+      // midnight.setHours(14, 40, 0, 0);
+      // if(midnight.getTime() <= now.getTime()){
+      //   midnight.setDate(midnight.getDate() + 1)
+      // }
+      //
+
+      const timeUntilMidnight = midnight.getTime() - now.getTime();
+
+      timeoutId = setTimeout(() => {
+        resetDailyHabits()
+        checkMidnight();
+      }, timeUntilMidnight);
+    };
+
+    checkMidnight();
+
+    return () => {
+      if (timeoutId)
+        clearTimeout(timeoutId);
+    };
+  }, []);
 
   useEffect(() => {
 
@@ -29,12 +63,45 @@ function App() {
     localStorage.setItem('habitsList', JSON.stringify(habitsList))
   }, [habitsList])
 
+  const habitsListFiltered = useMemo(() => {
+    if (habitFilter === 0) return [...habitsList]
+    if (habitFilter === 1) return habitsList.filter(habit => getTodayHabits(habit))
+    return [...habitsList]
+  }, [habitFilter, habitsList])
+
+  function resetDailyHabits() {
+    setHabitsList(prevHabits =>
+      prevHabits.map(habit => (
+        {
+          ...habit,
+          done: false,
+          streak: checkDailyHabitStreak(habit)
+        }
+      ))
+    );
+  }
+
+  function checkDailyHabitStreak(habit: Habit) {
+    if (getTodayHabits(habit)) {
+      if (habit.done)
+        return habit.streak
+      return 0
+    }
+    return habit.streak
+  }
+
+  function getTodayHabits(habit: Habit) {
+    const today = new Date().getDay()
+    return habit.daysOfTheWeek.includes(today)
+  }
+
   function createNewHabit(title: string) {
     const newHabit: Habit = {
       'id': uuidv4(),
       'title': title,
       'done': false,
-      'daysOfTheWeek': [0,1,2,3,4,5,6]
+      'streak': 0,
+      'daysOfTheWeek': [0, 1, 2, 3, 4, 5, 6]
     }
     setHabitsList([...habitsList, newHabit])
   }
@@ -52,14 +119,17 @@ function App() {
   }
 
   return (
-    <div className='p-16 flex flex-col gap-2'>
-      <Title value='daily habits' />
+    <div className='m-16 flex flex-col gap-1 w-full md:w-1/2 lg:w-1/4'>
+      <div className='flex flex-row justify-between'>
+        <Title value='daily habits' />
+        <Filter value={habitFilter} onChange={setHabitFilter} />
+      </div>
       <Whiteboard>
         <Input placeholder='add habit' onSubmit={createNewHabit} submitOnEnter={true}></Input>
         {
-          habitsList.map((habit) => {
-            return <HabitBox key={habit.id} habit={habit} updateHabit={updateHabit} deleteHabit={deleteHabit} />
-          })
+          habitsListFiltered.map((habit) => (
+            <HabitBox key={habit.id} habit={habit} updateHabit={updateHabit} deleteHabit={deleteHabit} />
+          ))
         }
       </Whiteboard>
     </div>
