@@ -13,6 +13,7 @@ function App() {
   const [habitsList, setHabitsList] = useState<Habit[]>([])
   const [habitFilter, setHabitFilter] = useState<number | null>(1)
   const initialLoadRef = useRef(true)
+  const hasResetToday = useRef(false)
 
   useEffect(() => {
     let timeoutId: number
@@ -21,14 +22,14 @@ function App() {
       let now = new Date();
       let midnight = new Date(now);
       // comment to test 'daily check'
-      midnight.setHours(24, 0, 0, 0);
+      // midnight.setHours(24, 0, 0, 0);
 
-      //to test 'daily check'
-      // midnight.setHours(14, 40, 0, 0);
-      // if(midnight.getTime() <= now.getTime()){
-      //   midnight.setDate(midnight.getDate() + 1)
-      // }
-      //
+      // to test 'daily check'
+      midnight.setHours(11, 7, 0, 0);
+      if (midnight.getTime() <= now.getTime()) {
+        midnight.setDate(midnight.getDate() + 1)
+      }
+
 
       const timeUntilMidnight = midnight.getTime() - now.getTime();
 
@@ -48,10 +49,28 @@ function App() {
 
   useEffect(() => {
 
-    let hl: Habit[] = JSON.parse((localStorage.getItem('habitsList') || '[]'))
-    setHabitsList(hl)
+    const localStorageHabitList: Habit[] = JSON.parse((localStorage.getItem('habitsList') || '[]'))
+    setHabitsList(localStorageHabitList)
+
+    const localStorageLastResetDate: Date = new Date(localStorage.getItem('lastResetDate') || new Date())
+    localStorageLastResetDate.setHours(0, 0, 0, 0)
+    hasResetToday.current = getHasResetToday(localStorageLastResetDate)
 
   }, [])
+
+  useEffect(() => {
+
+    if (process.env.NODE_ENV === 'development' && initialLoadRef.current) {
+      return
+    }
+
+    if (!hasResetToday.current) {
+      resetDailyHabits()
+      const now: Date = new Date()
+      now.setHours(0, 0, 0, 0)
+      localStorage.setItem('lastResetDate', now.toString())
+    }
+  }, [hasResetToday])
 
   useEffect(() => {
 
@@ -79,6 +98,12 @@ function App() {
         }
       ))
     );
+  }
+
+  function getHasResetToday(lastResetTimestamp: Date) {
+    const now: Date = new Date()
+    now.setHours(0, 0, 0, 0)
+    return !(now.getTime() > lastResetTimestamp.getTime())
   }
 
   function checkDailyHabitStreak(habit: Habit) {
