@@ -16,7 +16,7 @@ function App() {
   const [modalHabits, setModalHabits] = useState<string[]>([])
   const [showNewDayModal, setShowNewDayModal] = useState<boolean>(false)
   const initialLoadRef = useRef(true)
-  const hasResetToday = useRef(false)
+  const hasResetToday = useRef(true)
 
   useEffect(() => {
     let timeoutId: number
@@ -24,15 +24,7 @@ function App() {
     const checkMidnight = () => {
       let now = new Date();
       let midnight = new Date(now);
-      // comment to test 'daily check'
-      // midnight.setHours(24, 0, 0, 0);
-
-      // to test 'daily check'
-      midnight.setHours(21, 21, 0, 0);
-      if (midnight.getTime() <= now.getTime()) {
-        midnight.setDate(midnight.getDate() + 1)
-      }
-
+      midnight.setHours(24, 0, 0, 0);
 
       const timeUntilMidnight = midnight.getTime() - now.getTime();
 
@@ -60,11 +52,9 @@ function App() {
       const lastResetDate: Date = new Date(localStorageLastResetDate)
       lastResetDate.setHours(0, 0, 0, 0)
       hasResetToday.current = getHasResetToday(lastResetDate)
+    } else {
+      saveTodayDateOnLocalStorage()
     }
-    else {
-      hasResetToday.current = false
-    }
-
   }, [])
 
   useEffect(() => {
@@ -75,10 +65,6 @@ function App() {
 
     if (!hasResetToday.current)
       setShowNewDayModal(true)
-
-    const now: Date = new Date()
-    now.setHours(0, 0, 0, 0)
-    localStorage.setItem('lastResetDate', now.toString())
 
   }, [hasResetToday])
 
@@ -98,7 +84,28 @@ function App() {
     return [...habitsList]
   }, [habitFilter, habitsList])
 
+  useEffect(() => {
+    if (showNewDayModal) {
+      const pendingHabits = habitsListFiltered.filter(habit => !habit.done)
+        .map(habit => habit.id)
+      if (pendingHabits.length == 0) {
+        resetDailyHabits()
+        return
+      }
+      setModalHabits(pendingHabits)
+    } else {
+      setModalHabits([])
+    }
+  }, [showNewDayModal])
+
+  function saveTodayDateOnLocalStorage() {
+    const now: Date = new Date()
+    now.setHours(0, 0, 0, 0)
+    localStorage.setItem('lastResetDate', now.toString())
+  }
+
   function resetDailyHabits() {
+    saveTodayDateOnLocalStorage()
     setShowNewDayModal(false)
     setHabitsList(prevHabits =>
       prevHabits.map(habit => (
@@ -154,16 +161,6 @@ function App() {
     )
   }
 
-  useEffect(() => {
-    if (showNewDayModal) {
-      const pendingHabits = habitsListFiltered.filter(habit => !habit.done)
-        .map(habit => habit.id)
-      setModalHabits(pendingHabits)
-    } else {
-      setModalHabits([])
-    }
-  }, [showNewDayModal])
-
   return (
     <div className='m-16 flex flex-col gap-1 w-full md:w-1/2 lg:w-1/4'>
       <div className='flex flex-row justify-between'>
@@ -174,12 +171,12 @@ function App() {
         <Input placeholder='add habit' onSubmit={createNewHabit} submitOnEnter={true}></Input>
         {
           habitsListFiltered.map((habit) => (
-            <HabitBox key={habit.id} habit={habit} updateHabit={updateHabit} deleteHabit={deleteHabit} onlyVisible={false}/>
+            <HabitBox key={habit.id} habit={habit} updateHabit={updateHabit} deleteHabit={deleteHabit} onlyVisible={false} />
           ))
         }
       </Whiteboard>
       {
-        showNewDayModal &&
+        showNewDayModal && modalHabits.length > 0 &&
         <NewDayModal title='check yesterday habits' onStart={resetDailyHabits}>
           {habitsListFiltered.filter(habit => modalHabits.includes(habit.id))
             .map(habit => (
