@@ -1,18 +1,20 @@
 import { CheckIcon, TrashIcon, ForwardIcon } from '@heroicons/react/24/solid'
 import type { Habit } from '../../../types'
-import Modal from '../../modal'
+import Modal from '../../modal/default'
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import Input from '../../input'
 import DayOfWeekSelector from '../../day-of-week-selector'
+import Button from '../../button'
 
 interface HabitBoxProps {
-    habit: Habit
+    habit: Habit,
+    onlyVisible?: boolean,
     updateHabit: (id: string, key: string, value: any) => void,
     deleteHabit: (id: string) => void
 }
 
-export default function HabitBox({ habit, updateHabit, deleteHabit }: HabitBoxProps) {
+export default function HabitBox({ habit, updateHabit, deleteHabit, onlyVisible = true }: HabitBoxProps) {
 
     const { id, title, done, daysOfTheWeek, streak } = habit
     const [showModal, setShowModal] = useState(false)
@@ -53,7 +55,11 @@ export default function HabitBox({ habit, updateHabit, deleteHabit }: HabitBoxPr
             className={`w-full text-lg rounded-lg bg-primary-500 p-2 flex flex-row cursor-pointer items-center gap-2
                 ${done ? 'opacity-50' : ''}
                 `}
-            onClick={openModal}
+            onClick={() => {
+                if (!onlyVisible) {
+                    openModal()
+                }
+            }}
         >
             <div className='h-7 w-7 shrink-0 rounded-sm border border-secondary cursor-pointer' onClick={(e) => {
                 e.stopPropagation()
@@ -69,13 +75,11 @@ export default function HabitBox({ habit, updateHabit, deleteHabit }: HabitBoxPr
                     <p className='grow'>
                         {title}
                     </p>
-                    <button className='h-6 w-6 cursor-pointer' onClick={(e) => {
-                        e.stopPropagation()
-                        deleteHabit(id)
+                    {!onlyVisible &&
+                        <Button style='h-6 w-6' action={() => deleteHabit(id)} type='other'>
+                            <TrashIcon />
+                        </Button>
                     }
-                    }>
-                        <TrashIcon />
-                    </button>
                 </div>
                 <div className='flex justify-end items-center gap-1'>
                     <ForwardIcon className='h-4 w-4' ></ForwardIcon>

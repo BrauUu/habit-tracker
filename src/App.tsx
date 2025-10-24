@@ -7,11 +7,14 @@ import HabitBox from './components/boxes/habitbox'
 import Title from './components/title'
 import Input from './components/input'
 import Filter from './components/filter'
+import NewDayModal from './components/modal/new-day';
 
 function App() {
 
   const [habitsList, setHabitsList] = useState<Habit[]>([])
   const [habitFilter, setHabitFilter] = useState<number | null>(1)
+  const [modalHabits, setModalHabits] = useState<string[]>([])
+  const [showNewDayModal, setShowNewDayModal] = useState<boolean>(false)
   const initialLoadRef = useRef(true)
   const hasResetToday = useRef(false)
 
@@ -25,7 +28,7 @@ function App() {
       // midnight.setHours(24, 0, 0, 0);
 
       // to test 'daily check'
-      midnight.setHours(11, 7, 0, 0);
+      midnight.setHours(21, 21, 0, 0);
       if (midnight.getTime() <= now.getTime()) {
         midnight.setDate(midnight.getDate() + 1)
       }
@@ -34,7 +37,7 @@ function App() {
       const timeUntilMidnight = midnight.getTime() - now.getTime();
 
       timeoutId = setTimeout(() => {
-        resetDailyHabits()
+        setShowNewDayModal(true)
         checkMidnight();
       }, timeUntilMidnight);
     };
@@ -52,9 +55,15 @@ function App() {
     const localStorageHabitList: Habit[] = JSON.parse((localStorage.getItem('habitsList') || '[]'))
     setHabitsList(localStorageHabitList)
 
-    const localStorageLastResetDate: Date = new Date(localStorage.getItem('lastResetDate') || new Date())
-    localStorageLastResetDate.setHours(0, 0, 0, 0)
-    hasResetToday.current = getHasResetToday(localStorageLastResetDate)
+    const localStorageLastResetDate: string | null = localStorage.getItem('lastResetDate')
+    if (localStorageLastResetDate) {
+      const lastResetDate: Date = new Date(localStorageLastResetDate)
+      lastResetDate.setHours(0, 0, 0, 0)
+      hasResetToday.current = getHasResetToday(lastResetDate)
+    }
+    else {
+      hasResetToday.current = false
+    }
 
   }, [])
 
@@ -64,12 +73,13 @@ function App() {
       return
     }
 
-    if (!hasResetToday.current) {
-      resetDailyHabits()
-      const now: Date = new Date()
-      now.setHours(0, 0, 0, 0)
-      localStorage.setItem('lastResetDate', now.toString())
-    }
+    if (!hasResetToday.current)
+      setShowNewDayModal(true)
+
+    const now: Date = new Date()
+    now.setHours(0, 0, 0, 0)
+    localStorage.setItem('lastResetDate', now.toString())
+
   }, [hasResetToday])
 
   useEffect(() => {
@@ -89,6 +99,7 @@ function App() {
   }, [habitFilter, habitsList])
 
   function resetDailyHabits() {
+    setShowNewDayModal(false)
     setHabitsList(prevHabits =>
       prevHabits.map(habit => (
         {
@@ -143,6 +154,16 @@ function App() {
     )
   }
 
+  useEffect(() => {
+    if (showNewDayModal) {
+      const pendingHabits = habitsListFiltered.filter(habit => !habit.done)
+        .map(habit => habit.id)
+      setModalHabits(pendingHabits)
+    } else {
+      setModalHabits([])
+    }
+  }, [showNewDayModal])
+
   return (
     <div className='m-16 flex flex-col gap-1 w-full md:w-1/2 lg:w-1/4'>
       <div className='flex flex-row justify-between'>
@@ -153,10 +174,19 @@ function App() {
         <Input placeholder='add habit' onSubmit={createNewHabit} submitOnEnter={true}></Input>
         {
           habitsListFiltered.map((habit) => (
-            <HabitBox key={habit.id} habit={habit} updateHabit={updateHabit} deleteHabit={deleteHabit} />
+            <HabitBox key={habit.id} habit={habit} updateHabit={updateHabit} deleteHabit={deleteHabit} onlyVisible={false}/>
           ))
         }
       </Whiteboard>
+      {
+        showNewDayModal &&
+        <NewDayModal title='check yesterday habits' onStart={resetDailyHabits}>
+          {habitsListFiltered.filter(habit => modalHabits.includes(habit.id))
+            .map(habit => (
+              <HabitBox key={habit.id} habit={habit} updateHabit={updateHabit} deleteHabit={deleteHabit} />
+            ))}
+        </NewDayModal>
+      }
     </div>
   )
 }

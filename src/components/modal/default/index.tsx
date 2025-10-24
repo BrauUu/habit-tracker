@@ -1,4 +1,5 @@
-import Title from "../title"
+import Button from "../../button"
+import Title from "../../title"
 
 interface ModalProps {
     title: string,
@@ -22,21 +23,8 @@ export default function Modal({title, children, onClose, onSave }: ModalProps) {
                 <div className="flex justify-between items-center">
                     <Title value={title} style="text-lg"></Title>
                     <div className="flex justify-end gap-4">
-                        <button onClick={(e) => {
-                            e.stopPropagation()
-                            onClose()
-                        }} aria-label="close">
-                            cancel
-                        </button>
-                        <button
-                            className='px-1.5 py-0.5 rounded-sm bg-secondary text-primary-500'
-                            onClick={(e) => {
-                                e.stopPropagation()
-                                onSave()
-                            }}
-                        >
-                            save
-                        </button>
+                       <Button action={onClose} type="other" text="cancel"/>
+                       <Button action={onSave} type="primary" text="save"/>
                     </div>
                 </div>
                 {children}

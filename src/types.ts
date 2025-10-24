@@ -5,3 +5,5 @@ export interface Habit {
   streak: number,
   daysOfTheWeek: number[]
 }
+
+export type ButtonType = 'primary' | 'other';
