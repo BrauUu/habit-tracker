@@ -1,5 +1,5 @@
 import { CheckIcon, TrashIcon, ForwardIcon } from '@heroicons/react/24/solid'
-import type { Habit } from '../../../types'
+import type { Habit } from '../../../types/types'
 import Modal from '../../modal/default'
 import { useState } from 'react'
 import { createPortal } from 'react-dom'

@@ -1,25 +1,30 @@
-import { v4 as uuidv4 } from 'uuid';
-import type { Habit } from './types'
 
-import { useEffect, useState, useRef, useMemo } from 'react'
+import { useEffect, useState, useRef, useMemo, useReducer } from 'react'
+import { v4 as uuidv4 } from 'uuid';
+
+import type { Habit } from './types/types'
+import { modalReducer } from './reducers/modalReducer'
+
 import Whiteboard from './components/whiteboard'
 import HabitBox from './components/boxes/habitbox'
 import Title from './components/title'
 import Input from './components/input'
 import Filter from './components/filter'
 import NewDayModal from './components/modal/new-day';
+import Modal from './components/modal/default';
+import DayOfWeekSelector from './components/day-of-week-selector';
 
 function App() {
 
   const [habitsList, setHabitsList] = useState<Habit[]>([])
   const [habitFilter, setHabitFilter] = useState<number | null>(1)
-  const [modalHabits, setModalHabits] = useState<string[]>([])
-  const [showNewDayModal, setShowNewDayModal] = useState<boolean>(false)
+  const [modalState, modalDispatch] = useReducer(modalReducer, { type: null })
   const initialLoadRef = useRef(true)
   const hasResetToday = useRef(true)
+  const hasCheckedPendingHabits = useRef(false)
 
   useEffect(() => {
-    let timeoutId: number
+    let timeoutId: NodeJS.Timeout
 
     const checkMidnight = () => {
       let now = new Date();
@@ -29,7 +34,13 @@ function App() {
       const timeUntilMidnight = midnight.getTime() - now.getTime();
 
       timeoutId = setTimeout(() => {
-        setShowNewDayModal(true)
+        const pendingHabits = habitsList.filter(habit => checkIfItsYesterdaysHabit(habit) && !habit.done)
+          .map(habit => habit.id)
+        if (pendingHabits.length > 0) {
+          modalDispatch({ type: 'showNewDay', payload: pendingHabits })
+        } else {
+          resetDailyHabits()
+        }
         checkMidnight();
       }, timeUntilMidnight);
     };
@@ -63,10 +74,18 @@ function App() {
       return
     }
 
-    if (!hasResetToday.current)
-      setShowNewDayModal(true)
+    if (!hasResetToday.current && habitsList.length > 0 && !hasCheckedPendingHabits.current) {
+      hasCheckedPendingHabits.current = true
+      const pendingHabits = habitsList.filter(habit => checkIfItsYesterdaysHabit(habit) && !habit.done)
+        .map(habit => habit.id)
+      if (pendingHabits.length > 0) {
+        modalDispatch({ type: 'showNewDay', payload: pendingHabits })
+      } else {
+        resetDailyHabits()
+      }
+    }
 
-  }, [hasResetToday])
+  }, [habitsList])
 
   useEffect(() => {
 
@@ -80,23 +99,11 @@ function App() {
 
   const habitsListFiltered = useMemo(() => {
     if (habitFilter === 0) return [...habitsList]
-    if (habitFilter === 1) return habitsList.filter(habit => getTodayHabits(habit))
+    if (habitFilter === 1) return habitsList.filter(habit => checkIfItsTodaysHabit(habit))
     return [...habitsList]
   }, [habitFilter, habitsList])
 
-  useEffect(() => {
-    if (showNewDayModal) {
-      const pendingHabits = habitsListFiltered.filter(habit => !habit.done)
-        .map(habit => habit.id)
-      if (pendingHabits.length == 0) {
-        resetDailyHabits()
-        return
-      }
-      setModalHabits(pendingHabits)
-    } else {
-      setModalHabits([])
-    }
-  }, [showNewDayModal])
+
 
   function saveTodayDateOnLocalStorage() {
     const now: Date = new Date()
@@ -106,7 +113,7 @@ function App() {
 
   function resetDailyHabits() {
     saveTodayDateOnLocalStorage()
-    setShowNewDayModal(false)
+    modalDispatch({ type: 'hideModal' })
     setHabitsList(prevHabits =>
       prevHabits.map(habit => (
         {
@@ -125,7 +132,7 @@ function App() {
   }
 
   function checkDailyHabitStreak(habit: Habit) {
-    if (getTodayHabits(habit)) {
+    if (checkIfItsYesterdaysHabit(habit)) {
       if (habit.done)
         return habit.streak
       return 0
@@ -133,9 +140,20 @@ function App() {
     return habit.streak
   }
 
-  function getTodayHabits(habit: Habit) {
+  function checkIfItsTodaysHabit(habit: Habit) {
     const today = new Date().getDay()
-    return habit.daysOfTheWeek.includes(today)
+    return checkHabitByDay(habit, today)
+  }
+
+  function checkIfItsYesterdaysHabit(habit: Habit) {
+    const today = new Date()
+    const yesterday = new Date(today)
+    yesterday.setDate(today.getDate() - 1);
+    return checkHabitByDay(habit, yesterday.getDay())
+  }
+
+  function checkHabitByDay(habit: Habit, weekDay: number) {
+    return habit.daysOfTheWeek.includes(weekDay)
   }
 
   function createNewHabit(title: string) {
@@ -146,7 +164,18 @@ function App() {
       'streak': 0,
       'daysOfTheWeek': [0, 1, 2, 3, 4, 5, 6]
     }
-    setHabitsList([...habitsList, newHabit])
+    modalDispatch({ type: 'createHabit', payload: newHabit })
+  }
+
+  function finishHabitCreation() {
+    if (modalState.type === 'createHabit' && modalState.data?.habit) {
+      setHabitsList([...habitsList, modalState.data.habit])
+      modalDispatch({ type: 'hideModal' })
+    }
+  }
+
+  function cancelHabitCreation() {
+    modalDispatch({ type: 'hideModal' })
   }
 
   function updateHabit(id: string, key: string, value: any) {
@@ -176,13 +205,35 @@ function App() {
         }
       </Whiteboard>
       {
-        showNewDayModal && modalHabits.length > 0 &&
+        modalState.type === 'newDay' && modalState.data?.pendingHabits &&
         <NewDayModal title='check yesterday habits' onStart={resetDailyHabits}>
-          {habitsListFiltered.filter(habit => modalHabits.includes(habit.id))
+          {habitsList.filter(habit => modalState.data?.pendingHabits?.includes(habit.id))
             .map(habit => (
               <HabitBox key={habit.id} habit={habit} updateHabit={updateHabit} deleteHabit={deleteHabit} />
             ))}
         </NewDayModal>
+      }
+      {
+        modalState.type === 'createHabit' && modalState.data?.habit &&
+        <Modal
+          title={"create habit"}
+          onClose={cancelHabitCreation}
+          onSave={finishHabitCreation}
+        >
+
+          <Input
+            value={modalState.data.habit.title}
+            placeholder='type your habit'
+            onSubmit={(v) => {
+              modalDispatch({ type: 'updateHabitModal', payload: { title: v } })
+            }}
+            onChange={(v) => modalDispatch({ type: 'updateHabitModal', payload: { title: v } })}
+          />
+          <DayOfWeekSelector
+            selectedDaysProps={modalState.data.habit.daysOfTheWeek}
+            onChange={(days) => modalDispatch({ type: 'updateHabitModal', payload: { daysOfTheWeek: days } })}
+          />
+        </Modal>
       }
     </div>
   )
