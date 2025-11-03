@@ -1,8 +1,12 @@
 import { CheckIcon, TrashIcon, ForwardIcon } from '@heroicons/react/24/solid'
-import type { Habit } from '../../../types/types'
-import Modal from '../../modal/default'
-import { useState } from 'react'
+
+import { useReducer } from 'react'
 import { createPortal } from 'react-dom'
+
+import type { Habit } from '../../../types/types'
+import { modalReducer } from '../../../reducers/modalReducer'
+
+import Modal from '../../modal/default'
 import Input from '../../input'
 import DayOfWeekSelector from '../../day-of-week-selector'
 import Button from '../../button'
@@ -17,37 +21,41 @@ interface HabitBoxProps {
 export default function HabitBox({ habit, updateHabit, deleteHabit, onlyVisible = true }: HabitBoxProps) {
 
     const { id, title, done, daysOfTheWeek, streak } = habit
-    const [showModal, setShowModal] = useState(false)
-
-    const [draft, setDraft] = useState<Habit | null>(null)
+    
+    const [modalState, modalDispatch] = useReducer(modalReducer, { type: null })
 
     function onUpdateHabit(key: string, value: any) {
         updateHabit(id, key, value)
     }
 
-    function updateHabitTitle(newTitle: any) {
+    function updateHabitTitle(newTitle: string) {
         onUpdateHabit('title', newTitle)
     }
 
-    function updateHabitDays(newTitle: any) {
-        onUpdateHabit('daysOfTheWeek', newTitle)
+    function updateHabitDays(newDays: number[]) {
+        onUpdateHabit('daysOfTheWeek', newDays)
     }
 
     function openModal() {
-        setDraft({ ...habit })
-        setShowModal(true)
+        modalDispatch({type: "updateHabit", payload: { daysOfTheWeek: daysOfTheWeek, title: title }})
     }
 
     function closeModal() {
-        setShowModal(false)
-        setDraft(null)
+        modalDispatch({type: "hideModal"})
     }
 
     function handleSave() {
-        if (!draft) { closeModal(); return }
-        if (draft.title !== title) updateHabitTitle(draft.title)
-        updateHabitDays(draft.daysOfTheWeek)
+        if (modalState.data?.habit?.title) {
+            updateHabitTitle(modalState.data.habit.title)
+        }
+        if (modalState.data?.habit?.daysOfTheWeek) {
+            updateHabitDays(modalState.data.habit.daysOfTheWeek)
+        }
         closeModal()
+    }
+
+    function onDeleteHabit() {
+        deleteHabit(id)
     }
 
     return (
@@ -76,7 +84,7 @@ export default function HabitBox({ habit, updateHabit, deleteHabit, onlyVisible 
                         {title}
                     </p>
                     {!onlyVisible &&
-                        <Button style='h-6 w-6' action={() => deleteHabit(id)} type='other'>
+                        <Button style='h-6 w-6' action={() => modalDispatch({ type: 'deleteHabit'})} type='other'>
                             <TrashIcon />
                         </Button>
                     }
@@ -86,7 +94,7 @@ export default function HabitBox({ habit, updateHabit, deleteHabit, onlyVisible 
                     {streak}
                 </div>
             </div>
-            {showModal && (
+            { modalState.type === 'updateHabit' && modalState.data?.habit && (
                 createPortal(
                     <Modal
                         title={"edit habit"}
@@ -94,21 +102,34 @@ export default function HabitBox({ habit, updateHabit, deleteHabit, onlyVisible 
                         onSave={handleSave}
                     >
                         <Input
-                            value={draft?.title}
+                            value={modalState.data.habit.title}
                             placeholder='type your habit'
                             onSubmit={(v) => {
-                                setDraft(d => d ? { ...d, 'title': v } : d)
+                                modalDispatch({ type: 'updateHabit', payload: { title: v } })
                                 handleSave()
                             }}
-                            onChange={(v) => setDraft(d => d ? { ...d, 'title': v } : d)}
+                            onChange={(v) => modalDispatch({ type: 'updateHabit', payload: { title: v } })}
                         />
                         <DayOfWeekSelector
-                            selectedDaysProps={draft?.daysOfTheWeek ?? []}
-                            onChange={(days) => setDraft(d => d ? { ...d, 'daysOfTheWeek': days } : d)}
+                            selectedDaysProps={modalState.data.habit.daysOfTheWeek ?? []}
+                            onChange={(days) => modalDispatch({ type: 'updateHabit', payload: { daysOfTheWeek: days } })}
                         />
                     </Modal>
                     , document.body)
             )
+            }
+            {
+                modalState.type === 'deleteHabit' &&
+                createPortal(
+                    <Modal
+                        title={"delete habit"}
+                        onClose={closeModal}
+                        onSave={onDeleteHabit}
+                        confirmButtonText={"delete"}
+                    >
+                        <p>are you sure you want to delete the habit <strong>{title}</strong> ?</p>
+                    </Modal>
+                , document.body )
             }
         </div>
     )

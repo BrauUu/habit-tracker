@@ -3,12 +3,14 @@ import Title from "../../title"
 
 interface ModalProps {
     title: string,
+    confirmButtonText?: string,
+    cancelButtonText?: string,
     children: any,
     onClose: () => void,
     onSave: () => void
 }
 
-export default function Modal({title, children, onClose, onSave }: ModalProps) {
+export default function Modal({title, children, onClose, onSave, confirmButtonText = 'save', cancelButtonText = 'cancel' }: ModalProps) {
     return (
         <div
           className="w-screen h-screen bg-primary-600/60 fixed inset-0 flex items-center justify-center z-50"
@@ -23,8 +25,8 @@ export default function Modal({title, children, onClose, onSave }: ModalProps) {
                 <div className="flex justify-between items-center">
                     <Title value={title} style="text-lg"></Title>
                     <div className="flex justify-end gap-4">
-                       <Button action={onClose} type="other" text="cancel"/>
-                       <Button action={onSave} type="primary" text="save"/>
+                       <Button action={onClose} type="other" text={cancelButtonText}/>
+                       <Button action={onSave} type="primary" text={confirmButtonText}/>
                     </div>
                 </div>
                 {children}

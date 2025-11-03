@@ -8,7 +8,7 @@ export interface Habit {
 
 export type ButtonType = 'primary' | 'other';
 
-export type ModalType = 'newDay' | 'createHabit' | null;
+export type ModalType = 'newDay' | 'createHabit' | 'updateHabit' | 'deleteHabit' | null;
 
 export interface ModalState {
   type: ModalType
@@ -21,5 +21,6 @@ export interface ModalState {
 export type ModalAction =
   | { type: 'showNewDay', payload: string[] }
   | { type: 'createHabit', payload: Habit }
-  | { type: 'updateHabitModal', payload: Partial<Habit> }
+  | { type: 'updateHabit', payload: Partial<Habit>|Habit }
+  | { type: 'deleteHabit' }
   | { type: 'hideModal' }

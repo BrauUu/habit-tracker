@@ -225,13 +225,13 @@ function App() {
             value={modalState.data.habit.title}
             placeholder='type your habit'
             onSubmit={(v) => {
-              modalDispatch({ type: 'updateHabitModal', payload: { title: v } })
+              modalDispatch({ type: 'updateHabit', payload: { title: v } })
             }}
-            onChange={(v) => modalDispatch({ type: 'updateHabitModal', payload: { title: v } })}
+            onChange={(v) => modalDispatch({ type: 'updateHabit', payload: { title: v } })}
           />
           <DayOfWeekSelector
             selectedDaysProps={modalState.data.habit.daysOfTheWeek}
-            onChange={(days) => modalDispatch({ type: 'updateHabitModal', payload: { daysOfTheWeek: days } })}
+            onChange={(days) => modalDispatch({ type: 'updateHabit', payload: { daysOfTheWeek: days } })}
           />
         </Modal>
       }
