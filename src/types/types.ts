@@ -1,9 +1,26 @@
-export interface Habit {
+// Base interface com propriedades comuns
+interface BaseHabit {
   id: string
   title: string
   done: boolean
   streak: number
+}
+
+export interface DailyHabit extends BaseHabit {
+  type: 'daily'
   daysOfTheWeek: number[]
+}
+
+export interface WeeklyHabit extends BaseHabit {
+  type: 'weekly'
+  daysOfTheWeek?: number[]
+}
+
+export type Habit = DailyHabit | WeeklyHabit
+
+export interface HabitsList {
+  dailyHabits: DailyHabit[]
+  weeklyHabits: WeeklyHabit[]
 }
 
 export type ButtonType = 'primary' | 'other';
