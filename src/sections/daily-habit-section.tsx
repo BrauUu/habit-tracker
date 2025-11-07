@@ -107,7 +107,7 @@ export default function DailyHabitsSection({
       >
         <SortableContext
           items={dailyHabits}
-          
+          strategy={verticalListSortingStrategy}trategy={verticalListSortingStrategy}
         >
           <Whiteboard>
             <Input placeholder='add habit' onSubmit={createNewHabit} submitOnEnter={true}></Input>
