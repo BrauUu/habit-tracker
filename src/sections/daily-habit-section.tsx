@@ -1,29 +1,14 @@
 import { useState, useMemo, useReducer } from 'react'
 import { v4 as uuidv4 } from 'uuid';
 
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragOverlay,
-  type DragEndEvent,
-  type DragStartEvent,
-} from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragOverlay, type DragEndEvent, type DragStartEvent } from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 
-import type { DailyHabit, HabitsList } from '../types/types'
+import type { DailyHabit } from '../types/types'
 import { modalReducer } from '../reducers/modalReducer'
 
 import Whiteboard from '../components/whiteboard'
-import {HabitBox, DragOverlayHabitBox} from '../components/boxes/habitbox'
+import { HabitBox, DragOverlayHabitBox } from '../components/boxes/habitbox'
 import Title from '../components/title'
 import Input from '../components/input'
 import Filter from '../components/filter'
@@ -56,7 +41,12 @@ export default function DailyHabitsSection({
   const [modalState, modalDispatch] = useReducer(modalReducer, { type: null })
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+       activationConstraint: {
+        distance: 15,
+        delay: 250,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
@@ -104,7 +94,7 @@ export default function DailyHabitsSection({
   }
 
   return (
-    <div className='m-16 flex flex-col gap-1 w-full md:w-1/2 lg:w-1/4'>
+    <div className='m-16 flex flex-col gap-1 w-full md:w-1/2 lg:w-1/4 max-h-[calc(100%-8rem)]'>
       <div className='flex flex-row justify-between'>
         <Title value='daily habits' />
         <Filter value={dailyHabitFilter} onChange={setDailyHabitFilter} />
@@ -117,7 +107,7 @@ export default function DailyHabitsSection({
       >
         <SortableContext
           items={dailyHabits}
-          strategy={verticalListSortingStrategy}
+          
         >
           <Whiteboard>
             <Input placeholder='add habit' onSubmit={createNewHabit} submitOnEnter={true}></Input>
@@ -130,7 +120,7 @@ export default function DailyHabitsSection({
         </SortableContext>
         <DragOverlay>
           {dragHabit &&
-            <DragOverlayHabitBox key={dragHabit?.id} habit={dragHabit}/>
+            <DragOverlayHabitBox key={dragHabit?.id} habit={dragHabit} />
           }
         </DragOverlay>
       </DndContext>
@@ -139,7 +129,7 @@ export default function DailyHabitsSection({
         <NewDayModal title='check yesterday habits' onStart={onResetDailyHabits}>
           {dailyHabits.filter(habit => pendingHabits.includes(habit.id))
             .map(habit => (
-              <HabitBox key={habit.id} habit={habit} updateHabit={onUpdateDailyHabit} deleteHabit={onDeleteDailyHabit} />
+              <HabitBox key={habit.id} habit={habit} updateHabit={onUpdateDailyHabit} deleteHabit={onDeleteDailyHabit}/>
             ))}
         </NewDayModal>
       }
