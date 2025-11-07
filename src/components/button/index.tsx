@@ -5,7 +5,7 @@ interface ButtonProps {
     type: ButtonType
     children?: any,
     style?: string,
-    action: () => void,
+    action?: () => void,
 }
 
 export default function Button({ text, type, children, style, action}: ButtonProps) {
@@ -24,7 +24,8 @@ export default function Button({ text, type, children, style, action}: ButtonPro
         className={`${getStyleByType(type)} ${style}`}
         onClick={(e) => {
             e.stopPropagation()
-            action()
+            if(action)
+                action()
         }
         }>
             {children ? children : text}

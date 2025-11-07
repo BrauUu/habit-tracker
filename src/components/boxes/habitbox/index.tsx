@@ -1,5 +1,6 @@
 import { CheckIcon, TrashIcon, ForwardIcon } from '@heroicons/react/24/solid'
-
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { useReducer } from 'react'
 import { createPortal } from 'react-dom'
 
@@ -18,11 +19,29 @@ interface HabitBoxProps {
     deleteHabit: (id: string) => void
 }
 
-export default function HabitBox({ habit, updateHabit, deleteHabit, onlyVisible = true }: HabitBoxProps) {
+interface DragOverlayHabitBoxProps {
+    habit: Habit,
+}
+
+export function HabitBox({ habit, updateHabit, deleteHabit, onlyVisible = true }: HabitBoxProps) {
 
     const { id, title, done, daysOfTheWeek, streak } = habit
-    
+
     const [modalState, modalDispatch] = useReducer(modalReducer, { type: null })
+
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+    } = useSortable({ id: id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+    };
+
 
     function onUpdateHabit(key: string, value: any) {
         updateHabit(id, key, value)
@@ -37,11 +56,11 @@ export default function HabitBox({ habit, updateHabit, deleteHabit, onlyVisible 
     }
 
     function openModal() {
-        modalDispatch({type: "updateHabit", payload: { daysOfTheWeek: daysOfTheWeek, title: title }})
+        modalDispatch({ type: "updateHabit", payload: { daysOfTheWeek: daysOfTheWeek, title: title } })
     }
 
     function closeModal() {
-        modalDispatch({type: "hideModal"})
+        modalDispatch({ type: "hideModal" })
     }
 
     function handleSave() {
@@ -63,11 +82,11 @@ export default function HabitBox({ habit, updateHabit, deleteHabit, onlyVisible 
             className={`w-full text-lg rounded-lg bg-primary-500 p-2 flex flex-row cursor-pointer items-center gap-2
                 ${done ? 'opacity-50' : ''}
                 `}
-            onClick={() => {
-                if (!onlyVisible) {
-                    openModal()
-                }
-            }}
+            onClick={() => !onlyVisible ? openModal() : undefined}
+            ref={setNodeRef}
+            {...listeners}
+            {...attributes}
+            style={style}
         >
             <div className='h-7 w-7 shrink-0 rounded-sm border border-secondary cursor-pointer' onClick={(e) => {
                 e.stopPropagation()
@@ -84,7 +103,7 @@ export default function HabitBox({ habit, updateHabit, deleteHabit, onlyVisible 
                         {title}
                     </p>
                     {!onlyVisible &&
-                        <Button style='h-6 w-6' action={() => modalDispatch({ type: 'deleteHabit'})} type='other'>
+                        <Button style='h-6 w-6' action={() => modalDispatch({ type: 'deleteHabit' })} type='other'>
                             <TrashIcon />
                         </Button>
                     }
@@ -94,7 +113,7 @@ export default function HabitBox({ habit, updateHabit, deleteHabit, onlyVisible 
                     {streak}
                 </div>
             </div>
-            { modalState.type === 'updateHabit' && modalState.data?.habit && (
+            {modalState.type === 'updateHabit' && modalState.data?.habit && (
                 createPortal(
                     <Modal
                         title={"edit habit"}
@@ -129,8 +148,37 @@ export default function HabitBox({ habit, updateHabit, deleteHabit, onlyVisible 
                     >
                         <p>are you sure you want to delete the habit <strong>{title}</strong> ?</p>
                     </Modal>
-                , document.body )
+                    , document.body)
             }
+        </div>
+    )
+}
+
+export function DragOverlayHabitBox({ habit }: DragOverlayHabitBoxProps) {
+
+    const { title, done, streak } = habit
+
+    return (
+        <div className={`w-full text-lg rounded-lg bg-primary-500 p-2 flex flex-row cursor-pointer items-center gap-2 opacity-80`}>
+            <div className='h-7 w-7 shrink-0 rounded-sm border border-secondary cursor-pointer'>
+                {
+                    done && <CheckIcon />
+                }
+            </div>
+            <div className='flex flex-col grow'>
+                <div className=' flex items-center justify-between gap-2'>
+                    <p className='grow'>
+                        {title}
+                    </p>
+                    <Button style='h-6 w-6' type='other'>
+                        <TrashIcon />
+                    </Button>
+                </div>
+                <div className='flex justify-end items-center gap-1'>
+                    <ForwardIcon className='h-4 w-4' ></ForwardIcon>
+                    {streak}
+                </div>
+            </div>
         </div>
     )
 }

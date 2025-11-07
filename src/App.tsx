@@ -1,5 +1,4 @@
-
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 
 import type { DailyHabit, Habit, HabitsList } from './types/types'
 
@@ -16,40 +15,46 @@ function App() {
   const initialLoadRef = useRef(true)
   const hasResetToday = useRef(true)
   const hasCheckedPendingHabits = useRef(false)
+  const habitsRef = useRef(habitsList)
+
+  useEffect(() => {
+    habitsRef.current = habitsList
+  }, [habitsList])
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout
 
     const checkMidnight = () => {
-      let now = new Date();
-      let midnight = new Date(now);
-      midnight.setHours(24, 0, 0, 0);
+      const now = new Date()
+      const midnight = new Date(now)
+      midnight.setHours(24, 0, 0, 0)
 
-      const timeUntilMidnight = midnight.getTime() - now.getTime();
+      const timeUntilMidnight = midnight.getTime() - now.getTime()
 
       timeoutId = setTimeout(() => {
-        const pendingHabits = habitsList.dailyHabits.filter(habit => checkIfItsYesterdaysHabit(habit) && !habit.done)
-          .map(habit => habit.id)
+        const pendingHabits = getPendingHabits()
+
         if (pendingHabits.length > 0) {
           setPendingDailyHabits(pendingHabits)
         } else {
           resetDailyHabits()
         }
-        checkMidnight();
-      }, timeUntilMidnight);
-    };
+        checkMidnight()
+      }, timeUntilMidnight)
+    }
 
-    checkMidnight();
+    checkMidnight()
 
     return () => {
-      if (timeoutId)
-        clearTimeout(timeoutId);
-    };
-  }, [habitsList.dailyHabits]);
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
+    }
+  }, [])
 
   useEffect(() => {
     const localStorageHabitList: HabitsList = JSON.parse((localStorage.getItem('habitsList') || '[]'))
-    
+
     const dailyHabits = localStorageHabitList?.dailyHabits
     const weeklyHabits = localStorageHabitList?.weeklyHabits
     setHabitsList({
@@ -72,10 +77,11 @@ function App() {
       return
     }
 
+    habitsList.dailyHabits.sort((habitA, habitB) => habitA.order - habitB.order)
+
     if (!hasResetToday.current && habitsList.dailyHabits.length > 0 && !hasCheckedPendingHabits.current) {
       hasCheckedPendingHabits.current = true
-      const pendingHabits = habitsList.dailyHabits.filter(habit => checkIfItsYesterdaysHabit(habit) && !habit.done)
-        .map(habit => habit.id)
+      const pendingHabits = getPendingHabits()
       if (pendingHabits.length > 0) {
         setPendingDailyHabits(pendingHabits)
       } else {
@@ -96,10 +102,16 @@ function App() {
   function updateDailyHabit(id: string, key: string, value: any) {
     setHabitsList(prevState => ({
       ...prevState,
-      dailyHabits: prevState.dailyHabits.map(habit => 
+      dailyHabits: prevState.dailyHabits.map(habit =>
         habit.id === id ? { ...habit, [key]: value } : habit
       )
     }))
+  }
+
+  function getPendingHabits() {
+    return habitsRef.current.dailyHabits
+      .filter(habit => checkIfItsYesterdaysHabit(habit) && !habit.done)
+      .map(habit => habit.id)
   }
 
   function deleteDailyHabit(id: string) {
@@ -158,22 +170,29 @@ function App() {
   }
 
   function checkHabitByDay(habit: Habit, weekDay: number) {
-    if(habit?.daysOfTheWeek)
+    if (habit?.daysOfTheWeek)
       return habit.daysOfTheWeek.includes(weekDay)
   }
+
+  const setDailyHabits = useCallback((updater: (dailyHabits: DailyHabit[]) => DailyHabit[]) => {
+    setHabitsList(prev => ({
+      ...prev,
+      dailyHabits: updater(prev.dailyHabits)
+    }))
+  }, [])
 
   return (
     <div className='flex flex-col gap-8'>
       <DailyHabitsSection
         dailyHabits={habitsList.dailyHabits}
+        setDailyHabits={setDailyHabits}
         onUpdateDailyHabit={updateDailyHabit}
         onDeleteDailyHabit={deleteDailyHabit}
         onAddDailyHabit={addDailyHabit}
         onResetDailyHabits={resetDailyHabits}
         pendingHabits={pendingDailyHabits}
       />
-
-    </div>
+    </div >
   )
 }
 

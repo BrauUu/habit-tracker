@@ -4,6 +4,7 @@ interface BaseHabit {
   title: string
   done: boolean
   streak: number
+  order: number
 }
 
 export interface DailyHabit extends BaseHabit {
