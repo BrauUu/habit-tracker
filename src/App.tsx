@@ -8,7 +8,6 @@ function App() {
 
   const [habitsList, setHabitsList] = useState<HabitsList>({
     dailyHabits: [],
-    weeklyHabits: []
   })
   const [pendingDailyHabits, setPendingDailyHabits] = useState<string[]>([])
 
@@ -56,10 +55,8 @@ function App() {
     const localStorageHabitList: HabitsList = JSON.parse((localStorage.getItem('habitsList') || '[]'))
 
     const dailyHabits = localStorageHabitList?.dailyHabits
-    const weeklyHabits = localStorageHabitList?.weeklyHabits
     setHabitsList({
-      dailyHabits,
-      weeklyHabits
+      dailyHabits
     })
 
     const localStorageLastResetDate: string | null = localStorage.getItem('lastResetDate')

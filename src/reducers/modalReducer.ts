@@ -39,7 +39,12 @@ export function modalReducer(state: ModalState, action: ModalAction): ModalState
       }
 
     case 'deleteHabit':
-      return { type: 'deleteHabit'}
+      return {
+        type: 'deleteHabit',
+        data: {
+          habit: { ...action.payload } as Habit
+        }
+      }
     case 'hideModal':
       return { type: null }
 

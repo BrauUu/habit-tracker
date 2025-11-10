@@ -42,9 +42,8 @@ export default function DailyHabitsSection({
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
-       activationConstraint: {
+      activationConstraint: {
         distance: 15,
-        delay: 250,
       },
     }),
     useSensor(KeyboardSensor, {
@@ -93,6 +92,21 @@ export default function DailyHabitsSection({
     modalDispatch({ type: 'hideModal' })
   }
 
+
+  function closeModal() {
+    modalDispatch({ type: "hideModal" })
+  }
+
+  function handleSave() {
+    if (modalState.data?.habit?.title) {
+      onUpdateDailyHabit(modalState.data.habit.id, 'title', modalState.data.habit.title)
+    }
+    if (modalState.data?.habit?.daysOfTheWeek) {
+      onUpdateDailyHabit(modalState.data.habit.id, 'daysOfTheWeek', modalState.data.habit.daysOfTheWeek)
+    }
+    closeModal()
+  }
+
   return (
     <div className='m-16 flex flex-col gap-1 w-full md:w-1/2 lg:w-1/4 max-h-[calc(100%-8rem)]'>
       <div className='flex flex-row justify-between'>
@@ -107,13 +121,19 @@ export default function DailyHabitsSection({
       >
         <SortableContext
           items={dailyHabits}
-          strategy={verticalListSortingStrategy}trategy={verticalListSortingStrategy}
+          strategy={verticalListSortingStrategy}
         >
           <Whiteboard>
             <Input placeholder='add habit' onSubmit={createNewHabit} submitOnEnter={true}></Input>
             {
               habitsListFiltered.map((habit) => (
-                <HabitBox key={habit.id} habit={habit} updateHabit={onUpdateDailyHabit} deleteHabit={onDeleteDailyHabit} onlyVisible={false} />
+                <HabitBox 
+                  key={habit.id} 
+                  habit={habit} 
+                  updateHabit={onUpdateDailyHabit} 
+                  onlyVisible={false} 
+                  modalDispatch={modalDispatch}
+                />
               ))
             }
           </Whiteboard>
@@ -129,7 +149,7 @@ export default function DailyHabitsSection({
         <NewDayModal title='check yesterday habits' onStart={onResetDailyHabits}>
           {dailyHabits.filter(habit => pendingHabits.includes(habit.id))
             .map(habit => (
-              <HabitBox key={habit.id} habit={habit} updateHabit={onUpdateDailyHabit} deleteHabit={onDeleteDailyHabit}/>
+              <HabitBox key={habit.id} habit={habit} updateHabit={onUpdateDailyHabit} />
             ))}
         </NewDayModal>
       }
@@ -153,6 +173,44 @@ export default function DailyHabitsSection({
             selectedDaysProps={modalState.data.habit.daysOfTheWeek || []}
             onChange={(days) => modalDispatch({ type: 'updateHabit', payload: { daysOfTheWeek: days } })}
           />
+        </Modal>
+      }
+      {modalState.type === 'updateHabit' && modalState.data?.habit &&
+        <Modal
+          title={"edit habit"}
+          onClose={closeModal}
+          onSave={handleSave}
+        >
+          <Input
+            value={modalState.data.habit.title}
+            placeholder='type your habit'
+            onSubmit={(v) => {
+              modalDispatch({ type: 'updateHabit', payload: { title: v } })
+              handleSave()
+            }}
+            onChange={(v) => modalDispatch({ type: 'updateHabit', payload: { title: v } })}
+          />
+          <DayOfWeekSelector
+            selectedDaysProps={modalState.data.habit.daysOfTheWeek ?? []}
+            onChange={(days) => modalDispatch({ type: 'updateHabit', payload: { daysOfTheWeek: days } })}
+          />
+        </Modal>
+      }
+
+      {
+        modalState.type === 'deleteHabit' && modalState.data?.habit &&
+        <Modal
+          title={"delete habit"}
+          onClose={closeModal}
+          onSave={() => {
+            if (modalState.data?.habit?.id)
+              onDeleteDailyHabit(modalState.data.habit.id)
+            closeModal()
+          }
+          }
+          confirmButtonText={"delete"}
+        >
+          <p>are you sure you want to delete the habit <strong>{modalState.data.habit.title}</strong> ?</p>
         </Modal>
       }
     </div >

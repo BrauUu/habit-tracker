@@ -12,16 +12,10 @@ export interface DailyHabit extends BaseHabit {
   daysOfTheWeek: number[]
 }
 
-export interface WeeklyHabit extends BaseHabit {
-  type: 'weekly'
-  daysOfTheWeek?: number[]
-}
-
-export type Habit = DailyHabit | WeeklyHabit
+export type Habit = DailyHabit
 
 export interface HabitsList {
   dailyHabits: DailyHabit[]
-  weeklyHabits: WeeklyHabit[]
 }
 
 export type ButtonType = 'primary' | 'other';
@@ -40,5 +34,5 @@ export type ModalAction =
   | { type: 'showNewDay', payload: string[] }
   | { type: 'createHabit', payload: Habit }
   | { type: 'updateHabit', payload: Partial<Habit>|Habit }
-  | { type: 'deleteHabit' }
+  | { type: 'deleteHabit', payload: Partial<Habit> }
   | { type: 'hideModal' }
