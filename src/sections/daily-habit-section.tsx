@@ -108,9 +108,10 @@ export default function DailyHabitsSection({
   }
 
   return (
-    <div className='m-16 flex flex-col gap-1 w-full md:w-1/2 lg:w-1/4 max-h-[calc(100%-8rem)]'>
+    <div 
+    className={`m-16 flex flex-col gap-1 w-full md:w-1/2 lg:w-1/4 max-h-[calc(100%-8rem)] `}>
       <div className='flex flex-row justify-between'>
-        <Title value='daily habits' />
+        <Title value='daily' />
         <Filter value={dailyHabitFilter} onChange={setDailyHabitFilter} />
       </div>
       <DndContext
@@ -227,11 +228,15 @@ export default function DailyHabitsSection({
         return arrayMove(dailyHabits, oldIndex, newIndex);
       });
     }
+    
+    setDragHabit(null);
+    document.body.classList.remove('dragging');
   }
 
   function handleDragStart(event: DragStartEvent) {
     const { active } = event;
     const habit = dailyHabits.find(h => h.id === active.id) ?? null;
     setDragHabit(habit);
+    document.body.classList.add('dragging');
   }
 }

@@ -91,8 +91,8 @@ export function DragOverlayHabitBox({ habit }: DragOverlayHabitBoxProps) {
     const { title, done, streak } = habit
 
     return (
-        <div className={`w-full text-lg rounded-lg bg-primary-500 p-2 flex flex-row cursor-pointer items-center gap-2 opacity-80`}>
-            <div className='h-7 w-7 shrink-0 rounded-sm border border-secondary cursor-pointer'>
+        <div className={`w-full text-lg rounded-lg bg-primary-500 p-2 flex flex-row items-center gap-2 opacity-80 cursor-grabbing`}>
+            <div className='h-7 w-7 shrink-0 rounded-sm border border-secondary'>
                 {
                     done && <CheckIcon />
                 }

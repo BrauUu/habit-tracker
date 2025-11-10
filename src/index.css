@@ -23,3 +23,8 @@ html {
     @apply cursor-pointer;
   }
 }
+
+body.dragging,
+body.dragging * {
+  cursor: grabbing !important;
+}
