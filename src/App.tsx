@@ -1,13 +1,15 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 
-import type { DailyHabit, Habit, HabitsList } from './types/types'
+import type { DailyHabit, CounterHabit, HabitsList } from './types/types'
 
 import DailyHabitsSection from './sections/daily-habit-section'
+import CounterHabitsSection from './sections/counter-habit-section'
 
 function App() {
 
   const [habitsList, setHabitsList] = useState<HabitsList>({
     dailyHabits: [],
+    counterHabits: []
   })
   const [pendingDailyHabits, setPendingDailyHabits] = useState<string[]>([])
 
@@ -53,10 +55,12 @@ function App() {
 
   useEffect(() => {
     const localStorageHabitList: HabitsList = JSON.parse((localStorage.getItem('habitsList') || '[]'))
-
     const dailyHabits = localStorageHabitList?.dailyHabits
+    const counterHabits = localStorageHabitList?.counterHabits
+
     setHabitsList({
-      dailyHabits
+      dailyHabits,
+      counterHabits
     })
 
     const localStorageLastResetDate: string | null = localStorage.getItem('lastResetDate')
@@ -73,8 +77,6 @@ function App() {
     if (process.env.NODE_ENV === 'development' && initialLoadRef.current) {
       return
     }
-
-    habitsList.dailyHabits.sort((habitA, habitB) => habitA.order - habitB.order)
 
     if (!hasResetToday.current && habitsList.dailyHabits.length > 0 && !hasCheckedPendingHabits.current) {
       hasCheckedPendingHabits.current = true
@@ -93,7 +95,7 @@ function App() {
       return
     }
 
-    localStorage.setItem('habitsList', JSON.stringify(habitsList))
+    localStorage.setItem('habitsList', JSON.stringify([...habitsList.dailyHabits, ...habitsList.counterHabits]))
   }, [habitsList])
 
   function updateDailyHabit(id: string, key: string, value: any) {
@@ -115,6 +117,29 @@ function App() {
     setHabitsList(prevState => ({
       ...prevState,
       dailyHabits: prevState.dailyHabits.filter(habit => habit.id !== id)
+    }))
+  }
+
+  function updateCounterHabit(id: string, key: string, value: any) {
+    setHabitsList(prevState => ({
+      ...prevState,
+      counterHabits: prevState.counterHabits.map(habit =>
+        habit.id === id ? { ...habit, [key]: value } : habit
+      )
+    }))
+  }
+
+  function deleteCounterHabit(id: string) {
+    setHabitsList(prevState => ({
+      ...prevState,
+      counterHabits: prevState.counterHabits.filter(habit => habit.id !== id)
+    }))
+  }
+
+  function addCounterHabit(habit: CounterHabit) {
+    setHabitsList(prevState => ({
+      ...prevState,
+      counterHabits: [...prevState.counterHabits, habit]
     }))
   }
 
@@ -150,7 +175,7 @@ function App() {
     return !(now.getTime() > lastResetTimestamp.getTime())
   }
 
-  function checkDailyHabitStreak(habit: Habit) {
+  function checkDailyHabitStreak(habit: DailyHabit) {
     if (checkIfItsYesterdaysHabit(habit)) {
       if (habit.done)
         return habit.streak
@@ -159,16 +184,15 @@ function App() {
     return habit.streak
   }
 
-  function checkIfItsYesterdaysHabit(habit: Habit) {
+  function checkIfItsYesterdaysHabit(habit: DailyHabit) {
     const today = new Date()
     const yesterday = new Date(today)
     yesterday.setDate(today.getDate() - 1);
     return checkHabitByDay(habit, yesterday.getDay())
   }
 
-  function checkHabitByDay(habit: Habit, weekDay: number) {
-    if (habit?.daysOfTheWeek)
-      return habit.daysOfTheWeek.includes(weekDay)
+  function checkHabitByDay(habit: DailyHabit, weekDay: number) {
+    return habit.daysOfTheWeek.includes(weekDay)
   }
 
   const setDailyHabits = useCallback((updater: (dailyHabits: DailyHabit[]) => DailyHabit[]) => {
@@ -188,6 +212,13 @@ function App() {
         onAddDailyHabit={addDailyHabit}
         onResetDailyHabits={resetDailyHabits}
         pendingHabits={pendingDailyHabits}
+      />
+      
+      <CounterHabitsSection
+        counterHabits={habitsList.counterHabits}
+        onUpdateCounterHabit={updateCounterHabit}
+        onDeleteCounterHabit={deleteCounterHabit}
+        onAddCounterHabit={addCounterHabit}
       />
     </div >
   )

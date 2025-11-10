@@ -74,16 +74,18 @@ export default function DailyHabitsSection({
       'title': title,
       'done': false,
       'streak': 0,
-      'order': dailyHabits.length + 1,
+      'type': 'daily',
       'daysOfTheWeek': [0, 1, 2, 3, 4, 5, 6],
-      'type': 'daily'
     }
     modalDispatch({ type: 'createHabit', payload: newHabit })
   }
 
   function finishHabitCreation() {
-    if (modalState.type === 'createHabit' && modalState.data?.habit?.type == 'daily') {
-      onAddDailyHabit(modalState.data.habit)
+    const habit = modalState.data?.habit
+    if (!habit) return
+
+    if (modalState.type === 'createHabit' && habit.type === 'daily') {
+      onAddDailyHabit(habit)
       modalDispatch({ type: 'hideModal' })
     }
   }
@@ -98,18 +100,23 @@ export default function DailyHabitsSection({
   }
 
   function handleSave() {
-    if (modalState.data?.habit?.title) {
-      onUpdateDailyHabit(modalState.data.habit.id, 'title', modalState.data.habit.title)
-    }
-    if (modalState.data?.habit?.daysOfTheWeek) {
-      onUpdateDailyHabit(modalState.data.habit.id, 'daysOfTheWeek', modalState.data.habit.daysOfTheWeek)
+    const habit = modalState.data?.habit
+    if (!habit) return
+
+    if (habit.type === 'daily') {
+      if (habit.title) {
+        onUpdateDailyHabit(habit.id, 'title', habit.title)
+      }
+      if (habit.daysOfTheWeek) {
+        onUpdateDailyHabit(habit.id, 'daysOfTheWeek', habit.daysOfTheWeek)
+      }
     }
     closeModal()
   }
 
   return (
-    <div 
-    className={`m-16 flex flex-col gap-1 w-full md:w-1/2 lg:w-1/4 max-h-[calc(100%-8rem)] `}>
+    <div
+      className={`m-16 flex flex-col gap-1 w-full md:w-1/2 lg:w-1/4 max-h-[calc(100%-8rem)] `}>
       <div className='flex flex-row justify-between'>
         <Title value='daily' />
         <Filter value={dailyHabitFilter} onChange={setDailyHabitFilter} />
@@ -128,11 +135,11 @@ export default function DailyHabitsSection({
             <Input placeholder='add habit' onSubmit={createNewHabit} submitOnEnter={true}></Input>
             {
               habitsListFiltered.map((habit) => (
-                <HabitBox 
-                  key={habit.id} 
-                  habit={habit} 
-                  updateHabit={onUpdateDailyHabit} 
-                  onlyVisible={false} 
+                <HabitBox
+                  key={habit.id}
+                  habit={habit}
+                  updateHabit={onUpdateDailyHabit}
+                  onlyVisible={false}
                   modalDispatch={modalDispatch}
                 />
               ))
@@ -171,7 +178,11 @@ export default function DailyHabitsSection({
             onChange={(v) => modalDispatch({ type: 'updateHabit', payload: { title: v } })}
           />
           <DayOfWeekSelector
-            selectedDaysProps={modalState.data.habit.daysOfTheWeek || []}
+            selectedDaysProps={
+              modalState.data.habit.type === 'daily'
+                ? modalState.data.habit.daysOfTheWeek
+                : []
+            }
             onChange={(days) => modalDispatch({ type: 'updateHabit', payload: { daysOfTheWeek: days } })}
           />
         </Modal>
@@ -192,7 +203,11 @@ export default function DailyHabitsSection({
             onChange={(v) => modalDispatch({ type: 'updateHabit', payload: { title: v } })}
           />
           <DayOfWeekSelector
-            selectedDaysProps={modalState.data.habit.daysOfTheWeek ?? []}
+            selectedDaysProps={
+              modalState.data.habit.type === 'daily'
+                ? modalState.data.habit.daysOfTheWeek
+                : []
+            }
             onChange={(days) => modalDispatch({ type: 'updateHabit', payload: { daysOfTheWeek: days } })}
           />
         </Modal>
@@ -228,7 +243,7 @@ export default function DailyHabitsSection({
         return arrayMove(dailyHabits, oldIndex, newIndex);
       });
     }
-    
+
     setDragHabit(null);
     document.body.classList.remove('dragging');
   }
