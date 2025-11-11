@@ -1,4 +1,5 @@
-import type { ModalState, ModalAction, Habit } from '../types/types'
+import type { Habit } from '../types/habit'
+import type { ModalState, ModalAction } from '../types/modal'
 
 export function modalReducer(state: ModalState, action: ModalAction): ModalState {
   switch (action.type) {
@@ -19,7 +20,7 @@ export function modalReducer(state: ModalState, action: ModalAction): ModalState
         return {
           ...state,
           data: {
-            habit: { ...state.data.habit, ...action.payload }
+            habit: { ...state.data.habit, ...action.payload } as Habit
           }
         }
       }
@@ -27,7 +28,7 @@ export function modalReducer(state: ModalState, action: ModalAction): ModalState
         return {
           ...state,
           data: {
-            habit: { ...state.data.habit, ...action.payload }
+            habit: { ...state.data.habit, ...action.payload } as Habit
           }
         }
       }

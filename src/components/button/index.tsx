@@ -1,4 +1,4 @@
-import type { ButtonType } from "../../types/types"
+import type { ButtonType } from "../../types/others"
 
 interface ButtonProps {
     text?: string,

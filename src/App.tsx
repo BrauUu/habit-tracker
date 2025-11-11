@@ -1,15 +1,15 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 
-import type { DailyHabit, CounterHabit, HabitsList } from './types/types'
+import type { DailyHabit, IncrementalHabit, HabitsList } from './types/habit'
 
 import DailyHabitsSection from './sections/daily-habit-section'
-import CounterHabitsSection from './sections/counter-habit-section'
+import IncrementalHabitsSection from './sections/incremental-habit-section'
 
 function App() {
 
   const [habitsList, setHabitsList] = useState<HabitsList>({
     dailyHabits: [],
-    counterHabits: []
+    incrementalHabits: []
   })
   const [pendingDailyHabits, setPendingDailyHabits] = useState<string[]>([])
 
@@ -55,12 +55,12 @@ function App() {
 
   useEffect(() => {
     const localStorageHabitList: HabitsList = JSON.parse((localStorage.getItem('habitsList') || '[]'))
-    const dailyHabits = localStorageHabitList?.dailyHabits
-    const counterHabits = localStorageHabitList?.counterHabits
+    const dailyHabits = localStorageHabitList?.dailyHabits || []
+    const incrementalHabits = localStorageHabitList?.incrementalHabits || []
 
     setHabitsList({
       dailyHabits,
-      counterHabits
+      incrementalHabits
     })
 
     const localStorageLastResetDate: string | null = localStorage.getItem('lastResetDate')
@@ -95,7 +95,7 @@ function App() {
       return
     }
 
-    localStorage.setItem('habitsList', JSON.stringify([...habitsList.dailyHabits, ...habitsList.counterHabits]))
+    localStorage.setItem('habitsList', JSON.stringify(habitsList))
   }, [habitsList])
 
   function updateDailyHabit(id: string, key: string, value: any) {
@@ -120,26 +120,26 @@ function App() {
     }))
   }
 
-  function updateCounterHabit(id: string, key: string, value: any) {
+  function updateIncrementalHabit(id: string, key: string, value: any) {
     setHabitsList(prevState => ({
       ...prevState,
-      counterHabits: prevState.counterHabits.map(habit =>
+      incrementalHabits: prevState.incrementalHabits.map(habit =>
         habit.id === id ? { ...habit, [key]: value } : habit
       )
     }))
   }
 
-  function deleteCounterHabit(id: string) {
+  function deleteIncrementalHabit(id: string) {
     setHabitsList(prevState => ({
       ...prevState,
-      counterHabits: prevState.counterHabits.filter(habit => habit.id !== id)
+      incrementalHabits: prevState.incrementalHabits.filter(habit => habit.id !== id)
     }))
   }
 
-  function addCounterHabit(habit: CounterHabit) {
+  function addIncrementalHabit(habit: IncrementalHabit) {
     setHabitsList(prevState => ({
       ...prevState,
-      counterHabits: [...prevState.counterHabits, habit]
+      incrementalHabits: [...prevState.incrementalHabits, habit]
     }))
   }
 
@@ -202,8 +202,23 @@ function App() {
     }))
   }, [])
 
+
+  const setIncrementalHabits = useCallback((updater: (incrementalHabits: IncrementalHabit[]) => IncrementalHabit[]) => {
+    setHabitsList(prev => ({
+      ...prev,
+      incrementalHabits: updater(prev.incrementalHabits)
+    }))
+  }, [])
+
   return (
-    <div className='flex flex-col gap-8 h-screen'>
+    <div className='flex flex-row gap-8 h-screen p-16'>
+      <IncrementalHabitsSection
+        incrementalHabits={habitsList.incrementalHabits}
+        setIncrementalHabits={setIncrementalHabits}
+        onUpdateIncrementalHabit={updateIncrementalHabit}
+        onDeleteIncrementalHabit={deleteIncrementalHabit}
+        onAddIncrementalHabit={addIncrementalHabit}
+      />
       <DailyHabitsSection
         dailyHabits={habitsList.dailyHabits}
         setDailyHabits={setDailyHabits}
@@ -214,12 +229,6 @@ function App() {
         pendingHabits={pendingDailyHabits}
       />
       
-      <CounterHabitsSection
-        counterHabits={habitsList.counterHabits}
-        onUpdateCounterHabit={updateCounterHabit}
-        onDeleteCounterHabit={deleteCounterHabit}
-        onAddCounterHabit={addCounterHabit}
-      />
     </div >
   )
 }

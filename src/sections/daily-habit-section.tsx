@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragOverlay, type DragEndEvent, type DragStartEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 
-import type { DailyHabit } from '../types/types'
+import type { DailyHabit } from '../types/habit'
 import { modalReducer } from '../reducers/modalReducer'
 
 import Whiteboard from '../components/whiteboard'
@@ -116,7 +116,7 @@ export default function DailyHabitsSection({
 
   return (
     <div
-      className={`m-16 flex flex-col gap-1 w-full md:w-1/2 lg:w-1/4 max-h-[calc(100%-8rem)] `}>
+      className={`flex flex-col gap-1 w-full md:w-1/2 lg:w-1/4 max-h-full `}>
       <div className='flex flex-row justify-between'>
         <Title value='daily' />
         <Filter value={dailyHabitFilter} onChange={setDailyHabitFilter} />

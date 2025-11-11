@@ -2,22 +2,23 @@ import { PlusIcon, MinusIcon, TrashIcon } from '@heroicons/react/24/solid'
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-import type { CounterHabit, ModalAction } from '../../../types/types'
+import type { IncrementalHabit } from '../../../types/habit'
+import type { ModalAction } from '../../../types/modal'
 
 import Button from '../../button'
 
-interface CounterHabitBoxProps {
-    habit: CounterHabit,
+interface IncrementalHabitBoxProps {
+    habit: IncrementalHabit,
     onlyVisible?: boolean,
     updateHabit: (id: string, key: string, value: any) => void,
     modalDispatch?: (action: ModalAction) => void
 }
 
-interface DragOverlayCounterHabitBoxProps {
-    habit: CounterHabit,
+interface DragOverlayIncrementalHabitBoxProps {
+    habit: IncrementalHabit,
 }
 
-export function CounterHabitBox({ habit, onlyVisible = true, updateHabit, modalDispatch }: CounterHabitBoxProps) {
+export function IncrementalHabitBox({ habit, onlyVisible = true, updateHabit, modalDispatch }: IncrementalHabitBoxProps) {
 
     const { id, title, positiveCount, negativeCount } = habit
 
@@ -41,7 +42,7 @@ export function CounterHabitBox({ habit, onlyVisible = true, updateHabit, modalD
 
     return (
         <div
-            className={`w-full text-lg rounded-lg bg-primary-500 p-2 flex flex-row cursor-grab active:cursor-grabbing items-center gap-2`}
+            className={`w-full text-lg rounded-lg bg-primary-500 p-2 flex flex-row cursor-pointer items-center gap-2`}
             onClick={() => {
                 if (modalDispatch)
                     modalDispatch({ type: "updateHabit", payload: { id, title } })
@@ -53,7 +54,7 @@ export function CounterHabitBox({ habit, onlyVisible = true, updateHabit, modalD
         >
             <div className='flex flex-col gap-1 shrink-0'>
                 <button 
-                    className='h-7 w-7 rounded-sm bg-green-600 hover:bg-green-700 flex items-center justify-center transition-colors' 
+                    className='h-7 w-7 rounded-sm flex items-center justify-center transition-colors' 
                     onClick={(e) => {
                         e.stopPropagation()
                         updateHabit(id, "positiveCount", positiveCount + 1)
@@ -62,7 +63,7 @@ export function CounterHabitBox({ habit, onlyVisible = true, updateHabit, modalD
                     <PlusIcon className='h-5 w-5' />
                 </button>
                 <button 
-                    className='h-7 w-7 rounded-sm bg-red-600 hover:bg-red-700 flex items-center justify-center transition-colors' 
+                    className='h-7 w-7 rounded-sm flex items-center justify-center transition-colors' 
                     onClick={(e) => {
                         e.stopPropagation()
                         updateHabit(id, "negativeCount", negativeCount + 1)
@@ -93,23 +94,21 @@ export function CounterHabitBox({ habit, onlyVisible = true, updateHabit, modalD
                 
                 <div className='flex items-center gap-2 text-sm'>
                     <div className='flex items-center gap-1'>
-                        <span className='text-green-400'>+{positiveCount}</span>
-                        <span className='text-secondary/50'>/</span>
-                        <span className='text-red-400'>-{negativeCount}</span>
+                        <span className=''>+{positiveCount}</span>
+                        <span className=''>/</span>
+                        <span className=''>-{negativeCount}</span>
                     </div>
                     <span className='text-secondary/50'>•</span>
-                    <span className={`font-bold ${total >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    <span className={`font-bold`}>
                         {total >= 0 ? '+' : ''}{total}
                     </span>
-                    <span className='text-secondary/50'>•</span>
-                    <span className='text-secondary/70'>{percentage}%</span>
                 </div>
             </div>
         </div>
     )
 }
 
-export function DragOverlayCounterHabitBox({ habit }: DragOverlayCounterHabitBoxProps) {
+export function DragOverlayIncrementalHabitBox({ habit }: DragOverlayIncrementalHabitBoxProps) {
 
     const { title, positiveCount, negativeCount } = habit
     const total = positiveCount - negativeCount;
@@ -120,10 +119,10 @@ export function DragOverlayCounterHabitBox({ habit }: DragOverlayCounterHabitBox
     return (
         <div className={`w-full text-lg rounded-lg bg-primary-500 p-2 flex flex-row items-center gap-2 opacity-80 cursor-grabbing`}>
             <div className='flex flex-col gap-1 shrink-0'>
-                <div className='h-7 w-7 rounded-sm bg-green-600 flex items-center justify-center'>
+                <div className='h-7 w-7 rounded-smflex items-center justify-center'>
                     <PlusIcon className='h-5 w-5' />
                 </div>
-                <div className='h-7 w-7 rounded-sm bg-red-600 flex items-center justify-center'>
+                <div className='h-7 w-7 rounded-sm flex items-center justify-center'>
                     <MinusIcon className='h-5 w-5' />
                 </div>
             </div>
@@ -140,16 +139,14 @@ export function DragOverlayCounterHabitBox({ habit }: DragOverlayCounterHabitBox
                 
                 <div className='flex items-center gap-2 text-sm'>
                     <div className='flex items-center gap-1'>
-                        <span className='text-green-400'>+{positiveCount}</span>
-                        <span className='text-secondary/50'>/</span>
-                        <span className='text-red-400'>-{negativeCount}</span>
+                        <span className=''>+{positiveCount}</span>
+                        <span className=''>/</span>
+                        <span className=''>-{negativeCount}</span>
                     </div>
                     <span className='text-secondary/50'>•</span>
-                    <span className={`font-bold ${total >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    <span className={`font-bold`}>
                         {total >= 0 ? '+' : ''}{total}
                     </span>
-                    <span className='text-secondary/50'>•</span>
-                    <span className='text-secondary/70'>{percentage}%</span>
                 </div>
             </div>
         </div>

@@ -2,19 +2,20 @@ import { CheckIcon, TrashIcon, ForwardIcon } from '@heroicons/react/24/solid'
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-import type { Habit, ModalAction } from '../../../types/types'
+import type { DailyHabit } from '../../../types/habit'
+import type { ModalAction } from '../../../types/modal'
 
 import Button from '../../button'
 
 interface HabitBoxProps {
-    habit: Habit,
+    habit: DailyHabit,
     onlyVisible?: boolean,
     updateHabit: (id: string, key: string, value: any) => void,
-    modalDispatch?: (action: ModalAction) => void // nova prop
+    modalDispatch?: (action: ModalAction) => void
 }
 
 interface DragOverlayHabitBoxProps {
-    habit: Habit,
+    habit: DailyHabit,
 }
 
 export function HabitBox({ habit, onlyVisible = true, updateHabit, modalDispatch }: HabitBoxProps) {
