@@ -11,13 +11,13 @@ interface ModalProps {
 export default function NewDayModal({ title, children, onStart }: ModalProps) {
     return (
         <div
-            className="w-screen h-screen bg-primary-600/60 fixed inset-0 flex items-center justify-center z-50"
+            className="w-screen h-screen bg-primary-900/75 fixed inset-0 flex items-center justify-center z-50"
             onClick={(e) => {
                 e.stopPropagation()
             }}
         >
             <div
-                className="w-lg max-w-full bg-primary-500 sm:p-6 p-2 rounded-lg flex flex-col items-center gap-4"
+                className="w-lg max-w-full bg-primary-600 sm:p-6 p-2 rounded-lg flex flex-col items-center gap-4"
 
             >
                 <div className="flex justify-between items-center">

@@ -2,8 +2,8 @@ import { useEffect, useState, useRef, useCallback } from 'react'
 
 import type { DailyHabit, IncrementalHabit, HabitsList } from './types/habit'
 
-import DailyHabitsSection from './sections/daily-habit-section'
-import IncrementalHabitsSection from './sections/incremental-habit-section'
+import DailyHabitsSection from './sections/dailyHabitSection'
+import IncrementalHabitsSection from './sections/incrementalHabitSection'
 
 function App() {
 

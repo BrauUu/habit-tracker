@@ -14,7 +14,7 @@ import Input from '../components/input'
 import Filter from '../components/filter'
 import NewDayModal from '../components/modal/new-day';
 import Modal from '../components/modal/default';
-import DayOfWeekSelector from '../components/day-of-week-selector';
+import DayOfWeekSelector from '../components/dayOfWeekSelector';
 
 interface DailyHabitsSectionProps {
   dailyHabits: DailyHabit[]

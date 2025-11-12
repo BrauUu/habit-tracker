@@ -20,7 +20,7 @@ interface DragOverlayIncrementalHabitBoxProps {
 
 export function IncrementalHabitBox({ habit, onlyVisible = true, updateHabit, modalDispatch }: IncrementalHabitBoxProps) {
 
-    const { id, title, positiveCount, negativeCount } = habit
+    const { id, title, resetFrequency, positiveCount, negativeCount, type } = habit
 
     const {
         attributes,
@@ -36,16 +36,16 @@ export function IncrementalHabitBox({ habit, onlyVisible = true, updateHabit, mo
     };
 
     const total = positiveCount - negativeCount;
-    const percentage = positiveCount + negativeCount > 0 
-        ? Math.round((positiveCount / (positiveCount + negativeCount)) * 100) 
-        : 0;
+    // const percentage = positiveCount + negativeCount > 0 
+    //     ? Math.round((positiveCount / (positiveCount + negativeCount)) * 100) 
+    //     : 0;
 
     return (
         <div
-            className={`w-full text-lg rounded-lg bg-primary-500 p-2 flex flex-row cursor-pointer items-center gap-2`}
+            className={`w-full text-lg rounded-lg bg-primary-600 p-2 flex flex-row cursor-pointer items-center gap-2`}
             onClick={() => {
                 if (modalDispatch)
-                    modalDispatch({ type: "updateHabit", payload: { id, title } })
+                    modalDispatch({ type: "updateHabit", payload: { id, title, resetFrequency, type } })
             }}
             ref={setNodeRef}
             {...listeners}
@@ -98,7 +98,7 @@ export function IncrementalHabitBox({ habit, onlyVisible = true, updateHabit, mo
                         <span className=''>/</span>
                         <span className=''>-{negativeCount}</span>
                     </div>
-                    <span className='text-secondary/50'>•</span>
+                    <span className='text-secondary-100'>•</span>
                     <span className={`font-bold`}>
                         {total >= 0 ? '+' : ''}{total}
                     </span>
@@ -112,12 +112,12 @@ export function DragOverlayIncrementalHabitBox({ habit }: DragOverlayIncremental
 
     const { title, positiveCount, negativeCount } = habit
     const total = positiveCount - negativeCount;
-    const percentage = positiveCount + negativeCount > 0 
-        ? Math.round((positiveCount / (positiveCount + negativeCount)) * 100) 
-        : 0;
+    // const percentage = positiveCount + negativeCount > 0 
+    //     ? Math.round((positiveCount / (positiveCount + negativeCount)) * 100) 
+    //     : 0;
 
     return (
-        <div className={`w-full text-lg rounded-lg bg-primary-500 p-2 flex flex-row items-center gap-2 opacity-80 cursor-grabbing`}>
+        <div className={`w-full text-lg rounded-lg bg-primary-600 p-2 flex flex-row items-center gap-2 opacity-80 cursor-grabbing`}>
             <div className='flex flex-col gap-1 shrink-0'>
                 <div className='h-7 w-7 rounded-smflex items-center justify-center'>
                     <PlusIcon className='h-5 w-5' />
@@ -143,7 +143,7 @@ export function DragOverlayIncrementalHabitBox({ habit }: DragOverlayIncremental
                         <span className=''>/</span>
                         <span className=''>-{negativeCount}</span>
                     </div>
-                    <span className='text-secondary/50'>•</span>
+                    <span className='text-secondary-100'>•</span>
                     <span className={`font-bold`}>
                         {total >= 0 ? '+' : ''}{total}
                     </span>

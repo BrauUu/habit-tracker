@@ -1,3 +1,5 @@
+import type { resetFrequencyType } from "./others"
+
 interface BaseHabit {
   id: string
   title: string
@@ -12,6 +14,7 @@ export interface DailyHabit extends BaseHabit {
 
 export interface IncrementalHabit extends BaseHabit {
   type: 'incremental'
+  resetFrequency: resetFrequencyType
   positiveCount: number
   negativeCount: number
 }

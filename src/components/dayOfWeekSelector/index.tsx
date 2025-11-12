@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react"
 
 type DaySelectorProps = {
-  selectedDaysProps: number[],
-  onChange?: (days: number[]) => void
+    selectedDaysProps: number[],
+    onChange?: (days: number[]) => void
 }
 
 const DaysOfWeek = [
@@ -21,12 +21,11 @@ export default function DayOfWeekSelector({ selectedDaysProps, onChange }: DaySe
 
     function getStyleByDay(index: number) {
         if (index === 6) return 'rounded-md rounded-s-none'
-        else if(index === 0) return 'border-r rounded-md rounded-e-none'
+        else if (index === 0) return 'border-r rounded-md rounded-e-none'
         return 'border-r'
     }
 
-    function selectDay(event: React.MouseEvent<HTMLDivElement>) {
-        const id = Number(event.currentTarget.dataset.id)
+    function selectDay(id: number) {
         setSelectedDay(prev => {
             if (prev.includes(id)) {
                 return prev.filter(d => d !== id)
@@ -44,14 +43,14 @@ export default function DayOfWeekSelector({ selectedDaysProps, onChange }: DaySe
     return (
         <div className="flex flex-row border rounded-lg">
             {DaysOfWeek.map((day, index) =>
-                <div
-                    className={`text-center grow p-2 cursor-pointer ${getStyleByDay(index)} ${selectedDays.includes(index) ? 'bg-secondary text-primary-500' : 'bg-primary-500 text-secondary'}`}
-                    onClick={selectDay}
+                <button
                     key={index}
-                    data-id={index}
+                    type="button"
+                    className={`text-center grow p-2 cursor-pointer transition-colors ${getStyleByDay(index)} ${selectedDays.includes(index) ? 'bg-secondary-100 text-primary-600 ' : 'bg-primary-600 text-secondary-100 hover:bg-primary-700'}`}
+                    onClick={() => selectDay(index)}
                 >
                     {day}
-                </div>)}
+                </button>)}
         </div>
     )
 }

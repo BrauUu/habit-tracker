@@ -6,6 +6,7 @@ import type { DailyHabit } from '../../../types/habit'
 import type { ModalAction } from '../../../types/modal'
 
 import Button from '../../button'
+import { useState } from 'react';
 
 interface HabitBoxProps {
     habit: DailyHabit,
@@ -20,7 +21,8 @@ interface DragOverlayHabitBoxProps {
 
 export function HabitBox({ habit, onlyVisible = true, updateHabit, modalDispatch }: HabitBoxProps) {
 
-    const { id, title, done, daysOfTheWeek, streak } = habit
+    const { id, title, done, daysOfTheWeek, streak, type } = habit
+    const [isHover, setIsHover] = useState<boolean>(false)
 
     const {
         attributes,
@@ -37,12 +39,12 @@ export function HabitBox({ habit, onlyVisible = true, updateHabit, modalDispatch
 
     return (
         <div
-            className={`w-full text-lg rounded-lg bg-primary-500 p-2 flex flex-row cursor-pointer items-center gap-2
+            className={`w-full text-lg rounded-lg bg-primary-600 p-2 flex flex-row cursor-pointer items-center gap-2
                 ${done ? 'opacity-50' : ''}
                 `}
             onClick={() => {
                 if (modalDispatch)
-                    modalDispatch({ type: "updateHabit", payload: { id, daysOfTheWeek, title } })
+                    modalDispatch({ type: "updateHabit", payload: { id, daysOfTheWeek, title, type } })
             }
             }
             ref={setNodeRef}
@@ -50,23 +52,28 @@ export function HabitBox({ habit, onlyVisible = true, updateHabit, modalDispatch
             {...attributes}
             style={style}
         >
-            <div className='h-7 w-7 shrink-0 rounded-sm border border-secondary cursor-pointer' onClick={(e) => {
-                e.stopPropagation()
-                updateHabit(id, "streak", !done ? streak + 1 : streak - 1)
-                updateHabit(id, "done", !done)
-            }}>
+            <div
+                className={`h-7 w-7 shrink-0 rounded-sm border border-secondary-100 cursor-pointer `}
+                onClick={(e) => {
+                    e.stopPropagation()
+                    updateHabit(id, "streak", !done ? streak + 1 : streak - 1)
+                    updateHabit(id, "done", !done)
+                }}
+                onMouseEnter={() => setIsHover(true)}
+                onMouseLeave={() => setIsHover(false)}
+                >
                 {
-                    done && <CheckIcon />
+                    (done || isHover) && <CheckIcon />
                 }
             </div>
             <div className='flex flex-col grow'>
-                <div className=' flex items-center justify-between gap-2'>
+                <div className=' flex items-start gap-2'>
                     <p className='grow'>
                         {title}
                     </p>
                     {!onlyVisible &&
                         <Button
-                            style='h-6 w-6'
+                            style='h-6 w-6 shrink-0'
                             action={() => {
                                 if (modalDispatch)
                                     modalDispatch({ type: 'deleteHabit', payload: { id, title } })
@@ -92,8 +99,8 @@ export function DragOverlayHabitBox({ habit }: DragOverlayHabitBoxProps) {
     const { title, done, streak } = habit
 
     return (
-        <div className={`w-full text-lg rounded-lg bg-primary-500 p-2 flex flex-row items-center gap-2 opacity-80 cursor-grabbing`}>
-            <div className='h-7 w-7 shrink-0 rounded-sm border border-secondary'>
+        <div className={`w-full text-lg rounded-lg bg-primary-600 p-2 flex flex-row items-center gap-2 opacity-80 cursor-grabbing`}>
+            <div className='h-7 w-7 shrink-0 rounded-sm border border-secondary-100'>
                 {
                     done && <CheckIcon />
                 }

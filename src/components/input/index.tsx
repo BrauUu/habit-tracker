@@ -25,7 +25,7 @@ export default function Input({value, placeholder, submitOnEnter = false, onSubm
             value={inputValue}
             type="text"
             className={`
-            bg-primary-600 rounded-lg w-full h-10 p-2
+            bg-primary-700 rounded-lg w-full h-10 p-2
             focus:outline-0
             `}
             onChange={(e) => {

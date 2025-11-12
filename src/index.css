@@ -2,12 +2,32 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary-500: #837278;
-  --color-primary-600: #4C4246;
-  --color-primary-700: #41393C;
-  --color-primary-900: #2E282A;
 
-  --color-secondary: #F1F1F1
+  --color-primary-50: #f8f7f8;
+  --color-primary-100: #f3f0f2;
+  --color-primary-200: #e7e3e5;
+  --color-primary-300: #d4cdd0;
+  --color-primary-400: #b9adb2;
+  --color-primary-600: #a29299;
+  --color-primary-600: #837278;
+  --color-primary-700: #736369;
+  --color-primary-800: #615358;
+  --color-primary-900: #53484b;
+  --color-primary-950: #2f282a;
+
+  --color-secondary-50: #f8f8f8;
+  --color-secondary-100: #f1f1f1;
+  --color-secondary-200: #dcdcdc;
+  --color-secondary-300: #bdbdbd;
+  --color-secondary-400: #989898;
+  --color-secondary-500: #7c7c7c;
+  --color-secondary-600: #656565;
+  --color-secondary-700: #525252;
+  --color-secondary-800: #464646;
+  --color-secondary-900: #3d3d3d;
+  --color-secondary-950: #292929;
+
+
 }
 
 html {
@@ -19,6 +39,7 @@ html {
   h1 {
     @apply text-2xl;
   }
+
   button {
     @apply cursor-pointer;
   }

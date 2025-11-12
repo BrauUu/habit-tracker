@@ -13,15 +13,17 @@ export default function Button({ text, type, children, style, action}: ButtonPro
     function getStyleByType(type: ButtonType) {
         switch (type){
         case 'primary':
-          return 'px-1.5 py-0.5 rounded-sm bg-secondary text-primary-500'
+          return 'bg-secondary-100 text-primary-600 hover:bg-secondary-200 px-1.5 py-0.5'
+        case 'secondary':
+            return 'hover:bg-primary-700 px-1.5 py-0.5'
         case 'other':
-            return ''
+            return 'hover:text-secondary-200'
         }
     }
 
     return (
         <button 
-        className={`${getStyleByType(type)} ${style}`}
+        className={`${getStyleByType(type)} ${style} rounded-sm `}
         onClick={(e) => {
             e.stopPropagation()
             if(action)

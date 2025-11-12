@@ -1,1 +1,3 @@
-export type ButtonType = 'primary' | 'other';
+export type ButtonType = 'primary' | 'secondary' | 'other';
+
+export type resetFrequencyType = 'daily' | 'weekly'

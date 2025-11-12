@@ -4,7 +4,7 @@ interface WhiteboardProps {
 
 export default function Whiteboard({ children }: WhiteboardProps) {
     return (
-        <div className="w-full h-full overflow-y-auto bg-primary-700 rounded-lg p-4 flex flex-col gap-4">
+        <div className="w-full h-full overflow-y-auto bg-primary-800 rounded-lg p-4 flex flex-col gap-4">
             {children}
         </div>
     )
