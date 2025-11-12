@@ -39,7 +39,7 @@ function App() {
         if (pendingHabits.length > 0) {
           setPendingDailyHabits(pendingHabits)
         } else {
-          resetDailyHabits()
+          resetHabits()
         }
         checkMidnight()
       }, timeUntilMidnight)
@@ -64,13 +64,18 @@ function App() {
       incrementalHabits
     })
 
-    const localStorageLastResetDate: string | null = localStorage.getItem('lastResetDate')
-    if (localStorageLastResetDate) {
-      const lastResetDate: Date = new Date(localStorageLastResetDate)
-      lastResetDate.setHours(0, 0, 0, 0)
-      hasResetToday.current = getHasResetToday(lastResetDate)
+    const localStorageLastDailyResetDate: string | null = localStorage.getItem('lastDailyResetDate')
+    if (localStorageLastDailyResetDate) {
+      const lastDailyResetDate: Date = new Date(localStorageLastDailyResetDate)
+      lastDailyResetDate.setHours(0, 0, 0, 0)
+      hasResetToday.current = getHasResetToday(lastDailyResetDate)
     } else {
       saveTodayDateOnLocalStorage()
+    }
+
+    const localStorageLastWeeklyResetDate: string | null = localStorage.getItem('lastWeeklyResetDate')
+    if (!localStorageLastWeeklyResetDate) {
+      setLastSunday()
     }
   }, [])
 
@@ -85,10 +90,10 @@ function App() {
       if (pendingHabits.length > 0) {
         setPendingDailyHabits(pendingHabits)
       } else {
-        resetDailyHabits()
+        resetHabits()
       }
     }
-  }, [habitsList.dailyHabits])
+  }, [habitsList])
 
   useEffect(() => {
     if (initialLoadRef.current) {
@@ -154,20 +159,64 @@ function App() {
   function saveTodayDateOnLocalStorage() {
     const now: Date = new Date()
     now.setHours(0, 0, 0, 0)
-    localStorage.setItem('lastResetDate', now.toString())
+    localStorage.setItem('lastDailyResetDate', now.toISOString())
   }
 
-  function resetDailyHabits() {
-    saveTodayDateOnLocalStorage()
-    setPendingDailyHabits([])
+  function resetHabits() {
+    const shouldResetWeekly = checkShouldResetWeeklyHabits()
+    
     setHabitsList(prevState => ({
       ...prevState,
       dailyHabits: prevState.dailyHabits.map(habit => ({
         ...habit,
         done: false,
         streak: checkDailyHabitStreak(habit)
+      })),
+      incrementalHabits: prevState.incrementalHabits.map(habit => ({
+        ...habit,
+        negativeCount: checkShouldResetIncrementalHabit(habit, shouldResetWeekly) ? 0 : habit.negativeCount,
+        positiveCount: checkShouldResetIncrementalHabit(habit, shouldResetWeekly) ? 0 : habit.positiveCount
       }))
     }))
+    
+    saveTodayDateOnLocalStorage()
+    
+    if (shouldResetWeekly) {
+      setLastSunday()
+    }
+    
+    setPendingDailyHabits([])
+  }
+
+  function checkShouldResetWeeklyHabits(): boolean {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    const localStorageLastWeeklyResetDate: string | null = localStorage.getItem('lastWeeklyResetDate')
+    if (localStorageLastWeeklyResetDate) {
+      const lastWeeklyResetDate = new Date(localStorageLastWeeklyResetDate)
+      const sevenDaysAgo = new Date(today)
+      sevenDaysAgo.setDate(today.getDate() - 7)
+      
+      return lastWeeklyResetDate.getTime() <= sevenDaysAgo.getTime()
+    }
+
+    return false
+  }
+
+  function checkShouldResetIncrementalHabit(habit: IncrementalHabit, shouldResetWeekly: boolean): boolean {
+    if (habit.resetFrequency === 'daily') return true
+    if (habit.resetFrequency === 'weekly') return shouldResetWeekly
+    return false
+  }
+
+  function setLastSunday() {
+    const lastSunday = new Date()
+    lastSunday.setHours(0, 0, 0, 0)
+    while (lastSunday.getDay() !== 3) {
+      lastSunday.setDate(lastSunday.getDate() - 1)
+    }
+    localStorage.setItem('lastWeeklyResetDate', lastSunday.toISOString())
   }
 
   function getHasResetToday(lastResetTimestamp: Date) {
@@ -203,7 +252,6 @@ function App() {
     }))
   }, [])
 
-
   const setIncrementalHabits = useCallback((updater: (incrementalHabits: IncrementalHabit[]) => IncrementalHabit[]) => {
     setHabitsList(prev => ({
       ...prev,
@@ -226,7 +274,7 @@ function App() {
         onUpdateDailyHabit={updateDailyHabit}
         onDeleteDailyHabit={deleteDailyHabit}
         onAddDailyHabit={addDailyHabit}
-        onResetDailyHabits={resetDailyHabits}
+        onResetDailyHabits={resetHabits}
         pendingHabits={pendingDailyHabits}
       />
       <Toaster

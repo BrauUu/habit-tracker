@@ -106,11 +106,11 @@ export function DragOverlayHabitBox({ habit }: DragOverlayHabitBoxProps) {
                 }
             </div>
             <div className='flex flex-col grow'>
-                <div className=' flex items-center justify-between gap-2'>
+                <div className=' flex tems-start gap-2'>
                     <p className='grow'>
                         {title}
                     </p>
-                    <Button style='h-6 w-6' type='other'>
+                    <Button style='h-6 w-6 shrink-0' type='other'>
                         <TrashIcon />
                     </Button>
                 </div>

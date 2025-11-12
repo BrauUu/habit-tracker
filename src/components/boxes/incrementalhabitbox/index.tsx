@@ -73,13 +73,13 @@ export function IncrementalHabitBox({ habit, onlyVisible = true, updateHabit, mo
             </div>
 
             <div className='flex flex-col grow gap-1'>
-                <div className='flex items-center justify-between gap-2'>
+                <div className='flex items-start gap-2'>
                     <p className='grow'>
                         {title}
                     </p>
                     {!onlyVisible &&
                         <Button
-                            style='h-6 w-6'
+                            style='h-6 w-6 shrink-0'
                             action={() => {
                                 if (modalDispatch)
                                     modalDispatch({ type: 'deleteHabit', payload: { id, title } })
@@ -117,32 +117,32 @@ export function DragOverlayIncrementalHabitBox({ habit }: DragOverlayIncremental
     return (
         <div className={`w-full text-lg rounded-lg bg-primary-600 p-2 flex flex-row items-center gap-2 opacity-80 cursor-grabbing`}>
             <div className='flex flex-col gap-1 shrink-0'>
-                <div className='h-7 w-7 rounded-smflex items-center justify-center'>
+                <div className='h-7 w-7 rounded-sm flex bg-emerald-400 items-center justify-center'>
                     <PlusIcon className='h-5 w-5' />
                 </div>
-                <div className='h-7 w-7 rounded-sm flex items-center justify-center'>
+                <div className='h-7 w-7 rounded-sm flex bg-ruby-500 items-center justify-center'>
                     <MinusIcon className='h-5 w-5' />
                 </div>
             </div>
 
             <div className='flex flex-col grow gap-1'>
-                <div className='flex items-center justify-between gap-2'>
+                <div className='flex items-start gap-2'>
                     <p className='grow'>
                         {title}
                     </p>
-                    <Button style='h-6 w-6' type='other'>
+                    <Button style='h-6 w-6 shrink-0' type='other'>
                         <TrashIcon />
                     </Button>
                 </div>
 
-                <div className='flex items-center gap-2 text-sm'>
+                 <div className='flex items-center gap-2 text-sm'>
                     <div className='flex items-center gap-1'>
-                        <span className=''>+{positiveCount}</span>
-                        <span className=''>/</span>
-                        <span className=''>-{negativeCount}</span>
+                        <span className='text-emerald-400'>+{positiveCount}</span>
+                        <span className='text-secondary/50'>/</span>
+                        <span className='text-ruby-500'>-{negativeCount}</span>
                     </div>
-                    <span className='text-secondary-100'>•</span>
-                    <span className={`font-bold`}>
+                    <span className='text-secondary/50'>•</span>
+                    <span className={`font-bold ${total >= 0 ? 'text-emerald-400' : 'text-ruby-500'}`}>
                         {total >= 0 ? '+' : ''}{total}
                     </span>
                 </div>
