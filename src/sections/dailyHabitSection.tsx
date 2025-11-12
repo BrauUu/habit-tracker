@@ -15,6 +15,7 @@ import Filter from '../components/filter'
 import NewDayModal from '../components/modal/new-day';
 import Modal from '../components/modal/default';
 import DayOfWeekSelector from '../components/dayOfWeekSelector';
+import toast from 'react-hot-toast';
 
 interface DailyHabitsSectionProps {
   dailyHabits: DailyHabit[]
@@ -85,8 +86,10 @@ export default function DailyHabitsSection({
     if (!habit) return
 
     if (modalState.type === 'createHabit' && habit.type === 'daily') {
+      if(!checkHabitIsValid(habit))
+        return
       onAddDailyHabit(habit)
-      modalDispatch({ type: 'hideModal' })
+      closeModal()
     }
   }
 
@@ -104,14 +107,24 @@ export default function DailyHabitsSection({
     if (!habit) return
 
     if (habit.type === 'daily') {
-      if (habit.title) {
-        onUpdateDailyHabit(habit.id, 'title', habit.title)
-      }
-      if (habit.daysOfTheWeek) {
-        onUpdateDailyHabit(habit.id, 'daysOfTheWeek', habit.daysOfTheWeek)
-      }
+      if(!checkHabitIsValid(habit))
+        return
+      onUpdateDailyHabit(habit.id, 'title', habit.title)
+      onUpdateDailyHabit(habit.id, 'daysOfTheWeek', habit.daysOfTheWeek)
     }
     closeModal()
+  }
+
+  function checkHabitIsValid(habit: DailyHabit){
+     if (!habit.title) {
+        toast.error("habit title is required.")
+        return false
+      }
+      if (habit.daysOfTheWeek.length == 0) {
+        toast.error("habit days is required.")
+        return false
+      }
+      return true
   }
 
   return (
@@ -198,7 +211,6 @@ export default function DailyHabitsSection({
             placeholder='type your habit'
             onSubmit={(v) => {
               modalDispatch({ type: 'updateHabit', payload: { title: v } })
-              handleSave()
             }}
             onChange={(v) => modalDispatch({ type: 'updateHabit', payload: { title: v } })}
           />

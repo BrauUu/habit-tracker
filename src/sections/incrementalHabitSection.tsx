@@ -13,6 +13,7 @@ import Title from '../components/title'
 import Input from '../components/input'
 import Modal from '../components/modal/default';
 import ResetFrequencySelector from '../components/resetFrequencySelector';
+import toast from 'react-hot-toast';
 
 interface IncrementalHabitsSectionProps {
   incrementalHabits: IncrementalHabit[]
@@ -57,8 +58,13 @@ export default function IncrementalHabitsSection({
   }
 
   function finishHabitCreation() {
-    if (modalState.type === 'createHabit' && modalState.data?.habit) {
-      onAddIncrementalHabit(modalState.data.habit as IncrementalHabit)
+    const habit = modalState.data?.habit
+    if (!habit) return
+
+    if (modalState.type === 'createHabit' && habit.type === 'incremental') {
+      if (!checkHabitIsValid(habit))
+        return
+      onAddIncrementalHabit(habit)
       modalDispatch({ type: 'hideModal' })
     }
   }
@@ -72,18 +78,28 @@ export default function IncrementalHabitsSection({
     if (!habit) return
 
     if (habit.type === 'incremental') {
-      if (habit.title) {
-        onUpdateIncrementalHabit(habit.id, 'title', habit.title)
-      }
-      if (habit.resetFrequency) {
-        onUpdateIncrementalHabit(habit.id, 'resetFrequency', habit.resetFrequency)
-      }
+      if (!checkHabitIsValid(habit))
+        return
+      onUpdateIncrementalHabit(habit.id, 'title', habit.title)
+      onUpdateIncrementalHabit(habit.id, 'resetFrequency', habit.resetFrequency)
     }
     closeModal()
   }
 
   function closeModal() {
     modalDispatch({ type: "hideModal" })
+  }
+
+  function checkHabitIsValid(habit: IncrementalHabit) {
+    if (!habit.title) {
+      toast.error("habit title is required.")
+      return false
+    }
+    if (!habit.resetFrequency) {
+      toast.error("habit reset frequency is required.")
+      return false
+    }
+    return true
   }
 
   function handleDragEnd(event: DragEndEvent) {
@@ -179,7 +195,7 @@ export default function IncrementalHabitsSection({
             }}
             onChange={(v) => modalDispatch({ type: 'updateHabit', payload: { title: v } })}
           />
-           <ResetFrequencySelector
+          <ResetFrequencySelector
             resetFrequency={(modalState.data.habit as IncrementalHabit).resetFrequency}
             onChange={(v) => modalDispatch({ type: 'updateHabit', payload: { resetFrequency: v } })}
           />

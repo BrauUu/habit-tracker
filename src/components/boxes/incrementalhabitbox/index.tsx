@@ -6,7 +6,6 @@ import type { IncrementalHabit } from '../../../types/habit'
 import type { ModalAction } from '../../../types/modal'
 
 import Button from '../../button'
-
 interface IncrementalHabitBoxProps {
     habit: IncrementalHabit,
     onlyVisible?: boolean,
@@ -53,8 +52,8 @@ export function IncrementalHabitBox({ habit, onlyVisible = true, updateHabit, mo
             style={style}
         >
             <div className='flex flex-col gap-1 shrink-0'>
-                <button 
-                    className='h-7 w-7 rounded-sm flex items-center justify-center transition-colors' 
+                <button
+                    className='h-7 w-7 rounded-sm flex bg-emerald-400 items-center justify-center transition-colors'
                     onClick={(e) => {
                         e.stopPropagation()
                         updateHabit(id, "positiveCount", positiveCount + 1)
@@ -62,8 +61,8 @@ export function IncrementalHabitBox({ habit, onlyVisible = true, updateHabit, mo
                 >
                     <PlusIcon className='h-5 w-5' />
                 </button>
-                <button 
-                    className='h-7 w-7 rounded-sm flex items-center justify-center transition-colors' 
+                <button
+                    className='h-7 w-7 rounded-sm flex bg-ruby-500 items-center justify-center transition-colors'
                     onClick={(e) => {
                         e.stopPropagation()
                         updateHabit(id, "negativeCount", negativeCount + 1)
@@ -72,7 +71,7 @@ export function IncrementalHabitBox({ habit, onlyVisible = true, updateHabit, mo
                     <MinusIcon className='h-5 w-5' />
                 </button>
             </div>
-            
+
             <div className='flex flex-col grow gap-1'>
                 <div className='flex items-center justify-between gap-2'>
                     <p className='grow'>
@@ -91,15 +90,14 @@ export function IncrementalHabitBox({ habit, onlyVisible = true, updateHabit, mo
                         </Button>
                     }
                 </div>
-                
                 <div className='flex items-center gap-2 text-sm'>
                     <div className='flex items-center gap-1'>
-                        <span className=''>+{positiveCount}</span>
-                        <span className=''>/</span>
-                        <span className=''>-{negativeCount}</span>
+                        <span className='text-emerald-400'>+{positiveCount}</span>
+                        <span className='text-secondary/50'>/</span>
+                        <span className='text-ruby-500'>-{negativeCount}</span>
                     </div>
-                    <span className='text-secondary-100'>•</span>
-                    <span className={`font-bold`}>
+                    <span className='text-secondary/50'>•</span>
+                    <span className={`font-bold ${total >= 0 ? 'text-emerald-400' : 'text-ruby-500'}`}>
                         {total >= 0 ? '+' : ''}{total}
                     </span>
                 </div>
@@ -126,7 +124,7 @@ export function DragOverlayIncrementalHabitBox({ habit }: DragOverlayIncremental
                     <MinusIcon className='h-5 w-5' />
                 </div>
             </div>
-            
+
             <div className='flex flex-col grow gap-1'>
                 <div className='flex items-center justify-between gap-2'>
                     <p className='grow'>
@@ -136,7 +134,7 @@ export function DragOverlayIncrementalHabitBox({ habit }: DragOverlayIncremental
                         <TrashIcon />
                     </Button>
                 </div>
-                
+
                 <div className='flex items-center gap-2 text-sm'>
                     <div className='flex items-center gap-1'>
                         <span className=''>+{positiveCount}</span>
