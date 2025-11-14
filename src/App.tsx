@@ -1,16 +1,18 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 
-import type { DailyHabit, IncrementalHabit, HabitsList } from './types/habit'
+import type { DailyHabit, IncrementalHabit, HabitsList, Todo } from './types/habit'
 
 import DailyHabitsSection from './sections/dailyHabitSection'
 import IncrementalHabitsSection from './sections/incrementalHabitSection'
+import TodosSection from './sections/todoSection'
 
 
 function App() {
 
   const [habitsList, setHabitsList] = useState<HabitsList>({
     dailyHabits: [],
-    incrementalHabits: []
+    incrementalHabits: [],
+    todos: []
   })
   const [pendingDailyHabits, setPendingDailyHabits] = useState<string[]>([])
 
@@ -58,10 +60,12 @@ function App() {
     const localStorageHabitList: HabitsList = JSON.parse((localStorage.getItem('habitsList') || '[]'))
     const dailyHabits = localStorageHabitList?.dailyHabits || []
     const incrementalHabits = localStorageHabitList?.incrementalHabits || []
+    const todos = localStorageHabitList?.todos || []
 
     setHabitsList({
       dailyHabits,
-      incrementalHabits
+      incrementalHabits,
+      todos
     })
 
     const localStorageLastDailyResetDate: string | null = localStorage.getItem('lastDailyResetDate')
@@ -104,6 +108,13 @@ function App() {
     localStorage.setItem('habitsList', JSON.stringify(habitsList))
   }, [habitsList])
 
+  function addDailyHabit(habit: DailyHabit) {
+    setHabitsList(prevState => ({
+      ...prevState,
+      dailyHabits: [...prevState.dailyHabits, habit]
+    }))
+  }
+
   function updateDailyHabit(id: string, key: string, value: any) {
     setHabitsList(prevState => ({
       ...prevState,
@@ -126,6 +137,13 @@ function App() {
     }))
   }
 
+  function addIncrementalHabit(habit: IncrementalHabit) {
+    setHabitsList(prevState => ({
+      ...prevState,
+      incrementalHabits: [...prevState.incrementalHabits, habit]
+    }))
+  }
+
   function updateIncrementalHabit(id: string, key: string, value: any) {
     setHabitsList(prevState => ({
       ...prevState,
@@ -142,18 +160,36 @@ function App() {
     }))
   }
 
-  function addIncrementalHabit(habit: IncrementalHabit) {
+
+  function addTodo(todo: Todo) {
     setHabitsList(prevState => ({
       ...prevState,
-      incrementalHabits: [...prevState.incrementalHabits, habit]
+      todos: [...prevState.todos, todo]
     }))
   }
 
-  function addDailyHabit(habit: DailyHabit) {
+  function updateTodo(id: string, key: string, value: any) {
     setHabitsList(prevState => ({
       ...prevState,
-      dailyHabits: [...prevState.dailyHabits, habit]
+      todos: prevState.todos.map(todo =>
+        todo.id === id ? { ...todo, [key]: value } : todo
+      )
     }))
+  }
+
+  function deleteTodo(id: string) {
+    setHabitsList(prevState => ({
+      ...prevState,
+      todos: prevState.todos.filter(todo => todo.id !== id)
+    }))
+  }
+
+  function cleanDoneTodos() {
+    habitsList.todos.forEach((todo) => {
+      if (todo?.doneDate) {
+        deleteTodo(todo.id)
+      }
+    })
   }
 
   function saveTodayDateOnLocalStorage() {
@@ -164,7 +200,7 @@ function App() {
 
   function resetHabits() {
     const shouldResetWeekly = checkShouldResetWeeklyHabits()
-    
+
     setHabitsList(prevState => ({
       ...prevState,
       dailyHabits: prevState.dailyHabits.map(habit => ({
@@ -178,13 +214,29 @@ function App() {
         positiveCount: checkShouldResetIncrementalHabit(habit, shouldResetWeekly) ? 0 : habit.positiveCount
       }))
     }))
-    
+
+    habitsList.todos.forEach((todo) => {
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+
+      const sevenDaysAgo = new Date(today)
+      sevenDaysAgo.setDate(today.getDate() - 7)
+
+      if (todo?.doneDate) {
+        const doneDate = new Date(todo?.doneDate)
+        if (doneDate <= sevenDaysAgo) {
+          deleteTodo(todo.id)
+        }
+      }
+
+    })
+
     saveTodayDateOnLocalStorage()
-    
+
     if (shouldResetWeekly) {
       setLastSunday()
     }
-    
+
     setPendingDailyHabits([])
   }
 
@@ -197,7 +249,7 @@ function App() {
       const lastWeeklyResetDate = new Date(localStorageLastWeeklyResetDate)
       const sevenDaysAgo = new Date(today)
       sevenDaysAgo.setDate(today.getDate() - 7)
-      
+
       return lastWeeklyResetDate.getTime() <= sevenDaysAgo.getTime()
     }
 
@@ -259,6 +311,13 @@ function App() {
     }))
   }, [])
 
+  const setTodos = useCallback((updater: (todos: Todo[]) => Todo[]) => {
+    setHabitsList(prev => ({
+      ...prev,
+      todos: updater(prev.todos)
+    }))
+  }, [])
+
   return (
     <div className='flex flex-col lg:flex-row gap-8 h-screen p-4 md:p-16'>
       <IncrementalHabitsSection
@@ -276,6 +335,14 @@ function App() {
         onAddDailyHabit={addDailyHabit}
         onResetDailyHabits={resetHabits}
         pendingHabits={pendingDailyHabits}
+      />
+      <TodosSection
+        todos={habitsList.todos}
+        setTodos={setTodos}
+        onUpdateTodo={updateTodo}
+        onDeleteTodo={deleteTodo}
+        onAddTodo={addTodo}
+        onCleanDoneTodos={cleanDoneTodos}
       />
     </div >
   )

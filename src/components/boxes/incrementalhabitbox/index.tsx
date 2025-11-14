@@ -40,7 +40,7 @@ export function IncrementalHabitBox({ habit, updateHabit, modalDispatch }: Incre
 
     return (
         <div
-            className={`w-full text-lg rounded-lg bg-primary-600 p-2 flex flex-row cursor-pointer items-center gap-2`}
+            className={`w-full text-lg rounded-lg bg-primary-600 p-2 flex flex-row cursor-pointer items-center gap-2 min-h-20`}
             onClick={() => {
                 if (modalDispatch)
                     modalDispatch({ type: "updateHabit", payload: { id, title, resetFrequency, type } })
@@ -71,7 +71,7 @@ export function IncrementalHabitBox({ habit, updateHabit, modalDispatch }: Incre
                 </button>
             </div>
 
-            <div className='flex flex-col grow gap-1'>
+            <div className='flex flex-col grow gap-1 min-h-16 justify-between'>
                 <div className='flex items-start gap-2'>
                     <p className='grow'>
                         {title}
@@ -112,7 +112,7 @@ export function DragOverlayIncrementalHabitBox({ habit }: DragOverlayIncremental
     //     : 0;
 
     return (
-        <div className={`w-full text-lg rounded-lg bg-primary-600 p-2 flex flex-row items-center gap-2 opacity-80 cursor-grabbing`}>
+        <div className={`w-full text-lg rounded-lg bg-primary-600 p-2 flex flex-row items-center gap-2 opacity-80 cursor-grabbing min-h-20`}>
             <div className='flex flex-col gap-1 shrink-0'>
                 <div className='h-7 w-7 rounded-sm flex bg-emerald-400 items-center justify-center'>
                     <PlusIcon className='h-5 w-5' />
@@ -122,7 +122,7 @@ export function DragOverlayIncrementalHabitBox({ habit }: DragOverlayIncremental
                 </div>
             </div>
 
-            <div className='flex flex-col grow gap-1'>
+            <div className='flex flex-col grow gap-1 min-h-16 justify-between'>
                 <div className='flex items-start gap-2'>
                     <p className='grow'>
                         {title}

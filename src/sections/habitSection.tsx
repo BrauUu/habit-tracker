@@ -1,10 +1,10 @@
-import { useState, useReducer, type ReactNode } from 'react'
+import { useState, useReducer, useMemo, type ReactNode } from 'react'
 import { v4 as uuidv4 } from 'uuid';
 
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragOverlay, type DragEndEvent, type DragStartEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 
-import type { DailyHabit, IncrementalHabit } from '../types/habit'
+import type { DailyHabit, IncrementalHabit, Todo } from '../types/habit'
 import type { ModalAction } from '../types/modal'
 import { modalReducer } from '../reducers/modalReducer'
 
@@ -14,7 +14,7 @@ import Input from '../components/input'
 import Modal from '../components/modal/default';
 import { useToast } from '../hooks/useToast';
 
-type Habit = DailyHabit | IncrementalHabit
+type Habit = DailyHabit | IncrementalHabit | Todo
 
 interface HabitSectionProps<HabitType extends Habit> {
     title: string
@@ -27,9 +27,10 @@ interface HabitSectionProps<HabitType extends Habit> {
     validateHabit: (habit: HabitType) => boolean
     renderHabitBox: (habit: HabitType, updateHabit: (id: string, key: string, value: any) => void, modalDispatch: React.Dispatch<ModalAction>) => ReactNode
     renderDragOverlay: (habit: HabitType) => ReactNode
-    renderModalFields: (habit: HabitType, modalDispatch: React.Dispatch<ModalAction>) => ReactNode
+    renderModalFields?: (habit: HabitType, modalDispatch: React.Dispatch<ModalAction>) => ReactNode
     headerExtra?: ReactNode
     footerExtra?: ReactNode
+    contentExtra?: ReactNode
 }
 
 export default function HabitSection<HabitType extends Habit>({
@@ -45,7 +46,8 @@ export default function HabitSection<HabitType extends Habit>({
     renderDragOverlay,
     renderModalFields,
     headerExtra,
-    footerExtra
+    footerExtra,
+    contentExtra
 }: HabitSectionProps<HabitType>) {
 
     const toast = useToast()
@@ -63,6 +65,10 @@ export default function HabitSection<HabitType extends Habit>({
             coordinateGetter: sortableKeyboardCoordinates,
         })
     );
+
+    const templateHabit = useMemo(() => {
+        return createDefaultHabit('___tmp_id___', '')
+    }, [createDefaultHabit])
 
     function createNewHabit(title: string) {
         const newHabit = createDefaultHabit(uuidv4(), title)
@@ -144,8 +150,9 @@ export default function HabitSection<HabitType extends Habit>({
                 >
                     <Whiteboard>
                         <div>
-                            <Input placeholder='add habit' onSubmit={createNewHabit} submitOnEnter={true} />
+                            <Input placeholder={`add ${templateHabit.type}`} onSubmit={createNewHabit} submitOnEnter={true} />
                         </div>
+                        {contentExtra}
                         <div className='overflow-y-auto flex flex-col gap-2 '>
                             {habits.map((habit) => renderHabitBox(habit, onUpdateHabit, modalDispatch))}
                         </div>
@@ -170,7 +177,7 @@ export default function HabitSection<HabitType extends Habit>({
                         onSubmit={(v) => modalDispatch({ type: 'updateHabit', payload: { title: v } })}
                         onChange={(v) => modalDispatch({ type: 'updateHabit', payload: { title: v } })}
                     />
-                    {renderModalFields(modalState.data.habit as HabitType, modalDispatch)}
+                    {renderModalFields?.(modalState.data.habit as HabitType, modalDispatch)}
                 </Modal>
             )}
 
@@ -186,7 +193,7 @@ export default function HabitSection<HabitType extends Habit>({
                         onSubmit={(v) => modalDispatch({ type: 'updateHabit', payload: { title: v } })}
                         onChange={(v) => modalDispatch({ type: 'updateHabit', payload: { title: v } })}
                     />
-                    {renderModalFields(modalState.data.habit as HabitType, modalDispatch)}
+                    {renderModalFields?.(modalState.data.habit as HabitType, modalDispatch)}
                 </Modal>
             )}
 

@@ -28,8 +28,14 @@ export default function DailyHabitsSection({
   onResetDailyHabits,
   pendingHabits,
 }: DailyHabitsSectionProps) {
+
   const toast = useToast()
   const [dailyHabitFilter, setDailyHabitFilter] = useState<number | null>(1)
+
+  const filterOptions = [
+    { 'label': 'all', 'value': 0 },
+    { 'label': 'today', 'value': 1 }
+  ]
 
   const habitsListFiltered = useMemo(() => {
     if (dailyHabitFilter === 0) return [...dailyHabits]
@@ -95,7 +101,7 @@ export default function DailyHabitsSection({
             onChange={(days) => modalDispatch({ type: 'updateHabit', payload: { daysOfTheWeek: days } })}
           />
         )}
-        headerExtra={<Filter value={dailyHabitFilter} onChange={setDailyHabitFilter} />}
+        headerExtra={<Filter value={dailyHabitFilter} onChange={setDailyHabitFilter} filters={filterOptions} />}
       />
       {
         pendingHabits.length > 0 && (

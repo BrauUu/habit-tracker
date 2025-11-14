@@ -39,7 +39,7 @@ export function HabitBox({ habit, onlyVisible = true, updateHabit, modalDispatch
 
     return (
         <div
-            className={`w-full text-lg rounded-lg bg-primary-600 p-2 flex flex-row cursor-pointer items-center gap-2
+            className={`w-full text-lg rounded-lg bg-primary-600 p-2 flex flex-row cursor-pointer items-center gap-2 min-h-20
                 ${done ? 'opacity-50' : ''}
                 `}
             onClick={() => {
@@ -61,12 +61,12 @@ export function HabitBox({ habit, onlyVisible = true, updateHabit, modalDispatch
                 }}
                 onMouseEnter={() => setIsHover(true)}
                 onMouseLeave={() => setIsHover(false)}
-                >
+            >
                 {
                     (done || isHover) && <CheckIcon />
                 }
             </div>
-            <div className='flex flex-col grow'>
+            <div className='flex flex-col grow justify-between min-h-16'>
                 <div className=' flex items-start gap-2'>
                     <p className='grow'>
                         {title}
@@ -99,13 +99,17 @@ export function DragOverlayHabitBox({ habit }: DragOverlayHabitBoxProps) {
     const { title, done, streak } = habit
 
     return (
-        <div className={`w-full text-lg rounded-lg bg-primary-600 p-2 flex flex-row items-center gap-2 opacity-80 cursor-grabbing`}>
+        <div
+            className={`w-full text-lg rounded-lg  p-2 flex flex-row items-center gap-2 opacity-80 cursor-grabbing min-h-20
+            ${done ? 'bg-primary-700 *:opacity-50' : 'bg-primary-600'}
+            `}
+        >
             <div className='h-7 w-7 shrink-0 rounded-sm border border-secondary-100'>
                 {
                     done && <CheckIcon />
                 }
             </div>
-            <div className='flex flex-col grow'>
+            <div className='flex flex-col grow justify-between min-h-16'>
                 <div className=' flex tems-start gap-2'>
                     <p className='grow'>
                         {title}

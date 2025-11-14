@@ -12,6 +12,11 @@ export interface DailyHabit extends BaseHabit {
   daysOfTheWeek: number[]
 }
 
+export interface Todo extends BaseHabit {
+  type: 'todo',
+  doneDate?: Date
+}
+
 export interface IncrementalHabit extends BaseHabit {
   type: 'incremental'
   resetFrequency: resetFrequencyType
@@ -19,9 +24,10 @@ export interface IncrementalHabit extends BaseHabit {
   negativeCount: number
 }
 
-export type Habit = DailyHabit | IncrementalHabit
+export type Habit = DailyHabit | IncrementalHabit | Todo
 
 export interface HabitsList {
   dailyHabits: DailyHabit[]
   incrementalHabits: IncrementalHabit[]
+  todos: Todo[]
 }
