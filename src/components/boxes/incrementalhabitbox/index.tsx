@@ -8,7 +8,6 @@ import type { ModalAction } from '../../../types/modal'
 import Button from '../../button'
 interface IncrementalHabitBoxProps {
     habit: IncrementalHabit,
-    onlyVisible?: boolean,
     updateHabit: (id: string, key: string, value: any) => void,
     modalDispatch?: (action: ModalAction) => void
 }
@@ -17,7 +16,7 @@ interface DragOverlayIncrementalHabitBoxProps {
     habit: IncrementalHabit,
 }
 
-export function IncrementalHabitBox({ habit, onlyVisible = true, updateHabit, modalDispatch }: IncrementalHabitBoxProps) {
+export function IncrementalHabitBox({ habit, updateHabit, modalDispatch }: IncrementalHabitBoxProps) {
 
     const { id, title, resetFrequency, positiveCount, negativeCount, type } = habit
 
@@ -77,18 +76,16 @@ export function IncrementalHabitBox({ habit, onlyVisible = true, updateHabit, mo
                     <p className='grow'>
                         {title}
                     </p>
-                    {!onlyVisible &&
-                        <Button
-                            style='h-6 w-6 shrink-0'
-                            action={() => {
-                                if (modalDispatch)
-                                    modalDispatch({ type: 'deleteHabit', payload: { id, title } })
-                            }}
-                            type='other'
-                        >
-                            <TrashIcon />
-                        </Button>
-                    }
+                    <Button
+                        style='h-6 w-6 shrink-0'
+                        action={() => {
+                            if (modalDispatch)
+                                modalDispatch({ type: 'deleteHabit', payload: { id, title } })
+                        }}
+                        type='other'
+                    >
+                        <TrashIcon />
+                    </Button>
                 </div>
                 <div className='flex items-center gap-2 text-sm'>
                     <div className='flex items-center gap-1'>
@@ -135,7 +132,7 @@ export function DragOverlayIncrementalHabitBox({ habit }: DragOverlayIncremental
                     </Button>
                 </div>
 
-                 <div className='flex items-center gap-2 text-sm'>
+                <div className='flex items-center gap-2 text-sm'>
                     <div className='flex items-center gap-1'>
                         <span className='text-emerald-400'>+{positiveCount}</span>
                         <span className='text-secondary/50'>/</span>

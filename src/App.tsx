@@ -4,7 +4,7 @@ import type { DailyHabit, IncrementalHabit, HabitsList } from './types/habit'
 
 import DailyHabitsSection from './sections/dailyHabitSection'
 import IncrementalHabitsSection from './sections/incrementalHabitSection'
-import { Toaster } from 'react-hot-toast'
+
 
 function App() {
 
@@ -260,7 +260,7 @@ function App() {
   }, [])
 
   return (
-    <div className='flex flex-row gap-8 h-screen p-16'>
+    <div className='flex flex-col lg:flex-row gap-8 h-screen p-4 md:p-16'>
       <IncrementalHabitsSection
         incrementalHabits={habitsList.incrementalHabits}
         setIncrementalHabits={setIncrementalHabits}
@@ -277,16 +277,6 @@ function App() {
         onResetDailyHabits={resetHabits}
         pendingHabits={pendingDailyHabits}
       />
-      <Toaster
-        position="bottom-right"
-        toastOptions={{
-          style: {
-            backgroundColor: 'var(--color-primary-600)',
-            color: 'var(--color-secondary-100)'
-          },
-        }}
-      />
-
     </div >
   )
 }
