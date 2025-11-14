@@ -52,7 +52,7 @@ export function TodoBox({ todo, updateHabit, modalDispatch }: TodoBoxProps) {
 
     return (
         <div
-            className={`w-full text-lg rounded-lg bg-primary-600 p-2 flex flex-row cursor-pointer items-center gap-2 min-h-20
+            className={`w-full text-lg rounded-lg bg-primary-600 p-2 flex flex-row cursor-pointer items-center gap-2 min-h-20 shrink-0
                 ${doneDate ? 'opacity-50' : ''}
                 `}
             onClick={() => {
@@ -78,9 +78,9 @@ export function TodoBox({ todo, updateHabit, modalDispatch }: TodoBoxProps) {
                     (doneDate || isHover) && <CheckIcon />
                 }
             </div>
-            <div className='flex flex-col grow justify-start min-h-16'>
-                <div className=' flex items-start gap-2'>
-                    <p className='grow'>
+            <div className='flex flex-col grow justify-start min-w-0'>
+                <div className='flex items-start gap-2 min-w-0'>
+                    <p className='grow break-words min-w-0'>
                         {title}
                     </p>
                     <Button
@@ -106,7 +106,7 @@ export function DragOverlayTodoBox({ todo }: DragOverlayTodoBoxProps) {
 
     return (
         <div
-            className={`w-full text-lg rounded-lg p-2 flex flex-row items-center gap-2 opacity-80 cursor-grabbing min-h-20
+            className={`w-full text-lg rounded-lg p-2 flex flex-row items-center gap-2 opacity-80 cursor-grabbing min-h-20 shrink-0
             ${doneDate ? 'bg-primary-700 *:opacity-50' : 'bg-primary-600'}
             `}
         >
@@ -115,9 +115,9 @@ export function DragOverlayTodoBox({ todo }: DragOverlayTodoBoxProps) {
                     doneDate && <CheckIcon />
                 }
             </div>
-            <div className='flex flex-col grow justify-start min-h-16'>
-                <div className=' flex tems-start gap-2'>
-                    <p className='grow'>
+            <div className='flex flex-col grow justify-start min-w-0'>
+                <div className='flex items-start gap-2 min-w-0'>
+                    <p className='grow break-words min-w-0'>
                         {title}
                     </p>
                     <Button style='h-6 w-6 shrink-0' type='other'>

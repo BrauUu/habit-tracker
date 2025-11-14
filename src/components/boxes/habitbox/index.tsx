@@ -51,7 +51,7 @@ export function HabitBox({ habit, onlyVisible = true, updateHabit, modalDispatch
 
     return (
         <div
-            className={`w-full text-lg rounded-lg bg-primary-600 p-2 flex flex-row cursor-pointer items-center gap-2 min-h-20
+            className={`w-full text-lg rounded-lg bg-primary-600 p-2 flex flex-row cursor-pointer items-center gap-2 min-h-20 shrink-0
                 ${done ? 'opacity-50' : ''}
                 `}
             onClick={() => {

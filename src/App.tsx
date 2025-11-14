@@ -5,9 +5,11 @@ import type { DailyHabit, IncrementalHabit, HabitsList, Todo } from './types/hab
 import DailyHabitsSection from './sections/dailyHabitSection'
 import IncrementalHabitsSection from './sections/incrementalHabitSection'
 import TodosSection from './sections/todoSection'
+import MobileNav, { type Section } from './components/mobileNav'
 
 
 function App() {
+  const [activeSection, setActiveSection] = useState<Section>('daily')
 
   const [habitsList, setHabitsList] = useState<HabitsList>({
     dailyHabits: [],
@@ -311,31 +313,41 @@ function App() {
   }, [])
 
   return (
-    <div className='flex flex-col lg:flex-row gap-8 h-screen p-4 md:p-16'>
-      <IncrementalHabitsSection
-        incrementalHabits={habitsList.incrementalHabits}
-        setIncrementalHabits={setIncrementalHabits}
-        onUpdateIncrementalHabit={updateIncrementalHabit}
-        onDeleteIncrementalHabit={deleteIncrementalHabit}
-        onAddIncrementalHabit={addIncrementalHabit}
-      />
-      <DailyHabitsSection
-        dailyHabits={habitsList.dailyHabits}
-        setDailyHabits={setDailyHabits}
-        onUpdateDailyHabit={updateDailyHabit}
-        onDeleteDailyHabit={deleteDailyHabit}
-        onAddDailyHabit={addDailyHabit}
-        onResetDailyHabits={resetHabits}
-        pendingHabits={pendingDailyHabits}
-      />
-      <TodosSection
-        todos={habitsList.todos}
-        setTodos={setTodos}
-        onUpdateTodo={updateTodo}
-        onDeleteTodo={deleteTodo}
-        onAddTodo={addTodo}
-      />
-    </div >
+    <>
+      <div className='flex flex-col lg:flex-row gap-8 h-screen p-4 pb-20 lg:pb-4 md:p-16'>
+        <div className={`w-full h-full ${activeSection === 'incremental' ? 'block' : 'hidden lg:block'}`}>
+          <IncrementalHabitsSection
+            incrementalHabits={habitsList.incrementalHabits}
+            setIncrementalHabits={setIncrementalHabits}
+            onUpdateIncrementalHabit={updateIncrementalHabit}
+            onDeleteIncrementalHabit={deleteIncrementalHabit}
+            onAddIncrementalHabit={addIncrementalHabit}
+          />
+        </div>
+        <div className={`w-full h-full ${activeSection === 'daily' ? 'block' : 'hidden lg:block'}`}>
+          <DailyHabitsSection
+            dailyHabits={habitsList.dailyHabits}
+            setDailyHabits={setDailyHabits}
+            onUpdateDailyHabit={updateDailyHabit}
+            onDeleteDailyHabit={deleteDailyHabit}
+            onAddDailyHabit={addDailyHabit}
+            onResetDailyHabits={resetHabits}
+            pendingHabits={pendingDailyHabits}
+          />
+        </div>
+        <div className={`w-full h-full ${activeSection === 'todo' ? 'block' : 'hidden lg:block'}`}>
+          <TodosSection
+            todos={habitsList.todos}
+            setTodos={setTodos}
+            onUpdateTodo={updateTodo}
+            onDeleteTodo={deleteTodo}
+            onAddTodo={addTodo}
+          />
+        </div>
+      </div>
+      
+      <MobileNav activeSection={activeSection} onSectionChange={setActiveSection} />
+    </>
   )
 }
 

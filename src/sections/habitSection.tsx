@@ -133,7 +133,7 @@ export default function HabitSection<HabitType extends Habit>({
     }
 
     return (
-        <div className='flex flex-col gap-1 w-full lg:w-1/3 max-h-full'>
+        <div className='flex flex-col gap-1 w-full h-full'>
             <div className='flex flex-row justify-between'>
                 <Title value={title} />
                 {headerExtra}

@@ -8,7 +8,7 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />
     <Toaster
-      position="bottom-right"
+      position={window.screen.width >= 1024 ? "bottom-right" : 'top-right'}
       toastOptions={{
         style: {
           backgroundColor: 'var(--color-primary-600)',
