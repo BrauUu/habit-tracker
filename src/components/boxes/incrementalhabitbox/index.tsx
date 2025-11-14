@@ -6,6 +6,7 @@ import type { IncrementalHabit } from '../../../types/habit'
 import type { ModalAction } from '../../../types/modal'
 
 import Button from '../../button'
+import { useToast } from '../../../hooks/useToast';
 interface IncrementalHabitBoxProps {
     habit: IncrementalHabit,
     updateHabit: (id: string, key: string, value: any) => void,
@@ -17,6 +18,8 @@ interface DragOverlayIncrementalHabitBoxProps {
 }
 
 export function IncrementalHabitBox({ habit, updateHabit, modalDispatch }: IncrementalHabitBoxProps) {
+
+    const toast = useToast()
 
     const { id, title, resetFrequency, positiveCount, negativeCount, type } = habit
 
@@ -33,10 +36,17 @@ export function IncrementalHabitBox({ habit, updateHabit, modalDispatch }: Incre
         transition,
     };
 
+    function increaseHabitCount() {
+        updateHabit(id, "positiveCount", positiveCount + 1)
+        toast.habitCountIncreased(habit?.positiveCount)
+    }
+
+    function decreaseHabitCount() {
+        updateHabit(id, "negativeCount", negativeCount + 1)
+        toast.habitCountDecreased(habit?.negativeCount)
+    }
+
     const total = positiveCount - negativeCount;
-    // const percentage = positiveCount + negativeCount > 0 
-    //     ? Math.round((positiveCount / (positiveCount + negativeCount)) * 100) 
-    //     : 0;
 
     return (
         <div
@@ -55,7 +65,7 @@ export function IncrementalHabitBox({ habit, updateHabit, modalDispatch }: Incre
                     className='h-7 w-7 rounded-sm flex bg-emerald-400 items-center justify-center transition-colors'
                     onClick={(e) => {
                         e.stopPropagation()
-                        updateHabit(id, "positiveCount", positiveCount + 1)
+                        increaseHabitCount()
                     }}
                 >
                     <PlusIcon className='h-5 w-5' />
@@ -64,7 +74,7 @@ export function IncrementalHabitBox({ habit, updateHabit, modalDispatch }: Incre
                     className='h-7 w-7 rounded-sm flex bg-ruby-500 items-center justify-center transition-colors'
                     onClick={(e) => {
                         e.stopPropagation()
-                        updateHabit(id, "negativeCount", negativeCount + 1)
+                        decreaseHabitCount()
                     }}
                 >
                     <MinusIcon className='h-5 w-5' />
@@ -107,9 +117,6 @@ export function DragOverlayIncrementalHabitBox({ habit }: DragOverlayIncremental
 
     const { title, positiveCount, negativeCount } = habit
     const total = positiveCount - negativeCount;
-    // const percentage = positiveCount + negativeCount > 0 
-    //     ? Math.round((positiveCount / (positiveCount + negativeCount)) * 100) 
-    //     : 0;
 
     return (
         <div className={`w-full text-lg rounded-lg bg-primary-600 p-2 flex flex-row items-center gap-2 opacity-80 cursor-grabbing min-h-20`}>

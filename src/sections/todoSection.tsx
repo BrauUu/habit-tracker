@@ -1,4 +1,3 @@
-import { TrashIcon } from '@heroicons/react/24/solid'
 import { useState, useMemo } from 'react'
 
 import type { Todo } from '../types/habit'
@@ -7,7 +6,6 @@ import HabitSection from './habitSection'
 import { TodoBox, DragOverlayTodoBox } from '../components/boxes/todobox'
 import Filter from '../components/filter'
 import { useToast } from '../hooks/useToast';
-import Button from '../components/button'
 
 interface TodosSectionProps {
   todos: Todo[]
@@ -15,7 +13,6 @@ interface TodosSectionProps {
   onUpdateTodo: (id: string, key: string, value: any) => void
   onDeleteTodo: (id: string) => void
   onAddTodo: (habit: Todo) => void
-  onCleanDoneTodos: () => void
 }
 
 export default function TodosSection({
@@ -24,7 +21,6 @@ export default function TodosSection({
   onUpdateTodo,
   onDeleteTodo,
   onAddTodo,
-  onCleanDoneTodos
 }: TodosSectionProps) {
 
   const toast = useToast()
@@ -49,7 +45,7 @@ export default function TodosSection({
     return {
       id,
       title,
-      type: 'todo',
+      type: 'to do',
     }
   }
 
@@ -65,7 +61,7 @@ export default function TodosSection({
   return (
     <>
       <HabitSection
-        title="todos"
+        title="to do's"
         habits={todosFiltered}
         setHabits={setTodos}
         onUpdateHabit={onUpdateTodo}

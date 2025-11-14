@@ -184,14 +184,6 @@ function App() {
     }))
   }
 
-  function cleanDoneTodos() {
-    habitsList.todos.forEach((todo) => {
-      if (todo?.doneDate) {
-        deleteTodo(todo.id)
-      }
-    })
-  }
-
   function saveTodayDateOnLocalStorage() {
     const now: Date = new Date()
     now.setHours(0, 0, 0, 0)
@@ -342,7 +334,6 @@ function App() {
         onUpdateTodo={updateTodo}
         onDeleteTodo={deleteTodo}
         onAddTodo={addTodo}
-        onCleanDoneTodos={cleanDoneTodos}
       />
     </div >
   )

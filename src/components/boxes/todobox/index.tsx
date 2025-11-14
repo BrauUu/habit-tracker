@@ -7,6 +7,7 @@ import type { ModalAction } from '../../../types/modal'
 
 import Button from '../../button'
 import { useState } from 'react';
+import { useToast } from '../../../hooks/useToast';
 
 interface TodoBoxProps {
     todo: Todo,
@@ -19,6 +20,8 @@ interface DragOverlayTodoBoxProps {
 }
 
 export function TodoBox({ todo, updateHabit, modalDispatch }: TodoBoxProps) {
+
+    const toast = useToast()
 
     const { id, title, type, doneDate } = todo
     const [isHover, setIsHover] = useState<boolean>(false)
@@ -41,7 +44,7 @@ export function TodoBox({ todo, updateHabit, modalDispatch }: TodoBoxProps) {
             updateHabit(id, "doneDate", undefined)
             return
         }
-
+        toast.todoChecked()
         const today = new Date()
         today.setHours(0, 0, 0, 0)
         updateHabit(id, "doneDate", today)

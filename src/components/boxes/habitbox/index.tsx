@@ -7,6 +7,7 @@ import type { ModalAction } from '../../../types/modal'
 
 import Button from '../../button'
 import { useState } from 'react';
+import { useToast } from '../../../hooks/useToast';
 
 interface HabitBoxProps {
     habit: DailyHabit,
@@ -20,6 +21,8 @@ interface DragOverlayHabitBoxProps {
 }
 
 export function HabitBox({ habit, onlyVisible = true, updateHabit, modalDispatch }: HabitBoxProps) {
+
+    const toast = useToast()
 
     const { id, title, done, daysOfTheWeek, streak, type } = habit
     const [isHover, setIsHover] = useState<boolean>(false)
@@ -36,6 +39,15 @@ export function HabitBox({ habit, onlyVisible = true, updateHabit, modalDispatch
         transform: CSS.Transform.toString(transform),
         transition,
     };
+
+    function checkHabit(){
+        const isChecked = done
+        if(!isChecked){
+            toast.habitChecked(habit?.streak)
+        }
+        updateHabit(id, "streak", !done ? streak + 1 : streak - 1)
+        updateHabit(id, "done", !done)
+    }
 
     return (
         <div
@@ -56,8 +68,7 @@ export function HabitBox({ habit, onlyVisible = true, updateHabit, modalDispatch
                 className={`h-7 w-7 shrink-0 rounded-sm border border-secondary-100 cursor-pointer `}
                 onClick={(e) => {
                     e.stopPropagation()
-                    updateHabit(id, "streak", !done ? streak + 1 : streak - 1)
-                    updateHabit(id, "done", !done)
+                    checkHabit()
                 }}
                 onMouseEnter={() => setIsHover(true)}
                 onMouseLeave={() => setIsHover(false)}
