@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react"
 import Button from "../../button"
 import Title from "../../title"
 
@@ -11,6 +12,22 @@ interface ModalProps {
 }
 
 export default function Modal({title, children, onClose, onSave, confirmButtonText = 'save', cancelButtonText = 'cancel' }: ModalProps) {
+    const modalContentRef = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        if (document.activeElement instanceof HTMLElement) {
+            document.activeElement.blur()
+        }
+
+        // Previne scroll do body no mobile
+        document.body.style.overflow = 'hidden'
+
+        return () => {
+            document.body.style.overflow = ''
+        }
+    }, [])
+
+
     return (
         <div
           className="w-screen h-screen bg-primary-900/75 fixed inset-0 flex items-center justify-center z-50 overflow-y-auto"
@@ -19,8 +36,8 @@ export default function Modal({title, children, onClose, onSave, confirmButtonTe
           }}
         >
             <div
-              className="w-[95%] max-w-lg bg-primary-600 p-6 rounded-lg flex flex-col gap-4"
-              
+              ref={modalContentRef}
+              className="w-full m-4 max-w-lg bg-primary-600 p-6 rounded-lg flex flex-col gap-4"
             >
                 <div className="flex justify-between items-center">
                     <Title value={title} style="text-lg"></Title>

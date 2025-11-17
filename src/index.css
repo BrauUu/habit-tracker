@@ -73,6 +73,18 @@ body.dragging * {
   cursor: grabbing !important;
 }
 
+@media (max-width: 1023px) {
+  .container {
+    height: 100dvh;
+    padding-bottom: 5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    height: 100vh;
+  }
+}
 
 .rdp .rdp-nav button {
   color: var(--picker-accent);

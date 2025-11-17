@@ -313,8 +313,8 @@ function App() {
 
   return (
     <>
-      <div className='flex flex-col lg:flex-row gap-8 h-screen p-4 pb-20 lg:pb-4 md:p-16'>
-        <div className={`w-full h-full ${activeSection === 'incremental' ? 'block' : 'hidden lg:block'}`}>
+      <div className='flex flex-col lg:flex-row gap-8 p-4 lg:p-16 lg:w-full w-dvw h-dvh pb-20'>
+        <div className={`w-full lg:w-1/3 h-full ${activeSection === 'incremental' ? 'block' : 'hidden lg:block'}`}>
           <IncrementalHabitsSection
             incrementalHabits={habitsList.incrementalHabits}
             setIncrementalHabits={setIncrementalHabits}
@@ -323,7 +323,7 @@ function App() {
             onAddIncrementalHabit={addIncrementalHabit}
           />
         </div>
-        <div className={`w-full h-full ${activeSection === 'daily' ? 'block' : 'hidden lg:block'}`}>
+        <div className={`w-full lg:w-1/3 h-full ${activeSection === 'daily' ? 'block' : 'hidden lg:block'}`}>
           <DailyHabitsSection
             dailyHabits={habitsList.dailyHabits}
             setDailyHabits={setDailyHabits}
@@ -334,7 +334,7 @@ function App() {
             pendingHabits={pendingDailyHabits}
           />
         </div>
-        <div className={`w-full h-full ${activeSection === 'todo' ? 'block' : 'hidden lg:block'}`}>
+        <div className={`w-full lg:w-1/3 h-full ${activeSection === 'todo' ? 'block' : 'hidden lg:block'}`}>
           <TodosSection
             todos={habitsList.todos}
             setTodos={setTodos}

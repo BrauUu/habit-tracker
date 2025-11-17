@@ -53,7 +53,7 @@ export default function DatePicker({ date, onChange }: DatePickerProps) {
             </button>
             
             {isDatePickerOpen && (
-                <div className="absolute z-50 pt-2 pb-20 lg:py-2">
+                <div className="absolute z-50 pt-2 pb-36 lg:py-2">
                     <DayPicker
                         required
                         animate

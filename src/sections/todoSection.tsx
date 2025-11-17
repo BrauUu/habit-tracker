@@ -25,16 +25,16 @@ export default function TodosSection({
 }: TodosSectionProps) {
 
   const toast = useToast()
-  const [todoFilter, setTodoFilter] = useState<number | null>(0)
+  const [todoFilter, setTodoFilter] = useState<number | null>(1)
 
   const filterOptions = [
-    { 'label': 'active', 'value': 0 },
-    { 'label': 'completed', 'value': 1 }
+    { 'label': 'completed', 'value': 0 },
+    { 'label': 'active', 'value': 1 },
   ]
 
   const todosFiltered = useMemo(() => {
-    if (todoFilter === 0) return todos.filter(todo => checkIfItsDone(todo, false))
-    if (todoFilter === 1) return todos.filter(todo => checkIfItsDone(todo))
+    if (todoFilter === 0) return todos.filter(todo => checkIfItsDone(todo))
+    if (todoFilter === 1) return todos.filter(todo => checkIfItsDone(todo, false))
     return [...todos]
   }, [todoFilter, todos])
 
@@ -89,7 +89,7 @@ export default function TodosSection({
         )}
         headerExtra={<Filter value={todoFilter} onChange={setTodoFilter} filters={filterOptions} />}
         contentExtra={
-          todoFilter == 1 &&
+          todoFilter == 0 &&
           <p className='text-xs text-center text-secondary-200'>completed todos are deleted after 7 days</p>
         }
       />
