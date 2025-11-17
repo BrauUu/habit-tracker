@@ -41,7 +41,7 @@ export default function DayOfWeekSelector({ selectedDaysProps, onChange }: DaySe
     }, [selectedDays])
 
     return (
-        <div className="flex flex-row border rounded-lg">
+        <div className="flex flex-row border rounded-lg sm:text-sm">
             {DaysOfWeek.map((day, index) =>
                 <button
                     key={index}

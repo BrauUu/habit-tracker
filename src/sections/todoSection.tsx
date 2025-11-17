@@ -6,6 +6,7 @@ import HabitSection from './habitSection'
 import { TodoBox, DragOverlayTodoBox } from '../components/boxes/todobox'
 import Filter from '../components/filter'
 import { useToast } from '../hooks/useToast';
+import DatePicker from '../components/datePicker'
 
 interface TodosSectionProps {
   todos: Todo[]
@@ -24,7 +25,7 @@ export default function TodosSection({
 }: TodosSectionProps) {
 
   const toast = useToast()
-  const [todoFilter, setTodoFilter] = useState<number | null>(1)
+  const [todoFilter, setTodoFilter] = useState<number | null>(0)
 
   const filterOptions = [
     { 'label': 'active', 'value': 0 },
@@ -46,6 +47,7 @@ export default function TodosSection({
       id,
       title,
       type: 'to do',
+      dueDate: null
     }
   }
 
@@ -77,13 +79,18 @@ export default function TodosSection({
             modalDispatch={modalDispatch}
           />
         )}
+        renderModalFields={(habit, modalDispatch) => (
+          <div className='flex justify-center'>
+            <DatePicker date={habit.dueDate} onChange={(v) => modalDispatch({ type: 'updateHabit', payload: { dueDate: v } })} />
+          </div>
+        )}
         renderDragOverlay={(todo) => (
           <DragOverlayTodoBox key={todo.id} todo={todo} />
         )}
         headerExtra={<Filter value={todoFilter} onChange={setTodoFilter} filters={filterOptions} />}
         contentExtra={
           todoFilter == 1 &&
-            <p className='text-xs text-center text-secondary-200'>completed todos are deleted after 7 days</p>
+          <p className='text-xs text-center text-secondary-200'>completed todos are deleted after 7 days</p>
         }
       />
     </>

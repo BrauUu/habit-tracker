@@ -72,3 +72,38 @@ body.dragging,
 body.dragging * {
   cursor: grabbing !important;
 }
+
+
+.rdp .rdp-nav button {
+  color: var(--picker-accent);
+}
+.rdp-chevron {
+  fill: var(--color-primary-400)!important;
+}
+ 
+.rdp-selected > .rdp-day_button {
+  border-color: var(--color-primary-400) !important;
+}
+
+.rdp-today > .rdp-day_button {
+  color: var(--color-primary-400) !important;
+  font-weight: 600;
+}
+
+.rdp-day_button:hover:not([disabled]):not(.rdp-day_selected) {
+  background-color: var(--color-primary-700);
+}
+
+.rdp-nav button:hover {
+  background-color: var(--color-primary-700);
+}
+
+.rdp-weekday {
+  color: var(--color-secondary-200);
+  font-size: 0.875rem;
+}
+
+.rdp-month_caption {
+  color: var(--color-secondary-100);
+  font-weight: 600;
+}

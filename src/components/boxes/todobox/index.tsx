@@ -1,4 +1,4 @@
-import { CheckIcon, TrashIcon } from '@heroicons/react/24/solid'
+import { CheckIcon, ClockIcon, TrashIcon } from '@heroicons/react/24/solid'
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
@@ -19,11 +19,17 @@ interface DragOverlayTodoBoxProps {
     todo: Todo,
 }
 
+function isDueDateExpired(dueDate: Date) {
+    const today = new Date()
+    today.setHours(0,0,0,0)
+    return today.getTime() > dueDate.getTime()
+}
+
 export function TodoBox({ todo, updateHabit, modalDispatch }: TodoBoxProps) {
 
     const toast = useToast()
 
-    const { id, title, type, doneDate } = todo
+    const { id, title, type, doneDate, dueDate } = todo
     const [isHover, setIsHover] = useState<boolean>(false)
 
     const {
@@ -40,7 +46,7 @@ export function TodoBox({ todo, updateHabit, modalDispatch }: TodoBoxProps) {
     };
 
     function onCheck() {
-        if(todo?.doneDate){
+        if (todo?.doneDate) {
             updateHabit(id, "doneDate", undefined)
             return
         }
@@ -57,7 +63,7 @@ export function TodoBox({ todo, updateHabit, modalDispatch }: TodoBoxProps) {
                 `}
             onClick={() => {
                 if (modalDispatch)
-                    modalDispatch({ type: "updateHabit", payload: { id, title, type, doneDate } })
+                    modalDispatch({ type: "updateHabit", payload: { id, title, type, doneDate, dueDate } })
             }
             }
             ref={setNodeRef}
@@ -78,7 +84,7 @@ export function TodoBox({ todo, updateHabit, modalDispatch }: TodoBoxProps) {
                     (doneDate || isHover) && <CheckIcon />
                 }
             </div>
-            <div className='flex flex-col grow justify-start min-w-0'>
+            <div className='flex flex-col grow min-h-16 justify-between'>
                 <div className='flex items-start gap-2 min-w-0'>
                     <p className='grow break-words min-w-0'>
                         {title}
@@ -95,6 +101,15 @@ export function TodoBox({ todo, updateHabit, modalDispatch }: TodoBoxProps) {
                         <TrashIcon />
                     </Button>
                 </div>
+
+                {
+                    dueDate ?
+                    
+                        <span className={`flex justify-end flex-row items-center gap-1 text-sm ${isDueDateExpired(new Date(dueDate)) ? 'text-ruby-500' : ''}`}><ClockIcon className='h-4' />{new Date(dueDate).toLocaleDateString()}</span>
+                        :
+                        undefined
+                }
+
             </div>
         </div>
     )
@@ -102,7 +117,7 @@ export function TodoBox({ todo, updateHabit, modalDispatch }: TodoBoxProps) {
 
 export function DragOverlayTodoBox({ todo }: DragOverlayTodoBoxProps) {
 
-    const { title, doneDate } = todo
+    const { title, doneDate, dueDate } = todo
 
     return (
         <div
@@ -123,6 +138,14 @@ export function DragOverlayTodoBox({ todo }: DragOverlayTodoBoxProps) {
                     <Button style='h-6 w-6 shrink-0' type='other'>
                         <TrashIcon />
                     </Button>
+                </div>
+                <div className='flex justify-end items-center gap-1'>
+                    {
+                        dueDate ?
+                           <span className={`flex justify-end flex-row items-center gap-1 text-sm ${isDueDateExpired(new Date(dueDate)) ? 'text-ruby-500' : ''}`}><ClockIcon className='h-4' />{new Date(dueDate).toLocaleDateString()}</span>
+                            :
+                            undefined
+                    }
                 </div>
             </div>
         </div>

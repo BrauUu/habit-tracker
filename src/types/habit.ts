@@ -14,7 +14,8 @@ export interface DailyHabit extends BaseHabit {
 
 export interface Todo extends BaseHabit {
   type: 'to do',
-  doneDate?: Date
+  doneDate?: Date,
+  dueDate: Date | null
 }
 
 export interface IncrementalHabit extends BaseHabit {

@@ -7,7 +7,6 @@ import IncrementalHabitsSection from './sections/incrementalHabitSection'
 import TodosSection from './sections/todoSection'
 import MobileNav, { type Section } from './components/mobileNav'
 
-
 function App() {
   const [activeSection, setActiveSection] = useState<Section>('daily')
 

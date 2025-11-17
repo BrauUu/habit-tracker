@@ -17,12 +17,12 @@ export function useToast() {
     },
     habitCountIncreased: (count: number) => {
       const { message, icon } = incrementalHabitTemplates.increase[Math.floor(Math.random() * incrementalHabitTemplates.increase.length)]
-      const newMessage = message.replace('{count}', String(count)).trim()
+      const newMessage = message.replace('{count}', String(count + 1)).trim()
       toast(newMessage, { icon: icon })
     },
     habitCountDecreased: (count: number) => {
       const { message, icon } = incrementalHabitTemplates.decrease[Math.floor(Math.random() * incrementalHabitTemplates.decrease.length)]
-      const newMessage = message.replace('{count}', String(count)).trim()
+      const newMessage = message.replace('{count}', String(count + 1)).trim()
       toast(newMessage, { icon: icon })
     },
     todoChecked: () => {
