@@ -7,6 +7,7 @@ import { TodoBox, DragOverlayTodoBox } from '../components/boxes/todobox'
 import Filter from '../components/filter'
 import { useToast } from '../hooks/useToast';
 import DatePicker from '../components/datePicker'
+import { CheckCircleIcon } from '@heroicons/react/24/outline'
 
 interface TodosSectionProps {
   todos: Todo[]
@@ -25,16 +26,16 @@ export default function TodosSection({
 }: TodosSectionProps) {
 
   const toast = useToast()
-  const [todoFilter, setTodoFilter] = useState<number | null>(1)
+  const [todoFilter, setTodoFilter] = useState<number | null>(0)
 
   const filterOptions = [
-    { 'label': 'completed', 'value': 0 },
-    { 'label': 'active', 'value': 1 },
+    { 'label': 'active', 'value': 0 },
+    { 'label': 'completed', 'value': 1 },
   ]
 
   const todosFiltered = useMemo(() => {
-    if (todoFilter === 0) return todos.filter(todo => checkIfItsDone(todo))
-    if (todoFilter === 1) return todos.filter(todo => checkIfItsDone(todo, false))
+    if (todoFilter === 0) return todos.filter(todo => checkIfItsDone(todo, false))
+    if (todoFilter === 1) return todos.filter(todo => checkIfItsDone(todo))
     return [...todos]
   }, [todoFilter, todos])
 
@@ -81,7 +82,7 @@ export default function TodosSection({
         )}
         renderModalFields={(habit, modalDispatch) => (
           <div className='flex justify-center'>
-            <DatePicker date={habit.dueDate} onChange={(v) => modalDispatch({ type: 'updateHabit', payload: { dueDate: v } })} />
+            <DatePicker date={habit.dueDate}  placeholder='pick a deadline if needed' onChange={(v) => modalDispatch({ type: 'updateHabit', payload: { dueDate: v } })} />
           </div>
         )}
         renderDragOverlay={(todo) => (
@@ -89,9 +90,14 @@ export default function TodosSection({
         )}
         headerExtra={<Filter value={todoFilter} onChange={setTodoFilter} filters={filterOptions} />}
         contentExtra={
-          todoFilter == 0 &&
+          todoFilter == 1 &&
           <p className='text-xs text-center text-secondary-200'>completed todos are deleted after 7 days</p>
         }
+        withoutContent={{
+          icon: CheckCircleIcon,
+          title: 'to do\'s will show here',
+          text: 'to-do\'s are one-time tasks with optional deadlines. complete them once to check them off your list.'
+        }}
       />
     </>
   )

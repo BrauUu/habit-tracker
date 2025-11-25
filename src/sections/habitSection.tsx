@@ -28,6 +28,7 @@ interface HabitSectionProps<HabitType extends Habit> {
     renderHabitBox: (habit: HabitType, updateHabit: (id: string, key: string, value: any) => void, modalDispatch: React.Dispatch<ModalAction>) => ReactNode
     renderDragOverlay: (habit: HabitType) => ReactNode
     renderModalFields?: (habit: HabitType, modalDispatch: React.Dispatch<ModalAction>) => ReactNode
+    withoutContent: { icon: React.ComponentType<React.SVGProps<SVGSVGElement>>, title: string, text: string }
     headerExtra?: ReactNode
     footerExtra?: ReactNode
     contentExtra?: ReactNode
@@ -47,7 +48,8 @@ export default function HabitSection<HabitType extends Habit>({
     renderModalFields,
     headerExtra,
     footerExtra,
-    contentExtra
+    contentExtra,
+    withoutContent
 }: HabitSectionProps<HabitType>) {
 
     const toast = useToast()
@@ -152,10 +154,20 @@ export default function HabitSection<HabitType extends Habit>({
                         <div>
                             <Input placeholder={`add ${templateHabit.type}`} onSubmit={createNewHabit} submitOnEnter={true} />
                         </div>
-                        {contentExtra}
-                        <div className='overflow-y-auto flex flex-col gap-2 '>
-                            {habits.map((habit) => renderHabitBox(habit, onUpdateHabit, modalDispatch))}
-                        </div>
+                        {habits.length ?
+                            <>
+                                {contentExtra}
+                                <div className='overflow-y-auto flex flex-col gap-2 '>
+                                    {habits.map((habit) => renderHabitBox(habit, onUpdateHabit, modalDispatch))}
+                                </div>
+                            </>
+                            :
+                            <div className='flex flex-1 justify-center items-center text-center flex-col text-secondary-300 px-5'>
+                                <withoutContent.icon className='h-8 w-8' />
+                                <p className='text-sm font-semibold mt-2'>{withoutContent.title}</p>
+                                <p className='text-xs'>{withoutContent.text}</p>
+                            </div>
+                        }
                     </Whiteboard>
                 </SortableContext>
                 <DragOverlay>
@@ -210,7 +222,7 @@ export default function HabitSection<HabitType extends Habit>({
                     }}
                     confirmButtonText="delete"
                 >
-                    <p>are you sure you want to delete the habit <strong>{modalState.data.habit.title}</strong>?</p>
+                    <p>are you sure you want to delete <strong>{modalState.data.habit.title}</strong>?</p>
                 </Modal>
             )}
         </div>

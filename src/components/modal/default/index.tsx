@@ -18,8 +18,7 @@ export default function Modal({title, children, onClose, onSave, confirmButtonTe
         if (document.activeElement instanceof HTMLElement) {
             document.activeElement.blur()
         }
-
-        // Previne scroll do body no mobile
+        
         document.body.style.overflow = 'hidden'
 
         return () => {

@@ -5,10 +5,11 @@ import "react-day-picker/style.css";
 
 interface DatePickerProps {
     date: Date | null,
+    placeholder?: string
     onChange: (date: Date | null) => void
 }
 
-export default function DatePicker({ date, onChange }: DatePickerProps) {
+export default function DatePicker({ date, placeholder, onChange }: DatePickerProps) {
 
     const [selectedDate, setSelectedDate] = useState<Date | null>(date);
     const [isDatePickerOpen, setIsDatePickerOpen] = useState<boolean>(false)
@@ -47,7 +48,7 @@ export default function DatePicker({ date, onChange }: DatePickerProps) {
                 onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
             >
                 <span className={selectedDate ? 'text-secondary-100' : 'text-secondary-100/50'}>
-                    {selectedDate ? new Date(selectedDate).toLocaleDateString() : 'pick a date'}
+                    {selectedDate ? new Date(selectedDate).toLocaleDateString() : placeholder}
                 </span>
                 <CalendarIcon className="h-5 w-5 text-secondary-100" />
             </button>

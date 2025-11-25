@@ -23,7 +23,7 @@ export default function Button({ text, type, children, style, action}: ButtonPro
 
     return (
         <button 
-        className={`${getStyleByType(type)} ${style} rounded-sm `}
+        className={`${getStyleByType(type)} ${style} rounded-sm transition-colors`}
         onClick={(e) => {
             e.stopPropagation()
             if(action)

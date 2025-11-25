@@ -1,4 +1,4 @@
-import { ChartBarIcon, CheckCircleIcon, ListBulletIcon } from '@heroicons/react/24/outline'
+import { ChartBarIcon, CalendarIcon, CheckCircleIcon } from '@heroicons/react/24/outline'
 
 type Section = 'incremental' | 'daily' | 'todo'
 
@@ -10,12 +10,12 @@ interface MobileNavProps {
 export default function MobileNav({ activeSection, onSectionChange }: MobileNavProps) {
   const navItems = [
     { id: 'incremental' as Section, label: 'Incremental', icon: ChartBarIcon },
-    { id: 'daily' as Section, label: 'Daily', icon: CheckCircleIcon },
-    { id: 'todo' as Section, label: 'Todo', icon: ListBulletIcon },
+    { id: 'daily' as Section, label: 'Daily', icon: CalendarIcon },
+    { id: 'todo' as Section, label: 'Todo', icon: CheckCircleIcon },
   ]
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-primary-800 border-t border-primary-600 lg:hidden z-50">
+    <nav className="fixed bottom-0 left-0 right-0 bg-primary-800 border-t border-primary-600 lg:hidden z-40">
       <div className="flex justify-around items-center h-16">
         {navItems.map((item) => {
           const Icon = item.icon

@@ -42,7 +42,7 @@ export function TodoBox({ todo, updateHabit, modalDispatch }: TodoBoxProps) {
 
     const style = {
         transform: CSS.Transform.toString(transform),
-        transition,
+        transition: transition && 'opacity 300ms',
     };
 
     function onCheck() {
@@ -59,7 +59,7 @@ export function TodoBox({ todo, updateHabit, modalDispatch }: TodoBoxProps) {
     return (
         <div
             className={`w-full text-lg rounded-lg bg-primary-600 p-2 flex flex-row cursor-pointer items-center gap-2 min-h-20 shrink-0
-                ${doneDate ? 'opacity-50' : ''}
+                ${doneDate ? 'opacity-50' : 'opacity-100'}
                 `}
             onClick={() => {
                 if (modalDispatch)

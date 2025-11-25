@@ -37,7 +37,7 @@ export function HabitBox({ habit, onlyVisible = true, updateHabit, modalDispatch
 
     const style = {
         transform: CSS.Transform.toString(transform),
-        transition,
+        transition: transition && 'opacity 300ms',
     };
 
     function checkHabit(){
@@ -51,8 +51,8 @@ export function HabitBox({ habit, onlyVisible = true, updateHabit, modalDispatch
 
     return (
         <div
-            className={`w-full text-lg rounded-lg bg-primary-600 p-2 flex flex-row cursor-pointer items-center gap-2 min-h-20 shrink-0
-                ${done ? 'opacity-50' : ''}
+            className={`w-full text-lg rounded-lg bg-primary-600 p-2 flex flex-row cursor-pointer items-center gap-2 min-h-20 shrink-0 transition-all
+                ${done ? 'opacity-50' : 'opacity-100'}
                 `}
             onClick={() => {
                 if (modalDispatch)

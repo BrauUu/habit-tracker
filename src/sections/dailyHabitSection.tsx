@@ -8,6 +8,7 @@ import Filter from '../components/filter'
 import NewDayModal from '../components/modal/new-day';
 import DayOfWeekSelector from '../components/dayOfWeekSelector';
 import { useToast } from '../hooks/useToast';
+import { CalendarIcon } from '@heroicons/react/24/outline'
 
 interface DailyHabitsSectionProps {
   dailyHabits: DailyHabit[]
@@ -102,6 +103,11 @@ export default function DailyHabitsSection({
           />
         )}
         headerExtra={<Filter value={dailyHabitFilter} onChange={setDailyHabitFilter} filters={filterOptions} />}
+        withoutContent={{
+          icon: CalendarIcon,
+          title: 'daily habits will show here',
+          text: 'daily habits have their designated days. complete them as scheduled and watch your streak grow.'
+        }}
       />
       {
         pendingHabits.length > 0 && (
