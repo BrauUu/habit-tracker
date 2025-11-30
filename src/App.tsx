@@ -29,14 +29,17 @@ function App() {
   useEffect(() => {
     let timeoutId: NodeJS.Timeout
 
-    const checkMidnight = () => {
-      const now = new Date()
-      const midnight = new Date(now)
-      midnight.setHours(24, 0, 0, 0)
+    const checkIfNeedsReset = () => {
+      const localStorageLastDailyResetDate = localStorage.getItem('lastDailyResetDate')
 
-      const timeUntilMidnight = midnight.getTime() - now.getTime()
+      if (!localStorageLastDailyResetDate) return
 
-      timeoutId = setTimeout(() => {
+      const lastResetDate = new Date(localStorageLastDailyResetDate)
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+
+      if (lastResetDate < today) {
+        hasResetToday.current = false
         const pendingHabits = getPendingHabits()
 
         if (pendingHabits.length > 0) {
@@ -44,16 +47,38 @@ function App() {
         } else {
           resetHabits()
         }
-        checkMidnight()
-      }, timeUntilMidnight)
+      }
     }
 
-    checkMidnight()
+    const scheduleNextCheck = () => {
+      const now = new Date()
+      const targetTime = new Date(now)
+      targetTime.setHours(0, 0, 0, 0)
+      targetTime.setDate(targetTime.getDate() + 1)
+
+      const timeUntilTarget = targetTime.getTime() - now.getTime()
+
+      timeoutId = setTimeout(() => {
+        checkIfNeedsReset()
+        scheduleNextCheck()
+      }, timeUntilTarget)
+    }
+
+    scheduleNextCheck()
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        checkIfNeedsReset()
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
 
     return () => {
       if (timeoutId) {
         clearTimeout(timeoutId)
       }
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
   }, [])
 
@@ -344,7 +369,7 @@ function App() {
           />
         </div>
       </div>
-      
+
       <MobileNav activeSection={activeSection} onSectionChange={setActiveSection} />
     </>
   )

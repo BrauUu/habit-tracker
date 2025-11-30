@@ -82,7 +82,7 @@ export default function TodosSection({
         )}
         renderModalFields={(habit, modalDispatch) => (
           <div className='flex justify-center'>
-            <DatePicker date={habit.dueDate}  placeholder='pick a deadline if needed' onChange={(v) => modalDispatch({ type: 'updateHabit', payload: { dueDate: v } })} />
+            <DatePicker date={habit.dueDate} placeholder='pick a deadline if needed' onChange={(v) => modalDispatch({ type: 'updateHabit', payload: { dueDate: v } })} />
           </div>
         )}
         renderDragOverlay={(todo) => (

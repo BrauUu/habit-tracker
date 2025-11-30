@@ -7,9 +7,9 @@ export function useToast() {
     success: (message: string) => toast.success(message),
     error: (message: string) => toast.error(message),
 
-    habitCreated: () => toast.success('habit created with success'),
-    habitUpdated: () => toast.success('habit updated with success'),
-    habitDeleted: () => toast.success('habit deleted with success'),
+    habitCreated: () => toast('habit created with success', {icon: '✅'}),
+    habitUpdated: () => toast('habit updated with success', {icon: '✅'}),
+    habitDeleted: () => toast('habit deleted with success', {icon: '✅'}),
     habitChecked: (streak: number) => {
       const { message, icon } = dailyHabitTemplates[Math.floor(Math.random() * dailyHabitTemplates.length)]
       const newMessage = message.replace('{streak}', String(streak + 1)).trim()
