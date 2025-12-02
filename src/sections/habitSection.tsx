@@ -157,7 +157,7 @@ export default function HabitSection<HabitType extends Habit>({
                         {habits.length ?
                             <>
                                 {contentExtra}
-                                <div className='overflow-y-auto flex flex-col gap-2 '>
+                                <div className='overflow-y-auto flex flex-col gap-2' translate="no">
                                     {habits.map((habit) => renderHabitBox(habit, onUpdateHabit, modalDispatch))}
                                 </div>
                             </>

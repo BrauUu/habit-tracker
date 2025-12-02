@@ -44,6 +44,7 @@ export default function DayOfWeekSelector({ selectedDaysProps, onChange }: DaySe
         <div className="flex flex-row border rounded-lg sm:text-sm">
             {DaysOfWeek.map((day, index) =>
                 <button
+                    translate="no"
                     key={index}
                     type="button"
                     className={`text-center grow p-2 cursor-pointer transition-colors ${getStyleByDay(index)} ${selectedDays.includes(index) ? 'bg-secondary-100 text-primary-600 ' : 'bg-primary-600 text-secondary-100 hover:bg-primary-700'}`}
