@@ -312,7 +312,7 @@ function App() {
   }
 
   function checkHabitByDay(habit: DailyHabit, weekDay: number) {
-    return habit.daysOfTheWeek.includes(weekDay)
+    return habit.daysOfTheWeek?.includes(weekDay)
   }
 
   const setDailyHabits = useCallback((updater: (dailyHabits: DailyHabit[]) => DailyHabit[]) => {
