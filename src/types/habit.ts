@@ -9,7 +9,7 @@ export interface DailyHabit extends BaseHabit {
   type: 'daily'
   done: boolean
   streak: number
-  daysOfTheWeek: number[]
+  daysOfTheWeek?: number[]
 }
 
 export interface Todo extends BaseHabit {

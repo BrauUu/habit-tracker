@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 
 type DaySelectorProps = {
-    selectedDaysProps: number[],
+    selectedDaysProps?: number[],
     onChange?: (days: number[]) => void
 }
 
@@ -17,7 +17,7 @@ const DaysOfWeek = [
 
 export default function DayOfWeekSelector({ selectedDaysProps, onChange }: DaySelectorProps) {
 
-    const [selectedDays, setSelectedDay] = useState<number[]>([...selectedDaysProps])
+    const [selectedDays, setSelectedDay] = useState<number[]>([...selectedDaysProps || []])
 
     function getStyleByDay(index: number) {
         if (index === 6) return 'rounded-md rounded-s-none'

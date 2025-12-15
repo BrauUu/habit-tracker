@@ -65,10 +65,6 @@ export default function DailyHabitsSection({
       toast.validationError('title')
       return false
     }
-    if (habit.daysOfTheWeek.length === 0) {
-      toast.validationError('days')
-      return false
-    }
     return true
   }
 

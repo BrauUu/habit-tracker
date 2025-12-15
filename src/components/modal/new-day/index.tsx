@@ -24,15 +24,17 @@ export default function NewDayModal({ title, children, onStart }: ModalProps) {
             }}
         >
             <div
-                className="w-full m-4 max-w-lg bg-primary-600 sm:p-6 p-4 rounded-lg flex flex-col items-center gap-4"
+                className="w-full max-h-11/12 max-w-lg bg-primary-600 sm:p-6 p-4 rounded-lg flex flex-col items-center gap-4"
             >
                 <div className="flex justify-between items-center">
                     <Title value={title} style="text-lg"></Title>
                 </div>
                 <Whiteboard>
-                    {children}
+                    <div className="overflow-y-auto flex flex-col gap-2" translate="no">
+                        {children}
+                    </div>
                 </Whiteboard>
-               <Button action={onStart} text="start a new day" type="primary" style="max-w-full w-60 h-8"/>
+                <Button action={onStart} text="start a new day" type="primary" style="max-w-full w-60 h-8" />
             </div>
         </div>
     )
