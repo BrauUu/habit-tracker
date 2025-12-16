@@ -7,12 +7,6 @@ A modern, minimalist habit tracking application built with React, TypeScript, an
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat&logo=tailwind-css&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat&logo=vite&logoColor=white)
 
-## 📝 Future Enhancements
-
-- [ ] Cloud sync across devices
-- [ ] Habit reminders/notifications
-- [ ] Dark/light theme toggle
-
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
@@ -22,6 +16,5 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 - Design inspired by minimalist productivity apps
 - Icons by [Heroicons](https://heroicons.com/)
 - Font: Google Sans Code
-
 
 Made with ❤️ and TypeScript
