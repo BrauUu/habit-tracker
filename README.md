@@ -10,8 +10,6 @@ A modern, minimalist habit tracking application built with React, TypeScript, an
 ## 📝 Future Enhancements
 
 - [ ] Cloud sync across devices
-- [ ] Habit reminders/notifications
-- [ ] Dark/light theme toggle
 
 ## 🤝 Contributing
 
