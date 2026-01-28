@@ -21,5 +21,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 - Icons by [Heroicons](https://heroicons.com/)
 - Font: Google Sans Code
 
-
 Made with ❤️ and TypeScript
