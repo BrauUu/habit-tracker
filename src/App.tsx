@@ -2,6 +2,7 @@ import { useEffect, useState, useRef, useCallback } from 'react'
 
 import type { DailyHabit, IncrementalHabit, HabitsList, Todo } from './types/habit'
 
+import UserSection from './sections/userSection'
 import DailyHabitsSection from './sections/dailyHabitSection'
 import IncrementalHabitsSection from './sections/incrementalHabitSection'
 import TodosSection from './sections/todoSection'
@@ -338,7 +339,8 @@ function App() {
 
   return (
     <>
-      <div className='flex flex-col lg:flex-row gap-8 p-4 lg:p-16 lg:w-full w-dvw h-dvh pb-20'>
+      <UserSection></UserSection>
+      <div className='flex flex-col lg:flex-row gap-8 p-4 lg:p-16  lg:w-full w-dvw h-dvh pb-20'>
         <div className={`w-full lg:w-1/3 h-full ${activeSection === 'incremental' ? 'block' : 'hidden lg:block'}`}>
           <IncrementalHabitsSection
             incrementalHabits={habitsList.incrementalHabits}

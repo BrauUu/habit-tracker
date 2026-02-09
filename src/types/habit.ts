@@ -3,32 +3,32 @@ import type { resetFrequencyType } from "./others"
 interface BaseHabit {
   id: string
   title: string
+  description?: string
+  createdAt: Date
+  userId: string
 }
 
-export interface DailyHabit extends BaseHabit {
-  type: 'daily'
+export interface Daily extends BaseHabit {
   done: boolean
   streak: number
   daysOfTheWeek?: number[]
 }
 
 export interface Todo extends BaseHabit {
-  type: 'to do',
   doneDate?: Date,
   dueDate: Date | null
 }
 
-export interface IncrementalHabit extends BaseHabit {
-  type: 'incremental'
+export interface Incremental extends BaseHabit {
   resetFrequency: resetFrequencyType
   positiveCount: number
   negativeCount: number
 }
 
-export type Habit = DailyHabit | IncrementalHabit | Todo
+export type Habit = Daily | Incremental | Todo
 
 export interface HabitsList {
-  dailyHabits: DailyHabit[]
-  incrementalHabits: IncrementalHabit[]
+  dailyHabits: Daily[]
+  incrementalHabits: Incremental[]
   todos: Todo[]
 }
