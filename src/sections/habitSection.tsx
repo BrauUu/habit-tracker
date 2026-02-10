@@ -181,7 +181,7 @@ export default function HabitSection<HabitType extends Habit>({
                 <Modal
                     title={`create ${modalState.data?.habit?.type} habit`}
                     onClose={cancelHabitCreation}
-                    onSave={finishHabitCreation}
+                    onConfirm={finishHabitCreation}
                 >
                     <Input
                         value={modalState.data.habit.title}
@@ -197,7 +197,7 @@ export default function HabitSection<HabitType extends Habit>({
                 <Modal
                     title={`edit habit`}
                     onClose={closeModal}
-                    onSave={handleSave}
+                    onConfirm={handleSave}
                 >
                     <Input
                         value={modalState.data.habit.title}
@@ -213,7 +213,7 @@ export default function HabitSection<HabitType extends Habit>({
                 <Modal
                     title="delete habit"
                     onClose={closeModal}
-                    onSave={() => {
+                    onConfirm={() => {
                         if (modalState.data?.habit?.id) {
                             onDeleteHabit(modalState.data.habit.id)
                             toast.habitDeleted()

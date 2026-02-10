@@ -4,8 +4,8 @@ import { dailyHabitTemplates, incrementalHabitTemplates, todoTemplates } from '.
 export function useToast() {
 
   return {
-    success: (message: string) => toast.success(message),
-    error: (message: string) => toast.error(message),
+    success: (message: string) => toast(message, {icon: '✅'}),
+    error: (message: string) => toast(message, {icon: '❌'}),
 
     habitCreated: () => toast('habit created with success', {icon: '✅'}),
     habitUpdated: () => toast('habit updated with success', {icon: '✅'}),

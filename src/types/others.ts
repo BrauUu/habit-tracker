@@ -1,6 +1,7 @@
 export interface User {
     id: string,
     username: string,
+    password: string
     last_daily_reset_date: Date | null,
     last_weekly_reset_date: Date | null
 }

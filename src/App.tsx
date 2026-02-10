@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 
-import type { DailyHabit, IncrementalHabit, HabitsList, Todo } from './types/habit'
+import type { Daily, Incremental, HabitsList, Todo } from './types/habit'
+import type { User } from './types/others'
 
 import UserSection from './sections/userSection'
 import DailyHabitsSection from './sections/dailyHabitSection'
@@ -16,6 +17,7 @@ function App() {
     incrementalHabits: [],
     todos: []
   })
+  const [user, setUser] = useState<User|null>(null)
   const [pendingDailyHabits, setPendingDailyHabits] = useState<string[]>([])
 
   const initialLoadRef = useRef(true)
@@ -135,7 +137,7 @@ function App() {
     localStorage.setItem('habitsList', JSON.stringify(habitsList))
   }, [habitsList])
 
-  function addDailyHabit(habit: DailyHabit) {
+  function addDailyHabit(habit: Daily) {
     setHabitsList(prevState => ({
       ...prevState,
       dailyHabits: [...prevState.dailyHabits, habit]
@@ -164,7 +166,7 @@ function App() {
     }))
   }
 
-  function addIncrementalHabit(habit: IncrementalHabit) {
+  function addIncrementalHabit(habit: Incremental) {
     setHabitsList(prevState => ({
       ...prevState,
       incrementalHabits: [...prevState.incrementalHabits, habit]
@@ -275,7 +277,7 @@ function App() {
     return false
   }
 
-  function checkShouldResetIncrementalHabit(habit: IncrementalHabit, shouldResetWeekly: boolean): boolean {
+  function checkShouldResetIncrementalHabit(habit: Incremental, shouldResetWeekly: boolean): boolean {
     if (habit.resetFrequency === 'daily') return true
     if (habit.resetFrequency === 'weekly') return shouldResetWeekly
     return false
@@ -296,7 +298,7 @@ function App() {
     return !(now.getTime() > lastResetTimestamp.getTime())
   }
 
-  function checkDailyHabitStreak(habit: DailyHabit) {
+  function checkDailyHabitStreak(habit: Daily) {
     if (checkIfItsYesterdaysHabit(habit)) {
       if (habit.done)
         return habit.streak
@@ -305,25 +307,25 @@ function App() {
     return habit.streak
   }
 
-  function checkIfItsYesterdaysHabit(habit: DailyHabit) {
+  function checkIfItsYesterdaysHabit(habit: Daily) {
     const today = new Date()
     const yesterday = new Date(today)
     yesterday.setDate(today.getDate() - 1);
     return checkHabitByDay(habit, yesterday.getDay())
   }
 
-  function checkHabitByDay(habit: DailyHabit, weekDay: number) {
+  function checkHabitByDay(habit: Daily, weekDay: number) {
     return habit.daysOfTheWeek?.includes(weekDay)
   }
 
-  const setDailyHabits = useCallback((updater: (dailyHabits: DailyHabit[]) => DailyHabit[]) => {
+  const setDailyHabits = useCallback((updater: (dailyHabits: Daily[]) => Daily[]) => {
     setHabitsList(prev => ({
       ...prev,
       dailyHabits: updater(prev.dailyHabits)
     }))
   }, [])
 
-  const setIncrementalHabits = useCallback((updater: (incrementalHabits: IncrementalHabit[]) => IncrementalHabit[]) => {
+  const setIncrementalHabits = useCallback((updater: (incrementalHabits: Incremental[]) => Incremental[]) => {
     setHabitsList(prev => ({
       ...prev,
       incrementalHabits: updater(prev.incrementalHabits)
@@ -339,8 +341,8 @@ function App() {
 
   return (
     <>
-      <UserSection></UserSection>
-      <div className='flex flex-col lg:flex-row gap-8 p-4 lg:p-16  lg:w-full w-dvw h-dvh pb-20'>
+      <UserSection user={user} setUser={setUser}></UserSection>
+      <div className='flex flex-col lg:flex-row gap-8 px-4 lg:px-16 lg:pb-16 lg:w-full w-dvw h-dvh pb-20'>
         <div className={`w-full lg:w-1/3 h-full ${activeSection === 'incremental' ? 'block' : 'hidden lg:block'}`}>
           <IncrementalHabitsSection
             incrementalHabits={habitsList.incrementalHabits}

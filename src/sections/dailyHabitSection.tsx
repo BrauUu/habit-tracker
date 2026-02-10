@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 
-import type { DailyHabit } from '../types/habit'
+import type { Daily } from '../types/habit'
 
 import HabitSection from './habitSection'
 import { HabitBox, DragOverlayHabitBox } from '../components/boxes/habitbox'
@@ -11,11 +11,11 @@ import { useToast } from '../hooks/useToast';
 import { CalendarIcon } from '@heroicons/react/24/outline'
 
 interface DailyHabitsSectionProps {
-  dailyHabits: DailyHabit[]
-  setDailyHabits: (updater: (dailyHabits: DailyHabit[]) => DailyHabit[]) => void
+  dailyHabits: Daily[]
+  setDailyHabits: (updater: (dailyHabits: Daily[]) => Daily[]) => void
   onUpdateDailyHabit: (id: string, key: string, value: any) => void
   onDeleteDailyHabit: (id: string) => void
-  onAddDailyHabit: (habit: DailyHabit) => void
+  onAddDailyHabit: (habit: Daily) => void
   onResetDailyHabits: () => void
   pendingHabits: string[]
 }
@@ -44,12 +44,12 @@ export default function DailyHabitsSection({
     return [...dailyHabits]
   }, [dailyHabitFilter, dailyHabits])
 
-  function checkIfItsTodaysHabit(habit: DailyHabit) {
+  function checkIfItsTodaysHabit(habit: Daily) {
     const today = new Date().getDay()
     return habit?.daysOfTheWeek?.includes(today)
   }
 
-  function createDefaultHabit(id: string, title: string): DailyHabit {
+  function createDefaultHabit(id: string, title: string): Daily {
     return {
       id,
       title,
@@ -60,7 +60,7 @@ export default function DailyHabitsSection({
     }
   }
 
-  function validateHabit(habit: DailyHabit): boolean {
+  function validateHabit(habit: Daily): boolean {
     if (!habit.title) {
       toast.validationError('title')
       return false

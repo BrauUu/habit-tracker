@@ -1,13 +1,11 @@
 import type { Habit } from './habit'
+import type { User } from './others';
 
-export type ModalType = 'newDay' | 'createHabit' | 'updateHabit' | 'deleteHabit' | null;
+export type ModalType = 'newDay' | 'createHabit' | 'updateHabit' | 'deleteHabit' | 'login' | 'register' | null;
 
 export interface ModalState {
   type: ModalType
-  data?: {
-    pendingHabits?: string[]
-    habit?: Habit
-  }
+  data?: any
 }
 
 export type ModalAction =
@@ -15,4 +13,7 @@ export type ModalAction =
   | { type: 'createHabit', payload: Habit }
   | { type: 'updateHabit', payload: Partial<Habit> | Habit }
   | { type: 'deleteHabit', payload: Partial<Habit> }
+  | { type: 'login'}
+  | { type: 'register'}
+  | { type: 'updateUser', payload: Partial<User>}
   | { type: 'hideModal' }
