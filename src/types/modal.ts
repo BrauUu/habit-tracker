@@ -10,7 +10,7 @@ export interface ModalState {
 
 export type ModalAction =
   | { type: 'showNewDay', payload: string[] }
-  | { type: 'createHabit', payload: Habit }
+  | { type: 'createHabit', payload: Partial<Habit> | Habit }
   | { type: 'updateHabit', payload: Partial<Habit> | Habit }
   | { type: 'deleteHabit', payload: Partial<Habit> }
   | { type: 'login'}

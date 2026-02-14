@@ -1,10 +1,9 @@
 import { useState, useReducer, useMemo, type ReactNode } from 'react'
-import { v4 as uuidv4 } from 'uuid';
 
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragOverlay, type DragEndEvent, type DragStartEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 
-import type { DailyHabit, IncrementalHabit, Todo } from '../types/habit'
+import type { Habit } from '../types/habit'
 import type { ModalAction } from '../types/modal'
 import { modalReducer } from '../reducers/modalReducer'
 
@@ -13,17 +12,17 @@ import Title from '../components/title'
 import Input from '../components/input'
 import Modal from '../components/modal/default';
 import { useToast } from '../hooks/useToast';
+import type { AxiosResponse } from 'axios';
 
-type Habit = DailyHabit | IncrementalHabit | Todo
 
 interface HabitSectionProps<HabitType extends Habit> {
     title: string
     habits: HabitType[]
     setHabits: (updater: (habits: HabitType[]) => HabitType[]) => void
     onUpdateHabit: (id: string, key: string, value: any) => void
-    onDeleteHabit: (id: string) => void
-    onAddHabit: (habit: HabitType) => void
-    createDefaultHabit: (id: string, title: string) => HabitType
+    onDeleteHabit: (id: string) => Promise<AxiosResponse | void>
+    onAddHabit: (habit: HabitType) => Promise<AxiosResponse<HabitType> | void>
+    createDefaultHabit: (title: string) => Partial<HabitType>
     validateHabit: (habit: HabitType) => boolean
     renderHabitBox: (habit: HabitType, updateHabit: (id: string, key: string, value: any) => void, modalDispatch: React.Dispatch<ModalAction>) => ReactNode
     renderDragOverlay: (habit: HabitType) => ReactNode
@@ -68,24 +67,53 @@ export default function HabitSection<HabitType extends Habit>({
         })
     );
 
-    const templateHabit = useMemo(() => {
-        return createDefaultHabit('___tmp_id___', '')
-    }, [createDefaultHabit])
-
     function createNewHabit(title: string) {
-        const newHabit = createDefaultHabit(uuidv4(), title)
+        const newHabit = createDefaultHabit(title)
         modalDispatch({ type: 'createHabit', payload: newHabit })
     }
 
-    function finishHabitCreation() {
+    async function finishHabitCreation() {
         const habit = modalState.data?.habit as HabitType
         if (!habit) return
 
         if (modalState.type === 'createHabit') {
             if (!validateHabit(habit)) return
-            onAddHabit(habit)
-            toast.habitCreated()
+
+            try {
+                const response = await onAddHabit(habit)
+
+                if (response) {
+                    if (response.status != 201)
+                        throw response.data
+                }
+
+                toast.habitCreated()
+                closeModal()
+
+            } catch (error) {
+                const errorMessage = error instanceof Error ? error.message : String(error)
+                toast.error(errorMessage)
+            }
+        }
+    }
+
+    async function deleteHabit() {
+        const id = modalState.data?.habit?.id
+
+        try {
+            const response = await onDeleteHabit(id)
+
+            if (response) {
+                if (response.status != 200)
+                    throw new Error()
+            }
+
+            toast.habitDeleted()
             closeModal()
+
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : String(error)
+            toast.error(errorMessage)
         }
     }
 
@@ -93,14 +121,13 @@ export default function HabitSection<HabitType extends Habit>({
         modalDispatch({ type: 'hideModal' })
     }
 
-    function handleSave() {
+    function handleUpdate() {
         const habit = modalState.data?.habit as HabitType
         if (!habit) return
 
         if (!validateHabit(habit)) return
 
         Object.entries(habit).forEach(([key, value]) => {
-            if (key == 'id' || key == 'type') return
             onUpdateHabit(habit.id, key, value)
         })
 
@@ -152,7 +179,7 @@ export default function HabitSection<HabitType extends Habit>({
                 >
                     <Whiteboard>
                         <div>
-                            <Input placeholder={`add ${templateHabit.type}`} onSubmit={createNewHabit} submitOnEnter={true} />
+                            <Input placeholder={`add ${title}`} onSubmit={createNewHabit} submitOnEnter={true} />
                         </div>
                         {habits.length ?
                             <>
@@ -197,7 +224,7 @@ export default function HabitSection<HabitType extends Habit>({
                 <Modal
                     title={`edit habit`}
                     onClose={closeModal}
-                    onConfirm={handleSave}
+                    onConfirm={handleUpdate}
                 >
                     <Input
                         value={modalState.data.habit.title}
@@ -213,13 +240,7 @@ export default function HabitSection<HabitType extends Habit>({
                 <Modal
                     title="delete habit"
                     onClose={closeModal}
-                    onConfirm={() => {
-                        if (modalState.data?.habit?.id) {
-                            onDeleteHabit(modalState.data.habit.id)
-                            toast.habitDeleted()
-                        }
-                        closeModal()
-                    }}
+                    onConfirm={deleteHabit}
                     confirmButtonText="delete"
                 >
                     <p>are you sure you want to delete <strong>{modalState.data.habit.title}</strong>?</p>

@@ -2,26 +2,26 @@ import { PlusIcon, MinusIcon, TrashIcon } from '@heroicons/react/24/solid'
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-import type { IncrementalHabit } from '../../../types/habit'
+import type { Incremental } from '../../../types/habit'
 import type { ModalAction } from '../../../types/modal'
 
 import Button from '../../button'
 import { useToast } from '../../../hooks/useToast';
 interface IncrementalHabitBoxProps {
-    habit: IncrementalHabit,
+    habit: Incremental,
     updateHabit: (id: string, key: string, value: any) => void,
     modalDispatch?: (action: ModalAction) => void
 }
 
 interface DragOverlayIncrementalHabitBoxProps {
-    habit: IncrementalHabit,
+    habit: Incremental,
 }
 
 export function IncrementalHabitBox({ habit, updateHabit, modalDispatch }: IncrementalHabitBoxProps) {
 
     const toast = useToast()
 
-    const { id, title, resetFrequency, positiveCount, negativeCount, type } = habit
+    const { id, title, reset_frequency, positive_count, negative_count} = habit
 
     const {
         attributes,
@@ -37,23 +37,23 @@ export function IncrementalHabitBox({ habit, updateHabit, modalDispatch }: Incre
     };
 
     function increaseHabitCount() {
-        updateHabit(id, "positiveCount", positiveCount + 1)
-        toast.habitCountIncreased(habit?.positiveCount)
+        updateHabit(id, "positive_count", positive_count + 1)
+        toast.habitCountIncreased(habit?.positive_count)
     }
 
     function decreaseHabitCount() {
-        updateHabit(id, "negativeCount", negativeCount + 1)
-        toast.habitCountDecreased(habit?.negativeCount)
+        updateHabit(id, "negative_count", negative_count + 1)
+        toast.habitCountDecreased(habit?.negative_count)
     }
 
-    const total = positiveCount - negativeCount;
+    const total = positive_count - negative_count;
 
     return (
         <div
             className={`w-full text-lg rounded-lg bg-primary-600 p-2 flex flex-row cursor-pointer items-center gap-2 min-h-20 shrink-0`}
             onClick={() => {
                 if (modalDispatch)
-                    modalDispatch({ type: "updateHabit", payload: { id, title, resetFrequency, type } })
+                    modalDispatch({ type: "updateHabit", payload: { id, title, reset_frequency } })
             }}
             ref={setNodeRef}
             {...listeners}
@@ -99,9 +99,9 @@ export function IncrementalHabitBox({ habit, updateHabit, modalDispatch }: Incre
                 </div>
                 <div className='flex items-center gap-2 text-sm'>
                     <div className='flex items-center gap-1'>
-                        <span className='text-emerald-400'>+{positiveCount}</span>
+                        <span className='text-emerald-400'>+{positive_count}</span>
                         <span className='text-secondary/50'>/</span>
-                        <span className='text-ruby-500'>-{negativeCount}</span>
+                        <span className='text-ruby-500'>-{negative_count}</span>
                     </div>
                     <span className='text-secondary/50'>•</span>
                     <span className={`font-bold ${total >= 0 ? 'text-emerald-400' : 'text-ruby-500'}`}>
@@ -115,8 +115,8 @@ export function IncrementalHabitBox({ habit, updateHabit, modalDispatch }: Incre
 
 export function DragOverlayIncrementalHabitBox({ habit }: DragOverlayIncrementalHabitBoxProps) {
 
-    const { title, positiveCount, negativeCount } = habit
-    const total = positiveCount - negativeCount;
+    const { title, positive_count, negative_count } = habit
+    const total = positive_count - negative_count;
 
     return (
         <div className={`w-full text-lg rounded-lg bg-primary-600 p-2 flex flex-row items-center gap-2 opacity-80 cursor-grabbing min-h-20 shrink-0`}>
@@ -141,9 +141,9 @@ export function DragOverlayIncrementalHabitBox({ habit }: DragOverlayIncremental
 
                 <div className='flex items-center gap-2 text-sm'>
                     <div className='flex items-center gap-1'>
-                        <span className='text-emerald-400'>+{positiveCount}</span>
+                        <span className='text-emerald-400'>+{positive_count}</span>
                         <span className='text-secondary/50'>/</span>
-                        <span className='text-ruby-500'>-{negativeCount}</span>
+                        <span className='text-ruby-500'>-{negative_count}</span>
                     </div>
                     <span className='text-secondary/50'>•</span>
                     <span className={`font-bold ${total >= 0 ? 'text-emerald-400' : 'text-ruby-500'}`}>

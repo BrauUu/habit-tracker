@@ -25,11 +25,12 @@ export default function UserSection({user, setUser}: UserSectionProps) {
 
     const toast = useToast()
 
-    //TODO: implementar lógica do isLogged
-    let isLogged = false
-
     function saveTokenOnLocalStorage(token: string) {
         window.localStorage.setItem('token', token)
+    }
+
+    function removeTokenOnLocalStorage() {
+        window.localStorage.removeItem('token')
     }
 
     async function login() {
@@ -45,7 +46,12 @@ export default function UserSection({user, setUser}: UserSectionProps) {
                 toast.error(error.response?.data.message)
             }
         }
-        
+    }
+
+    function logout() {
+        toast.success('logout with success')
+        removeTokenOnLocalStorage()
+        window.location.reload()
     }
 
     function closeModal() {
@@ -68,7 +74,7 @@ export default function UserSection({user, setUser}: UserSectionProps) {
                 {isShowingDropdown &&
                     <div className="absolute top-16">
                         <Dropdown>
-                            {!isLogged ?
+                            {!user ?
                                 <ul>
                                     <li onClick={openLoginModal}>
                                         login
@@ -79,7 +85,7 @@ export default function UserSection({user, setUser}: UserSectionProps) {
                                 </ul>
                                 :
                                 <ul>
-                                    <li>
+                                    <li onClick={logout}>
                                         logout
                                     </li>
                                 </ul>
@@ -103,7 +109,7 @@ export default function UserSection({user, setUser}: UserSectionProps) {
                     />
                     <Input
                         placeholder="type your password"
-                        value={modalState.data?.user?.username}
+                        value={modalState.data?.user?.password}
                         type="password"
                         onSubmit={(v) => modalDispatch({ type: 'updateUser', payload: { password: v } })}
                         onChange={(v) => modalDispatch({ type: 'updateUser', payload: { password: v } })}

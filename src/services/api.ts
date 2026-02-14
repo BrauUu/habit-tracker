@@ -1,17 +1,24 @@
-import axios, { AxiosError }  from "axios";
+import axios, { AxiosError } from "axios";
 
 
 const env = import.meta.env
 
 export const api = axios.create({
-    baseURL: env.VITE_API_URL
+  baseURL: env.VITE_API_URL
 })
+
+const publicRoutes = ['/login', '/register']
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+     const isPublicRoute = publicRoutes.some(route => 
+      config.url?.includes(route)
+    )
+    if (!isPublicRoute) {
+      const token = localStorage.getItem('token')
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+      }
     }
     return config
   },
@@ -42,7 +49,7 @@ api.interceptors.response.use(
     } else {
       console.error('Erro na requisição:', error.message)
     }
-    
+
     return Promise.reject(error)
   }
 )

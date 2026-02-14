@@ -1,19 +1,21 @@
-import type { IncrementalHabit } from '../types/habit'
+import type { Incremental } from '../types/habit'
+
 
 import HabitSection from './habitSection'
-import { IncrementalHabitBox, DragOverlayIncrementalHabitBox } from '../components/boxes/incrementalhabitbox'
+import { IncrementalHabitBox, DragOverlayIncrementalHabitBox } from '../components/boxes/incrementalBox'
 import ResetFrequencySelector from '../components/resetFrequencySelector';
 import { useToast } from '../hooks/useToast';
 import Filter from '../components/filter';
 import { useMemo, useState } from 'react';
 import { ChartBarIcon } from '@heroicons/react/24/outline';
+import type { AxiosResponse } from 'axios';
 
 interface IncrementalHabitsSectionProps {
-  incrementalHabits: IncrementalHabit[]
-  setIncrementalHabits: (updater: (incrementalHabits: IncrementalHabit[]) => IncrementalHabit[]) => void
+  incrementalHabits: Incremental[]
+  setIncrementalHabits: (updater: (incrementalHabits: Incremental[]) => Incremental[]) => void
   onUpdateIncrementalHabit: (id: string, key: string, value: any) => void
-  onDeleteIncrementalHabit: (id: string) => void
-  onAddIncrementalHabit: (habit: IncrementalHabit) => void
+  onDeleteIncrementalHabit: (id: string) => Promise<AxiosResponse | void>
+  onAddIncrementalHabit: (habit: Incremental) => Promise<AxiosResponse<Incremental> | void>
 }
 
 export default function IncrementalHabitsSection({
@@ -39,28 +41,26 @@ export default function IncrementalHabitsSection({
     return [...incrementalHabits]
   }, [incrementalHabitFilter, incrementalHabits])
 
-  function checkHabitStrength(habit: IncrementalHabit, filter: number) {
-    const strength : number = habit.positiveCount - habit.negativeCount
+  function checkHabitStrength(habit: Incremental, filter: number) {
+    const strength : number = habit.positive_count - habit.negative_count
     return strength > 0 && filter == 1 || strength < 0 && filter == -1
   }
 
-  function createDefaultHabit(id: string, title: string): IncrementalHabit {
+  function createDefaultHabit(title: string): Partial<Incremental> {
     return {
-      id,
-      resetFrequency: 'weekly',
+      reset_frequency: 'weekly',
       title,
-      type: 'incremental',
-      positiveCount: 0,
-      negativeCount: 0
+      positive_count: 0,
+      negative_count: 0
     }
   }
 
-  function validateHabit(habit: IncrementalHabit): boolean {
+  function validateHabit(habit: Incremental): boolean {
     if (!habit.title) {
       toast.validationError('title')
       return false
     }
-    if (!habit.resetFrequency) {
+    if (!habit.reset_frequency) {
       toast.validationError('reset frequency')
       return false
     }
@@ -91,8 +91,8 @@ export default function IncrementalHabitsSection({
       headerExtra={<Filter value={incrementalHabitFilter} onChange={setIncrementalHabitFilter} filters={filterOptions} />}
       renderModalFields={(habit, modalDispatch) => (
         <ResetFrequencySelector
-          resetFrequency={habit.resetFrequency}
-          onChange={(v) => modalDispatch({ type: 'updateHabit', payload: { resetFrequency: v } })}
+          resetFrequency={habit.reset_frequency}
+          onChange={(v) => modalDispatch({ type: 'updateHabit', payload: { reset_frequency: v } })}
         />
       )}
        withoutContent={{

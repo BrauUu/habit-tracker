@@ -20,7 +20,7 @@ export function modalReducer(state: ModalState, action: ModalAction): ModalState
         return {
           ...state,
           data: {
-            habit: { ...state.data.habit, ...action.payload } as Habit
+            habit: { ...state.data.habit, ...action.payload }
           }
         }
       }
@@ -28,7 +28,7 @@ export function modalReducer(state: ModalState, action: ModalAction): ModalState
         return {
           ...state,
           data: {
-            habit: { ...state.data.habit, ...action.payload } as Habit
+            habit: { ...state.data.habit, ...action.payload }
           }
         }
       }

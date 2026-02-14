@@ -3,18 +3,19 @@ import { useState, useMemo } from 'react'
 import type { Todo } from '../types/habit'
 
 import HabitSection from './habitSection'
-import { TodoBox, DragOverlayTodoBox } from '../components/boxes/todobox'
+import { TodoBox, DragOverlayTodoBox } from '../components/boxes/todoBox'
 import Filter from '../components/filter'
 import { useToast } from '../hooks/useToast';
 import DatePicker from '../components/datePicker'
 import { CheckCircleIcon } from '@heroicons/react/24/outline'
+import type { AxiosResponse } from 'axios'
 
 interface TodosSectionProps {
   todos: Todo[]
   setTodos: (updater: (todos: Todo[]) => Todo[]) => void
   onUpdateTodo: (id: string, key: string, value: any) => void
-  onDeleteTodo: (id: string) => void
-  onAddTodo: (habit: Todo) => void
+  onDeleteTodo: (id: string) => Promise<AxiosResponse | void>
+  onAddTodo: (habit: Todo) => Promise<AxiosResponse<Todo> | void>
 }
 
 export default function TodosSection({
@@ -40,15 +41,13 @@ export default function TodosSection({
   }, [todoFilter, todos])
 
   function checkIfItsDone(todo: Todo, isDone: boolean = true) {
-    return (todo?.doneDate !== undefined) === isDone
+    return (todo?.done_date !== null) === isDone
   }
 
-  function createDefaultHabit(id: string, title: string): Todo {
+  function createDefaultHabit(title: string): Partial<Todo> {
     return {
-      id,
       title,
-      type: 'to do',
-      dueDate: null
+      due_date: null
     }
   }
 
@@ -64,7 +63,7 @@ export default function TodosSection({
   return (
     <>
       <HabitSection
-        title="to do's"
+        title="todo"
         habits={todosFiltered}
         setHabits={setTodos}
         onUpdateHabit={onUpdateTodo}
@@ -82,7 +81,7 @@ export default function TodosSection({
         )}
         renderModalFields={(habit, modalDispatch) => (
           <div className='flex justify-center'>
-            <DatePicker date={habit.dueDate} placeholder='pick a deadline if needed' onChange={(v) => modalDispatch({ type: 'updateHabit', payload: { dueDate: v } })} />
+            <DatePicker date={habit.due_date} placeholder='pick a deadline if needed' onChange={(v) => modalDispatch({ type: 'updateHabit', payload: { due_date: v } })} />
           </div>
         )}
         renderDragOverlay={(todo) => (

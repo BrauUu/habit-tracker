@@ -2,7 +2,7 @@ import { CheckIcon, TrashIcon, ForwardIcon } from '@heroicons/react/24/solid'
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-import type { DailyHabit } from '../../../types/habit'
+import type { Daily } from '../../../types/habit'
 import type { ModalAction } from '../../../types/modal'
 
 import Button from '../../button'
@@ -10,21 +10,21 @@ import { useState } from 'react';
 import { useToast } from '../../../hooks/useToast';
 
 interface HabitBoxProps {
-    habit: DailyHabit,
+    habit: Daily,
     onlyVisible?: boolean,
     updateHabit: (id: string, key: string, value: any) => void,
     modalDispatch?: (action: ModalAction) => void
 }
 
 interface DragOverlayHabitBoxProps {
-    habit: DailyHabit,
+    habit: Daily,
 }
 
 export function HabitBox({ habit, onlyVisible = true, updateHabit, modalDispatch }: HabitBoxProps) {
 
     const toast = useToast()
 
-    const { id, title, done, daysOfTheWeek, streak, type } = habit
+    const { id, title, done, days_of_the_week, streak } = habit
     const [isHover, setIsHover] = useState<boolean>(false)
 
     const {
@@ -56,7 +56,7 @@ export function HabitBox({ habit, onlyVisible = true, updateHabit, modalDispatch
                 `}
             onClick={() => {
                 if (modalDispatch)
-                    modalDispatch({ type: "updateHabit", payload: { id, daysOfTheWeek, title, type } })
+                    modalDispatch({ type: "updateHabit", payload: { id, days_of_the_week, title} })
             }
             }
             ref={setNodeRef}

@@ -3,19 +3,20 @@ import { useState, useMemo } from 'react'
 import type { Daily } from '../types/habit'
 
 import HabitSection from './habitSection'
-import { HabitBox, DragOverlayHabitBox } from '../components/boxes/habitbox'
+import { HabitBox, DragOverlayHabitBox } from '../components/boxes/dailyBox'
 import Filter from '../components/filter'
 import NewDayModal from '../components/modal/new-day';
 import DayOfWeekSelector from '../components/dayOfWeekSelector';
 import { useToast } from '../hooks/useToast';
 import { CalendarIcon } from '@heroicons/react/24/outline'
+import type { AxiosResponse } from 'axios'
 
 interface DailyHabitsSectionProps {
   dailyHabits: Daily[]
   setDailyHabits: (updater: (dailyHabits: Daily[]) => Daily[]) => void
   onUpdateDailyHabit: (id: string, key: string, value: any) => void
-  onDeleteDailyHabit: (id: string) => void
-  onAddDailyHabit: (habit: Daily) => void
+  onDeleteDailyHabit: (id: string) => Promise<AxiosResponse | void>
+  onAddDailyHabit: (daily: Daily) => Promise<AxiosResponse<Daily> | void>
   onResetDailyHabits: () => void
   pendingHabits: string[]
 }
@@ -46,17 +47,15 @@ export default function DailyHabitsSection({
 
   function checkIfItsTodaysHabit(habit: Daily) {
     const today = new Date().getDay()
-    return habit?.daysOfTheWeek?.includes(today)
+    return habit?.days_of_the_week?.includes(today)
   }
 
-  function createDefaultHabit(id: string, title: string): Daily {
+  function createDefaultHabit(title: string): Partial<Daily> {
     return {
-      id,
       title,
       done: false,
       streak: 0,
-      type: 'daily',
-      daysOfTheWeek: [0, 1, 2, 3, 4, 5, 6],
+      days_of_the_week: [0, 1, 2, 3, 4, 5, 6]
     }
   }
 
@@ -94,8 +93,8 @@ export default function DailyHabitsSection({
         )}
         renderModalFields={(habit, modalDispatch) => (
           <DayOfWeekSelector
-            selectedDaysProps={habit.daysOfTheWeek}
-            onChange={(days) => modalDispatch({ type: 'updateHabit', payload: { daysOfTheWeek: days } })}
+            selectedDaysProps={habit.days_of_the_week}
+            onChange={(days) => modalDispatch({ type: 'updateHabit', payload: { days_of_the_week: days } })}
           />
         )}
         headerExtra={<Filter value={dailyHabitFilter} onChange={setDailyHabitFilter} filters={filterOptions} />}
