@@ -13,7 +13,7 @@ import type { AxiosResponse } from 'axios'
 interface TodosSectionProps {
   todos: Todo[]
   setTodos: (updater: (todos: Todo[]) => Todo[]) => void
-  onUpdateTodo: (id: string, key: string, value: any) => void
+  onUpdateTodo: (id: string, habit: Todo) => Promise<AxiosResponse<Todo> | void>
   onDeleteTodo: (id: string) => Promise<AxiosResponse | void>
   onAddTodo: (habit: Todo) => Promise<AxiosResponse<Todo> | void>
 }
@@ -42,12 +42,14 @@ export default function TodosSection({
 
   function checkIfItsDone(todo: Todo, isDone: boolean = true) {
     return (todo?.done_date !== null) === isDone
-  }
+  }             
 
-  function createDefaultHabit(title: string): Partial<Todo> {
+  function createDefaultHabit(id:string, title: string): Partial<Todo> {
     return {
+      id,
       title,
-      due_date: null
+      due_date: null,
+      done_date: null
     }
   }
 

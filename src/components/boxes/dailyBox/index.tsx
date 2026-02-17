@@ -4,6 +4,7 @@ import { CSS } from '@dnd-kit/utilities';
 
 import type { Daily } from '../../../types/habit'
 import type { ModalAction } from '../../../types/modal'
+import type { AxiosResponse } from 'axios';
 
 import Button from '../../button'
 import { useState } from 'react';
@@ -12,7 +13,7 @@ import { useToast } from '../../../hooks/useToast';
 interface HabitBoxProps {
     habit: Daily,
     onlyVisible?: boolean,
-    updateHabit: (id: string, key: string, value: any) => void,
+    updateHabit: (id: string, habit: Daily) => Promise<AxiosResponse<Daily> | void>
     modalDispatch?: (action: ModalAction) => void
 }
 
@@ -45,8 +46,7 @@ export function HabitBox({ habit, onlyVisible = true, updateHabit, modalDispatch
         if(!isChecked){
             toast.habitChecked(habit?.streak)
         }
-        updateHabit(id, "streak", !done ? streak + 1 : streak - 1)
-        updateHabit(id, "done", !done)
+        updateHabit(id, {...habit, streak: !done ? streak + 1 : streak - 1, done: !done})
     }
 
     return (
@@ -56,7 +56,7 @@ export function HabitBox({ habit, onlyVisible = true, updateHabit, modalDispatch
                 `}
             onClick={() => {
                 if (modalDispatch)
-                    modalDispatch({ type: "updateHabit", payload: { id, days_of_the_week, title} })
+                    modalDispatch({ type: "updateHabit", payload: {...habit} })
             }
             }
             ref={setNodeRef}

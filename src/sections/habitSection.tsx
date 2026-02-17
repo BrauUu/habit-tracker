@@ -1,4 +1,5 @@
-import { useState, useReducer, useMemo, type ReactNode } from 'react'
+import { useState, useReducer, type ReactNode } from 'react'
+import { v4 as uuidv4 } from 'uuid';
 
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragOverlay, type DragEndEvent, type DragStartEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -19,12 +20,12 @@ interface HabitSectionProps<HabitType extends Habit> {
     title: string
     habits: HabitType[]
     setHabits: (updater: (habits: HabitType[]) => HabitType[]) => void
-    onUpdateHabit: (id: string, key: string, value: any) => void
+    onUpdateHabit: (id: string, habit: HabitType) => Promise<AxiosResponse<HabitType> | void>
     onDeleteHabit: (id: string) => Promise<AxiosResponse | void>
     onAddHabit: (habit: HabitType) => Promise<AxiosResponse<HabitType> | void>
-    createDefaultHabit: (title: string) => Partial<HabitType>
+    createDefaultHabit: (id: string, title: string) => Partial<HabitType>
     validateHabit: (habit: HabitType) => boolean
-    renderHabitBox: (habit: HabitType, updateHabit: (id: string, key: string, value: any) => void, modalDispatch: React.Dispatch<ModalAction>) => ReactNode
+    renderHabitBox: (habit: HabitType, updateHabit: (id: string, habit: HabitType) => Promise<AxiosResponse<HabitType> | void>, modalDispatch: React.Dispatch<ModalAction>) => ReactNode
     renderDragOverlay: (habit: HabitType) => ReactNode
     renderModalFields?: (habit: HabitType, modalDispatch: React.Dispatch<ModalAction>) => ReactNode
     withoutContent: { icon: React.ComponentType<React.SVGProps<SVGSVGElement>>, title: string, text: string }
@@ -68,7 +69,7 @@ export default function HabitSection<HabitType extends Habit>({
     );
 
     function createNewHabit(title: string) {
-        const newHabit = createDefaultHabit(title)
+        const newHabit = createDefaultHabit(uuidv4(), title)
         modalDispatch({ type: 'createHabit', payload: newHabit })
     }
 
@@ -121,18 +122,27 @@ export default function HabitSection<HabitType extends Habit>({
         modalDispatch({ type: 'hideModal' })
     }
 
-    function handleUpdate() {
+    async function handleUpdate() {
         const habit = modalState.data?.habit as HabitType
         if (!habit) return
 
         if (!validateHabit(habit)) return
 
-        Object.entries(habit).forEach(([key, value]) => {
-            onUpdateHabit(habit.id, key, value)
-        })
+        try {
+            const response = await onUpdateHabit(habit.id, habit)
 
-        toast.habitUpdated()
-        closeModal()
+            if (response) {
+                if (response.status != 200)
+                    throw new Error()
+            }
+
+            toast.habitUpdated()
+            closeModal()
+
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : String(error)
+            toast.error(errorMessage)
+        }
     }
 
     function closeModal() {
@@ -206,7 +216,7 @@ export default function HabitSection<HabitType extends Habit>({
 
             {modalState.type === 'createHabit' && modalState.data?.habit && (
                 <Modal
-                    title={`create ${modalState.data?.habit?.type} habit`}
+                    title={`create ${title} habit`}
                     onClose={cancelHabitCreation}
                     onConfirm={finishHabitCreation}
                 >

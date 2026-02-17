@@ -13,7 +13,7 @@ import type { AxiosResponse } from 'axios';
 interface IncrementalHabitsSectionProps {
   incrementalHabits: Incremental[]
   setIncrementalHabits: (updater: (incrementalHabits: Incremental[]) => Incremental[]) => void
-  onUpdateIncrementalHabit: (id: string, key: string, value: any) => void
+  onUpdateIncrementalHabit: (id: string, habit: Incremental) => Promise<AxiosResponse<Incremental> | void>
   onDeleteIncrementalHabit: (id: string) => Promise<AxiosResponse | void>
   onAddIncrementalHabit: (habit: Incremental) => Promise<AxiosResponse<Incremental> | void>
 }
@@ -46,8 +46,9 @@ export default function IncrementalHabitsSection({
     return strength > 0 && filter == 1 || strength < 0 && filter == -1
   }
 
-  function createDefaultHabit(title: string): Partial<Incremental> {
+  function createDefaultHabit(id: string, title: string): Partial<Incremental> {
     return {
+      id,
       reset_frequency: 'weekly',
       title,
       positive_count: 0,

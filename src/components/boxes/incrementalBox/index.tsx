@@ -5,11 +5,13 @@ import { CSS } from '@dnd-kit/utilities';
 import type { Incremental } from '../../../types/habit'
 import type { ModalAction } from '../../../types/modal'
 
+
 import Button from '../../button'
 import { useToast } from '../../../hooks/useToast';
+import type { AxiosResponse } from 'axios';
 interface IncrementalHabitBoxProps {
     habit: Incremental,
-    updateHabit: (id: string, key: string, value: any) => void,
+    updateHabit: (id: string, habit: Incremental) => Promise<AxiosResponse<Incremental> | void>
     modalDispatch?: (action: ModalAction) => void
 }
 
@@ -37,12 +39,13 @@ export function IncrementalHabitBox({ habit, updateHabit, modalDispatch }: Incre
     };
 
     function increaseHabitCount() {
-        updateHabit(id, "positive_count", positive_count + 1)
+        updateHabit(id, {...habit, positive_count: positive_count + 1})
         toast.habitCountIncreased(habit?.positive_count)
+        console.log(habit)
     }
 
     function decreaseHabitCount() {
-        updateHabit(id, "negative_count", negative_count + 1)
+        updateHabit(id, {...habit, negative_count: negative_count + 1})
         toast.habitCountDecreased(habit?.negative_count)
     }
 
@@ -53,7 +56,7 @@ export function IncrementalHabitBox({ habit, updateHabit, modalDispatch }: Incre
             className={`w-full text-lg rounded-lg bg-primary-600 p-2 flex flex-row cursor-pointer items-center gap-2 min-h-20 shrink-0`}
             onClick={() => {
                 if (modalDispatch)
-                    modalDispatch({ type: "updateHabit", payload: { id, title, reset_frequency } })
+                    modalDispatch({ type: "updateHabit", payload: {...habit} })
             }}
             ref={setNodeRef}
             {...listeners}

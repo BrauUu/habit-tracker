@@ -9,7 +9,7 @@ export async function createDaily(data: DailyRequest) {
 }
 
 export async function getPendingDailies() {
-    return api.get<Daily[]>(`${basePath}/pendingHabits`)
+    return api.get<string[]>(`${basePath}/pendingHabits`)
 }
 
 export async function undoAllDailies() {

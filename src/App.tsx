@@ -10,10 +10,10 @@ import TodosSection from './sections/todoSection'
 import MobileNav, { type Section } from './components/mobileNav'
 
 import { useToast } from './hooks/useToast'
-import { getAllDataFromUser } from './services/user.service'
-import { createDaily, deleteDaily } from './services/daily.service'
-import { createIncremental } from './services/incremental.service'
-import { createTodo } from './services/todo.service'
+import { getAllDataFromUser, startNewDay } from './services/user.service'
+import { createDaily, deleteDaily, getPendingDailies, updateDaily } from './services/daily.service'
+import { createIncremental, deleteIncremental, updateIncremental } from './services/incremental.service'
+import { createTodo, updateTodo as updateTodoService, deleteTodo as deleteTodoService } from './services/todo.service'
 
 function App() {
   const [activeSection, setActiveSection] = useState<Section>('daily')
@@ -59,6 +59,17 @@ function App() {
   useEffect(() => {
     if (!isUserCheckComplete) return
 
+    const handleDailyReset = async () => {
+      hasResetToday.current = false
+      const pendingHabits = await getPendingHabits()
+
+      if (pendingHabits && pendingHabits?.length > 0) {
+        setPendingDailyHabits(pendingHabits)
+      } else {
+        resetHabits()
+      }
+    }
+
     let timeoutId: NodeJS.Timeout
     const checkIfNeedsReset = () => {
 
@@ -70,14 +81,7 @@ function App() {
       today.setHours(0, 0, 0, 0)
 
       if (lastResetDate < today) {
-        hasResetToday.current = false
-        const pendingHabits = getPendingHabits()
-
-        if (pendingHabits.length > 0) {
-          setPendingDailyHabits(pendingHabits)
-        } else {
-          resetHabits()
-        }
+        handleDailyReset()
       }
     }
 
@@ -118,7 +122,6 @@ function App() {
 
     if (!user) {
       const localHabitsList: HabitsList = JSON.parse((localStorage.getItem('habitsList') || '[]'))
-      console.log(localHabitsList)
       const dailyHabits = localHabitsList?.dailyHabits || []
       const incrementalHabits = localHabitsList?.incrementalHabits || []
       const todos = localHabitsList?.todos || []
@@ -151,14 +154,18 @@ function App() {
       return
     }
 
-    if (!hasResetToday.current && habitsList.dailyHabits.length > 0 && !hasCheckedPendingHabits.current) {
+    const handleDailyReset = async () => {
       hasCheckedPendingHabits.current = true
-      const pendingHabits = getPendingHabits()
-      if (pendingHabits.length > 0) {
+      const pendingHabits = await getPendingHabits()
+      if (pendingHabits && pendingHabits?.length > 0) {
         setPendingDailyHabits(pendingHabits)
       } else {
         resetHabits()
       }
+    }
+
+    if (!hasResetToday.current && habitsList.dailyHabits.length > 0 && !hasCheckedPendingHabits.current) {
+      handleDailyReset()
     }
   }, [habitsList])
 
@@ -195,20 +202,41 @@ function App() {
 
   }
 
-  //TODO: PROVAVELMENTE PRECISA USAR API
-  async function updateDailyHabit(id: string, key: string, value: any) {
-    setHabitsList(prevState => ({
-      ...prevState,
-      dailyHabits: prevState.dailyHabits.map(habit =>
-        habit.id === id ? { ...habit, [key]: value } : habit
-      )
-    }))
+  async function updateDailyHabit(id: string, daily: Daily) {
+    if (!user) {
+      setHabitsList(prevState => ({
+        ...prevState,
+        dailyHabits: prevState.dailyHabits.map(habit =>
+          habit.id === id ? { ...daily } : habit
+        )
+      }))
+      return
+    }
+
+    const response = await updateDaily(id, daily)
+    if (response && response.status == 200) {
+      setHabitsList(prevState => ({
+        ...prevState,
+        dailyHabits: prevState.dailyHabits.map(habit =>
+          habit.id === id ? { ...response.data } : habit
+        )
+      }))
+    }
+    return response
   }
 
-  function getPendingHabits() {
-    return habitsRef.current.dailyHabits
-      .filter(habit => checkIfItsYesterdaysHabit(habit) && !habit.done)
-      .map(habit => habit.id)
+  async function getPendingHabits() {
+    if (!user) {
+      return habitsRef.current.dailyHabits
+        .filter(habit => checkIfItsYesterdaysHabit(habit) && !habit.done)
+        .map(habit => habit.id)
+    }
+
+    const response = await getPendingDailies()
+    if (response && response.status == 200) {
+      return response.data
+    }
+
   }
 
 
@@ -222,7 +250,7 @@ function App() {
     }
 
     const response = await deleteDaily(id)
-    if (response && response.status == 201) {
+    if (response && response.status == 200) {
       setHabitsList(prevState => ({
         ...prevState,
         dailyHabits: prevState.dailyHabits.filter(habit => habit.id !== id)
@@ -249,22 +277,48 @@ function App() {
     return response
   }
 
-  //TODO: PROVAVELMENTE PRECISA USAR API
-  async function updateIncrementalHabit(id: string, key: string, value: any) {
-    setHabitsList(prevState => ({
-      ...prevState,
-      incrementalHabits: prevState.incrementalHabits.map(habit =>
-        habit.id === id ? { ...habit, [key]: value } : habit
-      )
-    }))
+
+  async function updateIncrementalHabit(id: string, incremental: Incremental) {
+    if (!user) {
+      setHabitsList(prevState => ({
+        ...prevState,
+        incrementalHabits: prevState.incrementalHabits.map(habit =>
+          habit.id === id ? { ...incremental } : habit
+        )
+      }))
+      return
+    }
+
+    const response = await updateIncremental(id, incremental)
+    if (response && response.status == 200) {
+      setHabitsList(prevState => ({
+        ...prevState,
+        incrementalHabits: prevState.incrementalHabits.map(habit =>
+          habit.id === id ? { ...response.data } : habit
+        )
+      }))
+    }
+    return response
   }
 
-  //TODO: PROVAVELMENTE PRECISA USAR API
   async function deleteIncrementalHabit(id: string) {
-    setHabitsList(prevState => ({
-      ...prevState,
-      incrementalHabits: prevState.incrementalHabits.filter(habit => habit.id !== id)
-    }))
+
+    if (!user) {
+      setHabitsList(prevState => ({
+        ...prevState,
+        incrementalHabits: prevState.incrementalHabits.filter(habit => habit.id !== id)
+      }))
+      return
+    }
+
+    const response = await deleteIncremental(id)
+    if (response && response.status == 200) {
+      setHabitsList(prevState => ({
+        ...prevState,
+        incrementalHabits: prevState.incrementalHabits.filter(habit => habit.id !== id)
+      }))
+    }
+    return response
   }
 
   async function addTodo(todo: Todo) {
@@ -285,22 +339,47 @@ function App() {
     return response
   }
 
-  //TODO: PROVAVELMENTE PRECISA USAR API
-  async function updateTodo(id: string, key: string, value: any) {
-    setHabitsList(prevState => ({
-      ...prevState,
-      todos: prevState.todos.map(todo =>
-        todo.id === id ? { ...todo, [key]: value } : todo
-      )
-    }))
+  async function updateTodo(id: string, todo: Todo) {
+
+    if (!user) {
+      setHabitsList(prevState => ({
+        ...prevState,
+        todos: prevState.todos.map(habit =>
+          habit.id === id ? { ...todo } : habit
+        )
+      }))
+      return
+    }
+
+    const response = await updateTodoService(id, todo)
+    if (response && response.status == 200) {
+      setHabitsList(prevState => ({
+        ...prevState,
+        todos: prevState.todos.map(habit =>
+          habit.id === id ? { ...response.data } : habit
+        )
+      }))
+    }
+    return response
   }
 
-  //TODO: PROVAVELMENTE PRECISA USAR API
   async function deleteTodo(id: string) {
-    setHabitsList(prevState => ({
-      ...prevState,
-      todos: prevState.todos.filter(todo => todo.id !== id)
-    }))
+    if (!user) {
+      setHabitsList(prevState => ({
+        ...prevState,
+        todos: prevState.todos.filter(habit => habit.id !== id)
+      }))
+      return
+    }
+
+    const response = await deleteTodoService(id)
+    if (response && response.status == 200) {
+      setHabitsList(prevState => ({
+        ...prevState,
+        todos: prevState.todos.filter(habit => habit.id !== id)
+      }))
+    }
+    return response
   }
 
   function saveTodayDateOnLocalStorage() {
@@ -309,47 +388,82 @@ function App() {
     localStorage.setItem('lastDailyResetDate', now.toISOString())
   }
 
-  //TODO: PROVAVELMENTE PRECISA USAR API
-  function resetHabits() {
-    const shouldResetWeekly = checkShouldResetWeeklyHabits()
-
-    setHabitsList(prevState => ({
-      ...prevState,
-      dailyHabits: prevState.dailyHabits.map(habit => ({
-        ...habit,
-        done: false,
-        streak: checkDailyHabitStreak(habit)
-      })),
-      incrementalHabits: prevState.incrementalHabits.map(habit => ({
-        ...habit,
-        negative_count: checkShouldResetIncrementalHabit(habit, shouldResetWeekly) ? 0 : habit.negative_count,
-        positive_count: checkShouldResetIncrementalHabit(habit, shouldResetWeekly) ? 0 : habit.positive_count
-      }))
-    }))
-
-    habitsList.todos.forEach((todo) => {
-      const today = new Date()
-      today.setHours(0, 0, 0, 0)
-
-      const sevenDaysAgo = new Date(today)
-      sevenDaysAgo.setDate(today.getDate() - 7)
-
-      if (todo?.done_date) {
-        const doneDate = new Date(todo?.done_date)
-        if (doneDate <= sevenDaysAgo) {
-          deleteTodo(todo.id)
-        }
-      }
-
-    })
-
-    saveTodayDateOnLocalStorage()
-
-    if (shouldResetWeekly) {
-      setLastSunday()
-    }
+  async function resetHabits() {
 
     setPendingDailyHabits([])
+    if (!user) {
+      const shouldResetWeekly = checkShouldResetWeeklyHabits()
+
+      setHabitsList(prevState => ({
+        ...prevState,
+        dailyHabits: prevState.dailyHabits.map(habit => ({
+          ...habit,
+          done: false,
+          streak: checkDailyHabitStreak(habit)
+        })),
+        incrementalHabits: prevState.incrementalHabits.map(habit => {
+          const shouldReset = checkShouldResetIncrementalHabit(habit, shouldResetWeekly)
+          return ({
+            ...habit,
+            negative_count: shouldReset ? 0 : habit.negative_count,
+            positive_count: shouldReset ? 0 : habit.positive_count
+          })
+        })
+      }))
+
+      habitsList.todos.forEach((todo) => {
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+
+        const sevenDaysAgo = new Date(today)
+        sevenDaysAgo.setDate(today.getDate() - 7)
+
+        if (todo?.done_date) {
+          const doneDate = new Date(todo?.done_date)
+          if (doneDate <= sevenDaysAgo) {
+            deleteTodo(todo.id)
+          }
+        }
+
+      })
+
+      saveTodayDateOnLocalStorage()
+
+      if (shouldResetWeekly) {
+        setLastSunday()
+      }
+
+      return
+    }
+
+    try {
+      const response = await startNewDay()
+      if (response && response.status == 200) {
+
+        const { dailiesUpdates, incrementalsUpdates, deletedTodos } = response.data
+
+        setHabitsList(prevState => ({
+          ...prevState,
+          dailyHabits: prevState.dailyHabits.map((daily) => {
+            const updatedDaily = dailiesUpdates.find((du) => du && du.id === daily.id)
+            return updatedDaily ? { ...daily, ...updatedDaily } : daily
+          }),
+          incrementalHabits: prevState.incrementalHabits.map((incremental) => {
+            const updatedIncremental = incrementalsUpdates.find((iu) => iu && iu.id === incremental.id)
+            return updatedIncremental ? { ...incremental, ...updatedIncremental } : incremental
+          }),
+          todos: prevState.todos.filter((todo) => {
+            return !deletedTodos.find((dt) => dt && dt.id === todo.id)
+          }),
+        }))
+      }
+      toast.success('new day started with sucess')
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      toast.error(errorMessage)
+    }
+    
+    return
   }
 
   function checkShouldResetWeeklyHabits(): boolean {
@@ -430,7 +544,6 @@ function App() {
     }))
   }, [])
 
-  //Integration here
 
   async function getUserData() {
     try {
@@ -449,9 +562,9 @@ function App() {
   }
 
   return (
-    <>
+    <div className='flex flex-col w-dvw h-dvh'>
       <UserSection user={user} setUser={setUser}></UserSection>
-      <div className='flex flex-col lg:flex-row gap-8 px-4 lg:px-16 lg:pb-16 lg:w-full w-dvw h-dvh pb-20'>
+      <div className='flex flex-col lg:flex-row gap-8 px-4 lg:px-16 lg:pb-16 grow pb-20 box-border'>
         <div className={`w-full lg:w-1/3 h-full ${activeSection === 'incremental' ? 'block' : 'hidden lg:block'}`}>
           <IncrementalHabitsSection
             incrementalHabits={habitsList.incrementalHabits}
@@ -484,7 +597,7 @@ function App() {
       </div>
 
       <MobileNav activeSection={activeSection} onSectionChange={setActiveSection} />
-    </>
+    </div>
   )
 }
 

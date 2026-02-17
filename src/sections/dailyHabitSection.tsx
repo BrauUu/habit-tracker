@@ -14,7 +14,7 @@ import type { AxiosResponse } from 'axios'
 interface DailyHabitsSectionProps {
   dailyHabits: Daily[]
   setDailyHabits: (updater: (dailyHabits: Daily[]) => Daily[]) => void
-  onUpdateDailyHabit: (id: string, key: string, value: any) => void
+  onUpdateDailyHabit: (id: string, habit: Daily) => Promise<AxiosResponse<Daily> | void>
   onDeleteDailyHabit: (id: string) => Promise<AxiosResponse | void>
   onAddDailyHabit: (daily: Daily) => Promise<AxiosResponse<Daily> | void>
   onResetDailyHabits: () => void
@@ -50,8 +50,9 @@ export default function DailyHabitsSection({
     return habit?.days_of_the_week?.includes(today)
   }
 
-  function createDefaultHabit(title: string): Partial<Daily> {
+  function createDefaultHabit(id: string, title: string): Partial<Daily> {
     return {
+      id,
       title,
       done: false,
       streak: 0,

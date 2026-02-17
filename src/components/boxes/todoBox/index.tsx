@@ -4,6 +4,7 @@ import { CSS } from '@dnd-kit/utilities';
 
 import type { Todo } from '../../../types/habit'
 import type { ModalAction } from '../../../types/modal'
+import type { AxiosResponse } from 'axios';
 
 import Button from '../../button'
 import { useState } from 'react';
@@ -11,7 +12,7 @@ import { useToast } from '../../../hooks/useToast';
 
 interface TodoBoxProps {
     todo: Todo,
-    updateHabit: (id: string, key: string, value: any) => void,
+    updateHabit: (id: string, habit: Todo) => Promise<AxiosResponse<Todo> | void>
     modalDispatch?: (action: ModalAction) => void
 }
 
@@ -47,13 +48,13 @@ export function TodoBox({ todo, updateHabit, modalDispatch }: TodoBoxProps) {
 
     function onCheck() {
         if (todo?.done_date) {
-            updateHabit(id, "done_date", undefined)
+            updateHabit(id, {...todo, done_date: null})
             return
         }
         toast.todoChecked()
         const today = new Date()
         today.setHours(0, 0, 0, 0)
-        updateHabit(id, "done_date", today)
+        updateHabit(id, {...todo, done_date: today})
     }
 
     return (
@@ -63,7 +64,7 @@ export function TodoBox({ todo, updateHabit, modalDispatch }: TodoBoxProps) {
                 `}
             onClick={() => {
                 if (modalDispatch)
-                    modalDispatch({ type: "updateHabit", payload: { id, title, done_date, due_date } })
+                    modalDispatch({ type: "updateHabit", payload: { ...todo } })
             }
             }
             ref={setNodeRef}

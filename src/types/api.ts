@@ -22,3 +22,9 @@ export type GetAllDataResponse = {
   todos: Todo[]
   user: User
 }
+
+export type NewDayResponse = {
+  dailiesUpdates: Partial<Daily[]>
+  incrementalsUpdates: Partial<Incremental[]>
+  deletedTodos: Partial<Todo[]>
+}
