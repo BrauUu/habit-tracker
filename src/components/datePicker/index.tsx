@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { DayPicker } from "react-day-picker";
-import { CalendarIcon } from "@heroicons/react/24/solid";
+import { CalendarIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import "react-day-picker/style.css";
 
 interface DatePickerProps {
@@ -35,6 +35,10 @@ export default function DatePicker({ date, placeholder, onChange }: DatePickerPr
         }
     }, [isDatePickerOpen])
 
+    function removeSelectedDate() {
+        setSelectedDate(null)
+    }
+
     const handleDateSelect = (date: Date | undefined) => {
         setSelectedDate(date || null)
         setIsDatePickerOpen(false)
@@ -50,9 +54,15 @@ export default function DatePicker({ date, placeholder, onChange }: DatePickerPr
                 <span className={selectedDate ? 'text-secondary-100' : 'text-secondary-100/50'}>
                     {selectedDate ? new Date(selectedDate).toLocaleDateString() : placeholder}
                 </span>
-                <CalendarIcon className="h-5 w-5 text-secondary-100" />
+                <div className="flex flex-row gap-3">
+                    {selectedDate && <XMarkIcon className="h-5 w-5 text-secondary-100" onClick={(e) => {
+                        removeSelectedDate()
+                        e.stopPropagation()
+                    }} />}
+                    <CalendarIcon className="h-5 w-5 text-secondary-100" />
+                </div>
             </button>
-            
+
             {isDatePickerOpen && (
                 <div className="absolute z-50 pt-2 pb-36 lg:py-2">
                     <DayPicker

@@ -1,7 +1,7 @@
-import type { Habit } from './habit'
+import type { Habit, HabitsList } from './habit'
 import type { User } from './others';
 
-export type ModalType = 'newDay' | 'createHabit' | 'updateHabit' | 'deleteHabit' | 'login' | 'register' | null;
+export type ModalType = 'newDay' | 'createHabit' | 'updateHabit' | 'deleteHabit' | 'login' | 'register' | 'syncHabits' | null;
 
 export interface ModalState {
   type: ModalType
@@ -15,5 +15,6 @@ export type ModalAction =
   | { type: 'deleteHabit', payload: Partial<Habit> }
   | { type: 'login'}
   | { type: 'register'}
+  | { type: 'syncHabits', payload: HabitsList}
   | { type: 'updateUser', payload: Partial<User>}
   | { type: 'hideModal' }

@@ -7,10 +7,11 @@ interface PlaceholderProps {
     submitOnEnter?: boolean,
     type?: React.InputHTMLAttributes<HTMLInputElement>['type'],
     onSubmit: (value: string) => void,
-    onChange?: (value: string) => void
+    onChange?: (value: string) => void,
+    style?: string
 }
 
-export default function Input({ value, placeholder, submitOnEnter = false, type = 'text', onSubmit, onChange }: PlaceholderProps) {
+export default function Input({ value, placeholder, submitOnEnter = false, type = 'text', onSubmit, onChange, style }: PlaceholderProps) {
 
     const [inputValue, setInputValue] = useState(value ?? '')
     const [currentType, setCurrentType] = useState(type)
@@ -30,11 +31,11 @@ export default function Input({ value, placeholder, submitOnEnter = false, type 
     }
 
     function getCurrentEyeIcon() {
-        return currentType == 'text' ? <EyeIcon className="h-6 w-6"/> : <EyeSlashIcon className="h-6 w-6"/>
+        return currentType == 'text' ? <EyeIcon className="h-6 w-6" /> : <EyeSlashIcon className="h-6 w-6" />
     }
 
-    function changeCurrentInputType(){
-        if(currentType == 'password')
+    function changeCurrentInputType() {
+        if (currentType == 'password')
             setCurrentType('text')
         else
             setCurrentType('password')
@@ -45,7 +46,7 @@ export default function Input({ value, placeholder, submitOnEnter = false, type 
             <input
                 value={inputValue}
                 type={currentType}
-                className={`
+                className={` ${style} 
             bg-primary-700 rounded-lg w-full h-full p-2 ${submitOnEnter ? 'pr-8' : ''}
             focus:outline-0
             `}

@@ -70,6 +70,12 @@ export function modalReducer(state: ModalState, action: ModalAction): ModalState
         }
       }
 
+    case 'syncHabits':
+      return {
+        type: 'syncHabits',
+        data: {habits: action.payload}
+      }
+
     case 'hideModal':
       return { type: null }
 

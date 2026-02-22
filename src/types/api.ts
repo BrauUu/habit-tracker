@@ -12,6 +12,18 @@ export type AuthResponse = {
   token: string
 }
 
+export type SynchronizeRequest = {
+  dailies: Daily[]
+  incrementals: Incremental[]
+  todos: Todo[]
+}
+
+export type SynchronizeResponse = {
+  dailies: Daily[]
+  incrementals: Incremental[]
+  todos: Todo[]
+}
+
 export type DailyRequest = Pick<Daily, 'title' | 'description' | 'days_of_the_week'>
 export type IncrementalRequest = Pick<Incremental, 'title' | 'description' | 'reset_frequency'>
 export type TodoRequest = Pick<Todo, 'title' | 'description' | 'due_date'>

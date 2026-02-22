@@ -150,10 +150,7 @@ function App() {
   }, [isUserCheckComplete])
 
   useEffect(() => {
-    if (process.env.NODE_ENV == 'development' && initialLoadRef.current) {
-      return
-    }
-
+    if (!isUserCheckComplete) return
     const handleDailyReset = async () => {
       hasCheckedPendingHabits.current = true
       const pendingHabits = await getPendingHabits()
@@ -167,7 +164,7 @@ function App() {
     if (!hasResetToday.current && habitsList.dailyHabits.length > 0 && !hasCheckedPendingHabits.current) {
       handleDailyReset()
     }
-  }, [habitsList])
+  }, [habitsList, isUserCheckComplete])
 
   useEffect(() => {
     if (!isUserCheckComplete) return
@@ -462,7 +459,7 @@ function App() {
       const errorMessage = error instanceof Error ? error.message : String(error)
       toast.error(errorMessage)
     }
-    
+
     return
   }
 
@@ -544,7 +541,6 @@ function App() {
     }))
   }, [])
 
-
   async function getUserData() {
     try {
       const response = await getAllDataFromUser()
@@ -561,10 +557,35 @@ function App() {
     return window.localStorage.getItem('token')
   }
 
+  async function handleSynchronizeHabits(habits: HabitsList) {
+
+    setHabitsList(prevState => ({
+      dailyHabits: [...prevState.dailyHabits, ...habits.dailyHabits],
+      incrementalHabits: [...prevState.incrementalHabits, ...habits.incrementalHabits],
+      todos: [...prevState.todos, ...habits.todos]
+    }))
+  }
+
+  async function handleAuthentication() {
+    const data = await getUserData()
+    if (data) {
+      setHabitsList({
+        dailyHabits: data.dailies,
+        incrementalHabits: data.incrementals,
+        todos: data.todos
+      })
+    }
+  }
+
   return (
-    <div className='flex flex-col w-dvw h-dvh'>
-      <UserSection user={user} setUser={setUser}></UserSection>
-      <div className='flex flex-col lg:flex-row gap-8 px-4 lg:px-16 lg:pb-16 grow pb-20 box-border'>
+    <div className='flex flex-col w-dvw h-dvh px-4 lg:px-16'>
+      <UserSection
+        user={user}
+        setUser={setUser}
+        onSynchronizeHabits={handleSynchronizeHabits}
+        onAuthenticate={handleAuthentication}
+      ></UserSection>
+      <div className='flex flex-col lg:flex-row gap-8 lg:pb-12 grow pb-20 box-border'>
         <div className={`w-full lg:w-1/3 h-full ${activeSection === 'incremental' ? 'block' : 'hidden lg:block'}`}>
           <IncrementalHabitsSection
             incrementalHabits={habitsList.incrementalHabits}

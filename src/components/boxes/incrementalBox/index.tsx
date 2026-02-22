@@ -41,7 +41,6 @@ export function IncrementalHabitBox({ habit, updateHabit, modalDispatch }: Incre
     function increaseHabitCount() {
         updateHabit(id, {...habit, positive_count: positive_count + 1})
         toast.habitCountIncreased(habit?.positive_count)
-        console.log(habit)
     }
 
     function decreaseHabitCount() {
