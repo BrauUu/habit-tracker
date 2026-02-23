@@ -222,6 +222,16 @@ function App() {
     return response
   }
 
+  async function updateDailyState(id: string, daily: Daily) {
+    setHabitsList(prevState => ({
+      ...prevState,
+      dailyHabits: prevState.dailyHabits.map(habit =>
+        habit.id === id ? { ...daily } : habit
+      )
+    }))
+  }
+
+
   async function getPendingHabits() {
     if (!user) {
       return habitsRef.current.dailyHabits
@@ -298,6 +308,15 @@ function App() {
     return response
   }
 
+  async function updateIncrementalState(id: string, incremental: Incremental) {
+    setHabitsList(prevState => ({
+      ...prevState,
+      incrementalHabits: prevState.incrementalHabits.map(habit =>
+        habit.id === id ? { ...incremental } : habit
+      )
+    }))
+  }
+
   async function deleteIncrementalHabit(id: string) {
 
     if (!user) {
@@ -358,6 +377,15 @@ function App() {
       }))
     }
     return response
+  }
+
+  async function updateTodoState(id: string, todo: Todo) {
+    setHabitsList(prevState => ({
+      ...prevState,
+      todos: prevState.todos.map(habit =>
+        habit.id === id ? { ...todo } : habit
+      )
+    }))
   }
 
   async function deleteTodo(id: string) {
@@ -591,6 +619,7 @@ function App() {
             incrementalHabits={habitsList.incrementalHabits}
             setIncrementalHabits={setIncrementalHabits}
             onUpdateIncrementalHabit={updateIncrementalHabit}
+            onUpdateIncrementalHabitState={updateIncrementalState}
             onDeleteIncrementalHabit={deleteIncrementalHabit}
             onAddIncrementalHabit={addIncrementalHabit}
           />
@@ -600,6 +629,7 @@ function App() {
             dailyHabits={habitsList.dailyHabits}
             setDailyHabits={setDailyHabits}
             onUpdateDailyHabit={updateDailyHabit}
+            onUpdateDailyHabitState={updateDailyState}
             onDeleteDailyHabit={deleteDailyHabit}
             onAddDailyHabit={addDailyHabit}
             onResetDailyHabits={resetHabits}
@@ -611,6 +641,7 @@ function App() {
             todos={habitsList.todos}
             setTodos={setTodos}
             onUpdateTodo={updateTodo}
+            onUpdateTodoState={updateTodoState}
             onDeleteTodo={deleteTodo}
             onAddTodo={addTodo}
           />

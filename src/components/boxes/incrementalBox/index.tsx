@@ -9,9 +9,10 @@ import type { ModalAction } from '../../../types/modal'
 import Button from '../../button'
 import { useToast } from '../../../hooks/useToast';
 import type { AxiosResponse } from 'axios';
+import { decreaseIncremental, increaseIncremental } from '../../../services/incremental.service';
 interface IncrementalHabitBoxProps {
     habit: Incremental,
-    updateHabit: (id: string, habit: Incremental) => Promise<AxiosResponse<Incremental> | void>
+    updateHabit: (id: string, habit: Incremental) => Promise<AxiosResponse<Incremental> | void> | void
     modalDispatch?: (action: ModalAction) => void
 }
 
@@ -23,7 +24,7 @@ export function IncrementalHabitBox({ habit, updateHabit, modalDispatch }: Incre
 
     const toast = useToast()
 
-    const { id, title, reset_frequency, positive_count, negative_count} = habit
+    const { id, title, reset_frequency, positive_count, negative_count } = habit
 
     const {
         attributes,
@@ -38,14 +39,34 @@ export function IncrementalHabitBox({ habit, updateHabit, modalDispatch }: Incre
         transition,
     };
 
-    function increaseHabitCount() {
-        updateHabit(id, {...habit, positive_count: positive_count + 1})
-        toast.habitCountIncreased(habit?.positive_count)
+    async function increaseHabitCount() {
+        try {
+            const res = await increaseIncremental(id)
+            if (res.status !== 200) {
+                throw res.data
+            }
+            habit.positive_count = Number(positive_count) + 1
+            updateHabit(id, habit)
+            toast.habitCountIncreased(habit?.positive_count)
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : String(error)
+            toast.error(errorMessage)
+        }
     }
 
-    function decreaseHabitCount() {
-        updateHabit(id, {...habit, negative_count: negative_count + 1})
-        toast.habitCountDecreased(habit?.negative_count)
+    async function decreaseHabitCount() {
+        try {
+            const res = await decreaseIncremental(id)
+            if (res.status !== 200) {
+                throw res.data
+            }
+            habit.negative_count =Number(negative_count) + 1
+            updateHabit(id, habit)
+            toast.habitCountDecreased(habit?.negative_count)
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : String(error)
+            toast.error(errorMessage)
+        }
     }
 
     const total = positive_count - negative_count;
@@ -55,7 +76,7 @@ export function IncrementalHabitBox({ habit, updateHabit, modalDispatch }: Incre
             className={`w-full text-lg rounded-lg bg-primary-600 p-2 flex flex-row cursor-pointer items-center gap-2 min-h-20 shrink-0`}
             onClick={() => {
                 if (modalDispatch)
-                    modalDispatch({ type: "updateHabit", payload: {...habit} })
+                    modalDispatch({ type: "updateHabit", payload: { ...habit } })
             }}
             ref={setNodeRef}
             {...listeners}

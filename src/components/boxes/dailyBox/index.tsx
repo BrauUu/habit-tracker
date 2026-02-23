@@ -9,11 +9,12 @@ import type { AxiosResponse } from 'axios';
 import Button from '../../button'
 import { useState } from 'react';
 import { useToast } from '../../../hooks/useToast';
+import { checkDaily, uncheckDaily } from '../../../services/daily.service';
 
 interface HabitBoxProps {
     habit: Daily,
     onlyVisible?: boolean,
-    updateHabit: (id: string, habit: Daily) => Promise<AxiosResponse<Daily> | void>
+    updateHabit: (id: string, habit: Daily) => Promise<AxiosResponse<Daily> | void> | void
     modalDispatch?: (action: ModalAction) => void
 }
 
@@ -41,12 +42,31 @@ export function HabitBox({ habit, onlyVisible = true, updateHabit, modalDispatch
         transition: transition && 'opacity 300ms',
     };
 
-    function checkHabit(){
+    async function checkHabit() {
         const isChecked = done
-        if(!isChecked){
-            toast.habitChecked(habit?.streak)
+        try {
+            if (!isChecked) {
+                const res = await checkDaily(id)
+                if (res.status !== 200) {
+                    throw res.data
+                }
+                habit.done = true
+                habit.streak++
+                toast.habitChecked(habit?.streak)
+            }
+            else {
+                const res = await uncheckDaily(id)
+                if (res.status !== 200) {
+                    throw res.data
+                }
+                habit.streak--
+                habit.done = false
+            }
+            updateHabit(id, habit)
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : String(error)
+            toast.error(errorMessage)
         }
-        updateHabit(id, {...habit, streak: !done ? streak + 1 : streak - 1, done: !done})
     }
 
     return (
@@ -56,7 +76,7 @@ export function HabitBox({ habit, onlyVisible = true, updateHabit, modalDispatch
                 `}
             onClick={() => {
                 if (modalDispatch)
-                    modalDispatch({ type: "updateHabit", payload: {...habit} })
+                    modalDispatch({ type: "updateHabit", payload: { ...habit } })
             }
             }
             ref={setNodeRef}

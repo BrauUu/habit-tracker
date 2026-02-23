@@ -9,10 +9,11 @@ import type { AxiosResponse } from 'axios';
 import Button from '../../button'
 import { useState } from 'react';
 import { useToast } from '../../../hooks/useToast';
+import { checkTodo, uncheckTodo } from '../../../services/todo.service';
 
 interface TodoBoxProps {
     todo: Todo,
-    updateHabit: (id: string, habit: Todo) => Promise<AxiosResponse<Todo> | void>
+    updateHabit: (id: string, habit: Todo) => Promise<AxiosResponse<Todo> | void> | void
     modalDispatch?: (action: ModalAction) => void
 }
 
@@ -22,7 +23,7 @@ interface DragOverlayTodoBoxProps {
 
 function isDueDateExpired(due_date: Date) {
     const today = new Date()
-    today.setHours(0,0,0,0)
+    today.setHours(0, 0, 0, 0)
     return today.getTime() > due_date.getTime()
 }
 
@@ -46,15 +47,30 @@ export function TodoBox({ todo, updateHabit, modalDispatch }: TodoBoxProps) {
         transition: transition && 'opacity 300ms',
     };
 
-    function onCheck() {
-        if (todo?.done_date) {
-            updateHabit(id, {...todo, done_date: null})
-            return
+    async function onCheck() {
+        try {
+            if (!done_date) {
+                const res = await checkTodo(id)
+                if (res.status !== 200) {
+                    throw res.data
+                }
+                const today = new Date()
+                today.setHours(0, 0, 0, 0)
+                todo.done_date = today
+                toast.todoChecked()
+            }
+            else {
+                const res = await uncheckTodo(id)
+                if (res.status !== 200) {
+                    throw res.data
+                }
+                todo.done_date = null
+            }
+            updateHabit(id, todo)
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : String(error)
+            toast.error(errorMessage)
         }
-        toast.todoChecked()
-        const today = new Date()
-        today.setHours(0, 0, 0, 0)
-        updateHabit(id, {...todo, done_date: today})
     }
 
     return (
@@ -105,7 +121,7 @@ export function TodoBox({ todo, updateHabit, modalDispatch }: TodoBoxProps) {
 
                 {
                     due_date ?
-                    
+
                         <span className={`flex justify-end flex-row items-center gap-1 text-sm ${isDueDateExpired(new Date(due_date)) ? 'text-ruby-500' : ''}`}><ClockIcon className='h-4' />{new Date(due_date).toLocaleDateString()}</span>
                         :
                         undefined
@@ -143,7 +159,7 @@ export function DragOverlayTodoBox({ todo }: DragOverlayTodoBoxProps) {
                 <div className='flex justify-end items-center gap-1'>
                     {
                         due_date ?
-                           <span className={`flex justify-end flex-row items-center gap-1 text-sm ${isDueDateExpired(new Date(due_date)) ? 'text-ruby-500' : ''}`}><ClockIcon className='h-4' />{new Date(due_date).toLocaleDateString()}</span>
+                            <span className={`flex justify-end flex-row items-center gap-1 text-sm ${isDueDateExpired(new Date(due_date)) ? 'text-ruby-500' : ''}`}><ClockIcon className='h-4' />{new Date(due_date).toLocaleDateString()}</span>
                             :
                             undefined
                     }

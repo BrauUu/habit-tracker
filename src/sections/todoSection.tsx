@@ -14,6 +14,7 @@ interface TodosSectionProps {
   todos: Todo[]
   setTodos: (updater: (todos: Todo[]) => Todo[]) => void
   onUpdateTodo: (id: string, habit: Todo) => Promise<AxiosResponse<Todo> | void>
+  onUpdateTodoState: (id: string, todo: Todo) => void
   onDeleteTodo: (id: string) => Promise<AxiosResponse | void>
   onAddTodo: (habit: Todo) => Promise<AxiosResponse<Todo> | void>
 }
@@ -22,6 +23,7 @@ export default function TodosSection({
   todos,
   setTodos,
   onUpdateTodo,
+  onUpdateTodoState,
   onDeleteTodo,
   onAddTodo,
 }: TodosSectionProps) {
@@ -69,6 +71,7 @@ export default function TodosSection({
         habits={todosFiltered}
         setHabits={setTodos}
         onUpdateHabit={onUpdateTodo}
+        onUpdateHabitState={onUpdateTodoState}
         onDeleteHabit={onDeleteTodo}
         onAddHabit={onAddTodo}
         createDefaultHabit={createDefaultHabit}

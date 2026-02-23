@@ -21,11 +21,12 @@ interface HabitSectionProps<HabitType extends Habit> {
     habits: HabitType[]
     setHabits: (updater: (habits: HabitType[]) => HabitType[]) => void
     onUpdateHabit: (id: string, habit: HabitType) => Promise<AxiosResponse<HabitType> | void>
+    onUpdateHabitState: (id: string, habit: HabitType) => void
     onDeleteHabit: (id: string) => Promise<AxiosResponse | void>
     onAddHabit: (habit: HabitType) => Promise<AxiosResponse<HabitType> | void>
     createDefaultHabit: (id: string, title: string) => Partial<HabitType>
     validateHabit: (habit: HabitType) => boolean
-    renderHabitBox: (habit: HabitType, updateHabit: (id: string, habit: HabitType) => Promise<AxiosResponse<HabitType> | void>, modalDispatch: React.Dispatch<ModalAction>) => ReactNode
+    renderHabitBox: (habit: HabitType, updateHabit: (id: string, habit: HabitType) => Promise<AxiosResponse<HabitType> | void> | void, modalDispatch: React.Dispatch<ModalAction>) => ReactNode
     renderDragOverlay: (habit: HabitType) => ReactNode
     renderModalFields?: (habit: HabitType, modalDispatch: React.Dispatch<ModalAction>) => ReactNode
     withoutContent: { icon: React.ComponentType<React.SVGProps<SVGSVGElement>>, title: string, text: string }
@@ -39,6 +40,7 @@ export default function HabitSection<HabitType extends Habit>({
     habits,
     setHabits,
     onUpdateHabit,
+    onUpdateHabitState,
     onDeleteHabit,
     onAddHabit,
     createDefaultHabit,
@@ -70,7 +72,7 @@ export default function HabitSection<HabitType extends Habit>({
 
     function createNewHabit(title: string) {
         const newHabit = createDefaultHabit(uuidv4(), title)
-        modalDispatch({ type: 'createHabit', payload: newHabit })
+        modalDispatch({ type: 'createHabit', payload: newHabit as HabitType })
     }
 
     async function finishHabitCreation() {
@@ -195,7 +197,7 @@ export default function HabitSection<HabitType extends Habit>({
                             <>
                                 {contentExtra}
                                 <div className='overflow-y-auto flex flex-col gap-2' translate="no">
-                                    {habits.map((habit) => renderHabitBox(habit, onUpdateHabit, modalDispatch))}
+                                    {habits.map((habit) => renderHabitBox(habit, onUpdateHabitState, modalDispatch))}
                                 </div>
                             </>
                             :
