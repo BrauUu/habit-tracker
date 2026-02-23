@@ -12,10 +12,6 @@ export async function getPendingDailies() {
     return api.get<string[]>(`${basePath}/pendingHabits`)
 }
 
-export async function undoAllDailies() {
-    return api.post(`${basePath}/newDay`)
-}
-
 export async function checkDaily(dailyId: string) {
     return api.post(`${basePath}/${dailyId}/check`)
 }

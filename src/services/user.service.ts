@@ -14,7 +14,7 @@ export function register(data: AuthRequest) {
 }
 
 export function startNewDay() {
-    return api.get<NewDayResponse>('/user/newDay')
+    return api.post<NewDayResponse>('/user/newDay')
 }
 
 export function getAllDataFromUser() {
