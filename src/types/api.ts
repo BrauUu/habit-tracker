@@ -39,4 +39,5 @@ export type NewDayResponse = {
   dailiesUpdates: Partial<Daily[]>
   incrementalsUpdates: Partial<Incremental[]>
   deletedTodos: Partial<Todo[]>
+  last_daily_reset_date: Date
 }

@@ -11,9 +11,9 @@ import MobileNav, { type Section } from './components/mobileNav'
 
 import { useToast } from './hooks/useToast'
 import { getAllDataFromUser, startNewDay } from './services/user.service'
-import { createDaily, deleteDaily, getPendingDailies, updateDaily } from './services/daily.service'
-import { createIncremental, deleteIncremental, updateIncremental } from './services/incremental.service'
-import { createTodo, updateTodo as updateTodoService, deleteTodo as deleteTodoService } from './services/todo.service'
+import { createDaily, deleteDaily, getPendingDailies, updateDaily, checkDaily, uncheckDaily } from './services/daily.service'
+import { createIncremental, deleteIncremental, updateIncremental, increaseIncremental, decreaseIncremental } from './services/incremental.service'
+import { createTodo, updateTodo as updateTodoService, deleteTodo as deleteTodoService, checkTodo, uncheckTodo } from './services/todo.service'
 
 function App() {
   const [activeSection, setActiveSection] = useState<Section>('daily')
@@ -72,7 +72,7 @@ function App() {
 
     let timeoutId: NodeJS.Timeout
     const checkIfNeedsReset = () => {
-
+      
       const localLastDailyResetDate = user ? user.last_daily_reset_date : localStorage.getItem('lastDailyResetDate')
       if (!localLastDailyResetDate) return
 
@@ -115,7 +115,7 @@ function App() {
       }
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [isUserCheckComplete])
+  }, [isUserCheckComplete, user]) // Adiciona user nas dependências
 
   useEffect(() => {
     if (!isUserCheckComplete) return
@@ -141,11 +141,6 @@ function App() {
       hasResetToday.current = getHasResetToday(localLastDailyResetDate)
     } else if (!user) {
       saveTodayDateOnLocalStorage()
-    }
-
-    const localLastWeeklyResetDate = user ? user.last_weekly_reset_date : localStorage.getItem('lastWeeklyResetDate')
-    if (!user && !localLastWeeklyResetDate) {
-      setLastSunday()
     }
   }, [isUserCheckComplete])
 
@@ -229,6 +224,40 @@ function App() {
         habit.id === id ? { ...daily } : habit
       )
     }))
+  }
+
+  async function checkDailyHabit(id: string, daily: Daily) {
+    if (!user) {
+      daily.done = true
+      daily.streak++
+      updateDailyState(id, daily)
+      return
+    }
+
+    const response = await checkDaily(id)
+    if (response && response.status === 200) {
+      daily.done = true
+      daily.streak++
+      updateDailyState(id, daily)
+    }
+    return response
+  }
+
+  async function uncheckDailyHabit(id: string, daily: Daily) {
+    if (!user) {
+      daily.done = false
+      daily.streak--
+      updateDailyState(id, daily)
+      return
+    }
+
+    const response = await uncheckDaily(id)
+    if (response && response.status === 200) {
+      daily.done = false
+      daily.streak--
+      updateDailyState(id, daily)
+    }
+    return response
   }
 
 
@@ -317,6 +346,36 @@ function App() {
     }))
   }
 
+  async function increaseIncrementalHabit(id: string, habit: Incremental) {
+    if (!user) {
+      habit.positive_count++
+      updateIncrementalState(id, habit)
+      return
+    }
+
+    const response = await increaseIncremental(id)
+    if (response && response.status === 200) {
+      habit.positive_count++
+      updateIncrementalState(id, habit)
+    }
+    return response
+  }
+
+  async function decreaseIncrementalHabit(id: string, habit: Incremental) {
+    if (!user) {
+      habit.negative_count++
+      updateIncrementalState(id, habit)
+      return
+    }
+
+    const response = await decreaseIncremental(id)
+    if (response && response.status === 200) {
+      habit.negative_count++
+      updateIncrementalState(id, habit)
+    }
+    return response
+  }
+
   async function deleteIncrementalHabit(id: string) {
 
     if (!user) {
@@ -388,6 +447,40 @@ function App() {
     }))
   }
 
+  async function checkTodoHabit(id: string, todo: Todo) {
+    if (!user) {
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      todo.done_date = today
+      updateTodoState(id, todo)
+      return
+    }
+
+    const response = await checkTodo(id)
+    if (response && response.status === 200) {
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      todo.done_date = today
+      updateTodoState(id, todo)
+    }
+    return response
+  }
+
+  async function uncheckTodoHabit(id: string, todo: Todo) {
+    if (!user) {
+      todo.done_date = null
+      updateTodoState(id, todo)
+      return
+    }
+
+    const response = await uncheckTodo(id)
+    if (response && response.status === 200) {
+      todo.done_date = null
+      updateTodoState(id, todo)
+    }
+    return response
+  }
+
   async function deleteTodo(id: string) {
     if (!user) {
       setHabitsList(prevState => ({
@@ -417,8 +510,6 @@ function App() {
 
     setPendingDailyHabits([])
     if (!user) {
-      const shouldResetWeekly = checkShouldResetWeeklyHabits()
-
       setHabitsList(prevState => ({
         ...prevState,
         dailyHabits: prevState.dailyHabits.map(habit => ({
@@ -427,7 +518,7 @@ function App() {
           streak: checkDailyHabitStreak(habit)
         })),
         incrementalHabits: prevState.incrementalHabits.map(habit => {
-          const shouldReset = checkShouldResetIncrementalHabit(habit, shouldResetWeekly)
+          const shouldReset = checkShouldResetIncrementalHabit(habit)
           return ({
             ...habit,
             negative_count: shouldReset ? 0 : habit.negative_count,
@@ -454,10 +545,6 @@ function App() {
 
       saveTodayDateOnLocalStorage()
 
-      if (shouldResetWeekly) {
-        setLastSunday()
-      }
-
       return
     }
 
@@ -465,7 +552,7 @@ function App() {
       const response = await startNewDay()
       if (response && response.status == 200) {
 
-        const { dailiesUpdates, incrementalsUpdates, deletedTodos } = response.data
+        const { dailiesUpdates, incrementalsUpdates, deletedTodos, last_daily_reset_date } = response.data
 
         setHabitsList(prevState => ({
           ...prevState,
@@ -481,6 +568,8 @@ function App() {
             return !deletedTodos.find((dt) => dt && dt.id === todo.id)
           }),
         }))
+        
+        setUser(prevState => prevState ? {...prevState, last_daily_reset_date} : null)
       }
       toast.success('new day started with sucess')
     } catch (error) {
@@ -491,36 +580,13 @@ function App() {
     return
   }
 
-  function checkShouldResetWeeklyHabits(): boolean {
+  function checkShouldResetIncrementalHabit(habit: Incremental): boolean {
     const today = new Date()
-    today.setHours(0, 0, 0, 0)
-
-    const tempLastWeeklyResetDate = user ? user.last_weekly_reset_date : localStorage.getItem('lastWeeklyResetDate')
-    if (tempLastWeeklyResetDate) {
-      const localLastWeeklyResetDate = new Date(tempLastWeeklyResetDate)
-      const sevenDaysAgo = new Date(today)
-      sevenDaysAgo.setDate(today.getDate() - 7)
-
-      return localLastWeeklyResetDate.getTime() <= sevenDaysAgo.getTime()
-    }
-
-    return false
-  }
-
-  function checkShouldResetIncrementalHabit(habit: Incremental, shouldResetWeekly: boolean): boolean {
     if (habit.reset_frequency === 'daily') return true
-    if (habit.reset_frequency === 'weekly') return shouldResetWeekly
+    if (habit.reset_frequency === 'weekly') return today.getDay() === 1
     return false
   }
 
-  function setLastSunday() {
-    const lastSunday = new Date()
-    lastSunday.setHours(0, 0, 0, 0)
-    while (lastSunday.getDay() !== 0) {
-      lastSunday.setDate(lastSunday.getDate() - 1)
-    }
-    localStorage.setItem('lastWeeklyResetDate', lastSunday.toISOString())
-  }
 
   function getHasResetToday(lastResetTimestamp: Date) {
     const now: Date = new Date()
@@ -619,7 +685,8 @@ function App() {
             incrementalHabits={habitsList.incrementalHabits}
             setIncrementalHabits={setIncrementalHabits}
             onUpdateIncrementalHabit={updateIncrementalHabit}
-            onUpdateIncrementalHabitState={updateIncrementalState}
+            onIncreaseIncremental={increaseIncrementalHabit}
+            onDecreaseIncremental={decreaseIncrementalHabit}
             onDeleteIncrementalHabit={deleteIncrementalHabit}
             onAddIncrementalHabit={addIncrementalHabit}
           />
@@ -629,7 +696,8 @@ function App() {
             dailyHabits={habitsList.dailyHabits}
             setDailyHabits={setDailyHabits}
             onUpdateDailyHabit={updateDailyHabit}
-            onUpdateDailyHabitState={updateDailyState}
+            onCheckDaily={checkDailyHabit}
+            onUncheckDaily={uncheckDailyHabit}
             onDeleteDailyHabit={deleteDailyHabit}
             onAddDailyHabit={addDailyHabit}
             onResetDailyHabits={resetHabits}
@@ -641,7 +709,8 @@ function App() {
             todos={habitsList.todos}
             setTodos={setTodos}
             onUpdateTodo={updateTodo}
-            onUpdateTodoState={updateTodoState}
+            onCheckTodo={checkTodoHabit}
+            onUncheckTodo={uncheckTodoHabit}
             onDeleteTodo={deleteTodo}
             onAddTodo={addTodo}
           />

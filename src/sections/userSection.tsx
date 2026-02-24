@@ -60,7 +60,7 @@ export default function UserSection({ user, setUser, onSynchronizeHabits, onAuth
         try {
             const user = modalState.data?.user
 
-            if(user.password !== user.password_confirmation) {
+            if (user.password !== user.password_confirmation) {
                 toast.error('passwords should be equal')
                 return
             }
@@ -73,7 +73,9 @@ export default function UserSection({ user, setUser, onSynchronizeHabits, onAuth
                 await onAuthenticate()
             }
             closeModal()
-            verifyUnsynchronizedHabits()
+            if (!verifyUnsynchronizedHabits()) {
+                removeDataFromLocalStorage()
+            }
         } catch (error: any) {
             if (error.response?.status < 500 && error.response?.status >= 400) {
                 toast.error(error.response?.data.message)
@@ -81,12 +83,16 @@ export default function UserSection({ user, setUser, onSynchronizeHabits, onAuth
         }
     }
 
-    async function verifyUnsynchronizedHabits() {
+    function verifyUnsynchronizedHabits() {
         const localData = localStorage.getItem('habitsList')
         if (localData) {
             const localHabitsList: HabitsList = JSON.parse(localData)
-            modalDispatch({ type: "syncHabits", payload: localHabitsList })
+            if (localHabitsList.dailyHabits.length > 0 || localHabitsList.incrementalHabits.length > 0 || localHabitsList.todos.length > 0) {
+                modalDispatch({ type: "syncHabits", payload: localHabitsList })
+                return true
+            }
         }
+        return false
     }
 
     async function synchronizeHabits() {
@@ -116,7 +122,6 @@ export default function UserSection({ user, setUser, onSynchronizeHabits, onAuth
     async function removeDataFromLocalStorage() {
         localStorage.removeItem('habitsList')
         localStorage.removeItem('lastDailyResetDate')
-        localStorage.removeItem('lastWeeklyResetDate')
         closeModal()
     }
 

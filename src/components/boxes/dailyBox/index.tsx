@@ -9,12 +9,12 @@ import type { AxiosResponse } from 'axios';
 import Button from '../../button'
 import { useState } from 'react';
 import { useToast } from '../../../hooks/useToast';
-import { checkDaily, uncheckDaily } from '../../../services/daily.service';
 
 interface HabitBoxProps {
     habit: Daily,
     onlyVisible?: boolean,
-    updateHabit: (id: string, habit: Daily) => Promise<AxiosResponse<Daily> | void> | void
+    checkDaily?: (id: string, habit: Daily) => Promise<AxiosResponse<Daily> | void> | void
+    uncheckDaily?: (id: string, habit: Daily) => Promise<AxiosResponse<Daily> | void> | void
     modalDispatch?: (action: ModalAction) => void
 }
 
@@ -22,7 +22,7 @@ interface DragOverlayHabitBoxProps {
     habit: Daily,
 }
 
-export function HabitBox({ habit, onlyVisible = true, updateHabit, modalDispatch }: HabitBoxProps) {
+export function HabitBox({ habit, onlyVisible = true, checkDaily, uncheckDaily, modalDispatch }: HabitBoxProps) {
 
     const toast = useToast()
 
@@ -46,23 +46,24 @@ export function HabitBox({ habit, onlyVisible = true, updateHabit, modalDispatch
         const isChecked = done
         try {
             if (!isChecked) {
-                const res = await checkDaily(id)
-                if (res.status !== 200) {
-                    throw res.data
+                if (checkDaily) {
+                    const response = await checkDaily(id, habit)
+                    if (response) {
+                        if (response.status != 200)
+                            throw response.data
+                    }
+                    toast.habitChecked(habit?.streak)
                 }
-                habit.done = true
-                habit.streak++
-                toast.habitChecked(habit?.streak)
             }
             else {
-                const res = await uncheckDaily(id)
-                if (res.status !== 200) {
-                    throw res.data
+                if (uncheckDaily) {
+                    const response = await uncheckDaily(id, habit)
+                    if (response) {
+                        if (response.status != 200)
+                            throw response.data
+                    }
                 }
-                habit.streak--
-                habit.done = false
             }
-            updateHabit(id, habit)
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : String(error)
             toast.error(errorMessage)

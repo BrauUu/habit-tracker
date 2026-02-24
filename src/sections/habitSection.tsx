@@ -21,12 +21,13 @@ interface HabitSectionProps<HabitType extends Habit> {
     habits: HabitType[]
     setHabits: (updater: (habits: HabitType[]) => HabitType[]) => void
     onUpdateHabit: (id: string, habit: HabitType) => Promise<AxiosResponse<HabitType> | void>
-    onUpdateHabitState: (id: string, habit: HabitType) => void
+    onCheckHabit: (id: string, habit: HabitType) => Promise<AxiosResponse<HabitType> | void>
+    onUncheckHabit: (id: string, habit: HabitType) => Promise<AxiosResponse<HabitType> | void>
     onDeleteHabit: (id: string) => Promise<AxiosResponse | void>
     onAddHabit: (habit: HabitType) => Promise<AxiosResponse<HabitType> | void>
     createDefaultHabit: (id: string, title: string) => Partial<HabitType>
     validateHabit: (habit: HabitType) => boolean
-    renderHabitBox: (habit: HabitType, updateHabit: (id: string, habit: HabitType) => Promise<AxiosResponse<HabitType> | void> | void, modalDispatch: React.Dispatch<ModalAction>) => ReactNode
+    renderHabitBox: (habit: HabitType, onCheck: (id: string, habit: HabitType) => Promise<AxiosResponse<HabitType> | void> | void, onUncheck: (id: string, habit: HabitType) => Promise<AxiosResponse<HabitType> | void> | void, modalDispatch: React.Dispatch<ModalAction>) => ReactNode
     renderDragOverlay: (habit: HabitType) => ReactNode
     renderModalFields?: (habit: HabitType, modalDispatch: React.Dispatch<ModalAction>) => ReactNode
     withoutContent: { icon: React.ComponentType<React.SVGProps<SVGSVGElement>>, title: string, text: string }
@@ -40,7 +41,8 @@ export default function HabitSection<HabitType extends Habit>({
     habits,
     setHabits,
     onUpdateHabit,
-    onUpdateHabitState,
+    onCheckHabit,
+    onUncheckHabit,
     onDeleteHabit,
     onAddHabit,
     createDefaultHabit,
@@ -108,7 +110,7 @@ export default function HabitSection<HabitType extends Habit>({
 
             if (response) {
                 if (response.status != 200)
-                    throw new Error()
+                    throw response.data
             }
 
             toast.habitDeleted()
@@ -197,7 +199,7 @@ export default function HabitSection<HabitType extends Habit>({
                             <>
                                 {contentExtra}
                                 <div className='overflow-y-auto flex flex-col gap-2' translate="no">
-                                    {habits.map((habit) => renderHabitBox(habit, onUpdateHabitState, modalDispatch))}
+                                    {habits.map((habit) => renderHabitBox(habit, onCheckHabit, onUncheckHabit, modalDispatch))}
                                 </div>
                             </>
                             :

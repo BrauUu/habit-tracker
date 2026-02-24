@@ -15,7 +15,8 @@ interface DailyHabitsSectionProps {
   dailyHabits: Daily[]
   setDailyHabits: (updater: (dailyHabits: Daily[]) => Daily[]) => void
   onUpdateDailyHabit: (id: string, habit: Daily) => Promise<AxiosResponse<Daily> | void>
-  onUpdateDailyHabitState: (id: string, habit: Daily) => void
+  onCheckDaily: (id: string, habit: Daily) => Promise<AxiosResponse<Daily> | void>
+  onUncheckDaily: (id: string, habit: Daily) => Promise<AxiosResponse<Daily> | void>
   onDeleteDailyHabit: (id: string) => Promise<AxiosResponse | void>
   onAddDailyHabit: (daily: Daily) => Promise<AxiosResponse<Daily> | void>
   onResetDailyHabits: () => void
@@ -26,7 +27,8 @@ export default function DailyHabitsSection({
   dailyHabits,
   setDailyHabits,
   onUpdateDailyHabit,
-  onUpdateDailyHabitState,
+  onCheckDaily,
+  onUncheckDaily,
   onDeleteDailyHabit,
   onAddDailyHabit,
   onResetDailyHabits,
@@ -78,16 +80,18 @@ export default function DailyHabitsSection({
         habits={habitsListFiltered}
         setHabits={setDailyHabits}
         onUpdateHabit={onUpdateDailyHabit}
-        onUpdateHabitState={onUpdateDailyHabitState}
+        onCheckHabit={onCheckDaily}
+        onUncheckHabit={onUncheckDaily}
         onDeleteHabit={onDeleteDailyHabit}
         onAddHabit={onAddDailyHabit}
         createDefaultHabit={createDefaultHabit}
         validateHabit={validateHabit}
-        renderHabitBox={(habit, updateHabit, modalDispatch) => (
+        renderHabitBox={(habit, checkDaily, uncheckDaily, modalDispatch) => (
           <HabitBox
             key={habit.id}
             habit={habit}
-            updateHabit={updateHabit}
+            checkDaily={checkDaily}
+            uncheckDaily={uncheckDaily}
             onlyVisible={false}
             modalDispatch={modalDispatch}
           />
@@ -113,7 +117,7 @@ export default function DailyHabitsSection({
           <NewDayModal title='check yesterday habits' onStart={onResetDailyHabits}>
             {dailyHabits.filter(habit => pendingHabits.includes(habit.id))
               .map(habit => (
-                <HabitBox key={habit.id} habit={habit} updateHabit={onUpdateDailyHabit} />
+                <HabitBox key={habit.id} habit={habit} />
               ))}
           </NewDayModal>
         )}

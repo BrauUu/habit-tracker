@@ -5,14 +5,13 @@ import { CSS } from '@dnd-kit/utilities';
 import type { Incremental } from '../../../types/habit'
 import type { ModalAction } from '../../../types/modal'
 
-
 import Button from '../../button'
 import { useToast } from '../../../hooks/useToast';
 import type { AxiosResponse } from 'axios';
-import { decreaseIncremental, increaseIncremental } from '../../../services/incremental.service';
 interface IncrementalHabitBoxProps {
     habit: Incremental,
-    updateHabit: (id: string, habit: Incremental) => Promise<AxiosResponse<Incremental> | void> | void
+    increaseIncremental?: (id: string, habit: Incremental) => Promise<AxiosResponse<Incremental> | void> | void
+    decreaseIncremental?: (id: string, habit: Incremental) => Promise<AxiosResponse<Incremental> | void> | void
     modalDispatch?: (action: ModalAction) => void
 }
 
@@ -20,7 +19,7 @@ interface DragOverlayIncrementalHabitBoxProps {
     habit: Incremental,
 }
 
-export function IncrementalHabitBox({ habit, updateHabit, modalDispatch }: IncrementalHabitBoxProps) {
+export function IncrementalHabitBox({ habit, increaseIncremental, decreaseIncremental, modalDispatch }: IncrementalHabitBoxProps) {
 
     const toast = useToast()
 
@@ -40,32 +39,34 @@ export function IncrementalHabitBox({ habit, updateHabit, modalDispatch }: Incre
     };
 
     async function increaseHabitCount() {
-        try {
-            const res = await increaseIncremental(id)
-            if (res.status !== 200) {
-                throw res.data
+        if (increaseIncremental) {
+            try {
+                const response = await increaseIncremental(id, habit)
+                if (response) {
+                    if (response.status != 200)
+                        throw response.data
+                }
+                toast.habitCountIncreased(habit?.positive_count)
+            } catch (error) {
+                const errorMessage = error instanceof Error ? error.message : String(error)
+                toast.error(errorMessage)
             }
-            habit.positive_count = Number(positive_count) + 1
-            updateHabit(id, habit)
-            toast.habitCountIncreased(habit?.positive_count)
-        } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : String(error)
-            toast.error(errorMessage)
         }
     }
 
     async function decreaseHabitCount() {
-        try {
-            const res = await decreaseIncremental(id)
-            if (res.status !== 200) {
-                throw res.data
+        if (decreaseIncremental) {
+            try {
+                const response = await decreaseIncremental(id, habit)
+                if (response) {
+                    if (response.status != 200)
+                        throw response.data
+                }
+                toast.habitCountIncreased(habit?.positive_count)
+            } catch (error) {
+                const errorMessage = error instanceof Error ? error.message : String(error)
+                toast.error(errorMessage)
             }
-            habit.negative_count =Number(negative_count) + 1
-            updateHabit(id, habit)
-            toast.habitCountDecreased(habit?.negative_count)
-        } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : String(error)
-            toast.error(errorMessage)
         }
     }
 

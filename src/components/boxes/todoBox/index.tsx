@@ -9,11 +9,10 @@ import type { AxiosResponse } from 'axios';
 import Button from '../../button'
 import { useState } from 'react';
 import { useToast } from '../../../hooks/useToast';
-import { checkTodo, uncheckTodo } from '../../../services/todo.service';
-
 interface TodoBoxProps {
     todo: Todo,
-    updateHabit: (id: string, habit: Todo) => Promise<AxiosResponse<Todo> | void> | void
+    checkTodo?: (id: string, habit: Todo) => Promise<AxiosResponse<Todo> | void> | void
+    uncheckTodo?: (id: string, habit: Todo) => Promise<AxiosResponse<Todo> | void> | void
     modalDispatch?: (action: ModalAction) => void
 }
 
@@ -27,7 +26,7 @@ function isDueDateExpired(due_date: Date) {
     return today.getTime() > due_date.getTime()
 }
 
-export function TodoBox({ todo, updateHabit, modalDispatch }: TodoBoxProps) {
+export function TodoBox({ todo, checkTodo, uncheckTodo, modalDispatch }: TodoBoxProps) {
 
     const toast = useToast()
 
@@ -50,23 +49,24 @@ export function TodoBox({ todo, updateHabit, modalDispatch }: TodoBoxProps) {
     async function onCheck() {
         try {
             if (!done_date) {
-                const res = await checkTodo(id)
-                if (res.status !== 200) {
-                    throw res.data
+                if (checkTodo) {
+                    const response = await checkTodo(id, todo)
+                    if (response) {
+                        if (response.status != 200)
+                            throw response.data
+                    }
+                    toast.todoChecked()
                 }
-                const today = new Date()
-                today.setHours(0, 0, 0, 0)
-                todo.done_date = today
-                toast.todoChecked()
             }
             else {
-                const res = await uncheckTodo(id)
-                if (res.status !== 200) {
-                    throw res.data
+                if (uncheckTodo) {
+                    const response = await uncheckTodo(id, todo)
+                    if (response) {
+                        if (response.status != 200)
+                            throw response.data
+                    }
                 }
-                todo.done_date = null
             }
-            updateHabit(id, todo)
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : String(error)
             toast.error(errorMessage)

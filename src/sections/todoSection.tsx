@@ -14,7 +14,8 @@ interface TodosSectionProps {
   todos: Todo[]
   setTodos: (updater: (todos: Todo[]) => Todo[]) => void
   onUpdateTodo: (id: string, habit: Todo) => Promise<AxiosResponse<Todo> | void>
-  onUpdateTodoState: (id: string, todo: Todo) => void
+  onCheckTodo: (id: string, habit: Todo) => Promise<AxiosResponse<Todo> | void>
+  onUncheckTodo: (id: string, habit: Todo) => Promise<AxiosResponse<Todo> | void>
   onDeleteTodo: (id: string) => Promise<AxiosResponse | void>
   onAddTodo: (habit: Todo) => Promise<AxiosResponse<Todo> | void>
 }
@@ -23,7 +24,8 @@ export default function TodosSection({
   todos,
   setTodos,
   onUpdateTodo,
-  onUpdateTodoState,
+  onCheckTodo,
+  onUncheckTodo,
   onDeleteTodo,
   onAddTodo,
 }: TodosSectionProps) {
@@ -71,16 +73,18 @@ export default function TodosSection({
         habits={todosFiltered}
         setHabits={setTodos}
         onUpdateHabit={onUpdateTodo}
-        onUpdateHabitState={onUpdateTodoState}
+        onCheckHabit={onCheckTodo}
+        onUncheckHabit={onUncheckTodo}
         onDeleteHabit={onDeleteTodo}
         onAddHabit={onAddTodo}
         createDefaultHabit={createDefaultHabit}
         validateHabit={validateHabit}
-        renderHabitBox={(todo, updateHabit, modalDispatch) => (
+        renderHabitBox={(todo, onCheckTodo, onUncheckTodo, modalDispatch) => (
           <TodoBox
             key={todo.id}
             todo={todo}
-            updateHabit={updateHabit}
+            checkTodo={onCheckTodo}
+            uncheckTodo={onUncheckTodo}
             modalDispatch={modalDispatch}
           />
         )}

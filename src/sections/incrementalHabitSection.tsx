@@ -14,7 +14,8 @@ interface IncrementalHabitsSectionProps {
   incrementalHabits: Incremental[]
   setIncrementalHabits: (updater: (incrementalHabits: Incremental[]) => Incremental[]) => void
   onUpdateIncrementalHabit: (id: string, habit: Incremental) => Promise<AxiosResponse<Incremental> | void>
-  onUpdateIncrementalHabitState: (id: string, habit: Incremental) => void
+  onIncreaseIncremental: (id: string, habit: Incremental) => Promise<AxiosResponse<Incremental> | void>
+  onDecreaseIncremental: (id: string, habit: Incremental) => Promise<AxiosResponse<Incremental> | void>
   onDeleteIncrementalHabit: (id: string) => Promise<AxiosResponse | void>
   onAddIncrementalHabit: (habit: Incremental) => Promise<AxiosResponse<Incremental> | void>
 }
@@ -23,7 +24,8 @@ export default function IncrementalHabitsSection({
   incrementalHabits,
   setIncrementalHabits,
   onUpdateIncrementalHabit,
-  onUpdateIncrementalHabitState,
+  onIncreaseIncremental,
+  onDecreaseIncremental,
   onDeleteIncrementalHabit,
   onAddIncrementalHabit
 }: IncrementalHabitsSectionProps) {
@@ -76,16 +78,18 @@ export default function IncrementalHabitsSection({
       habits={habitsListFiltered}
       setHabits={setIncrementalHabits}
       onUpdateHabit={onUpdateIncrementalHabit}
-      onUpdateHabitState={onUpdateIncrementalHabitState}
+      onCheckHabit={onIncreaseIncremental}
+      onUncheckHabit={onDecreaseIncremental}
       onDeleteHabit={onDeleteIncrementalHabit}
       onAddHabit={onAddIncrementalHabit}
       createDefaultHabit={createDefaultHabit}
       validateHabit={validateHabit}
-      renderHabitBox={(habit, updateHabit, modalDispatch) => (
+      renderHabitBox={(habit, onIncreaseIncremental, onDecreaseIncremental, modalDispatch) => (
         <IncrementalHabitBox
           key={habit.id}
           habit={habit}
-          updateHabit={updateHabit}
+          increaseIncremental={onIncreaseIncremental}
+          decreaseIncremental={onDecreaseIncremental}
           modalDispatch={modalDispatch}
         />
       )}

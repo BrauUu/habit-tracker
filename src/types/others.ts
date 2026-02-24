@@ -4,7 +4,6 @@ export interface User {
     password: string
     password_confirmation?: string
     last_daily_reset_date: Date | null
-    last_weekly_reset_date: Date | null
 }
 
 export type ButtonType = 'primary' | 'secondary' | 'other';
