@@ -117,7 +117,7 @@ export default function DailyHabitsSection({
           <NewDayModal title='check yesterday habits' onStart={onResetDailyHabits}>
             {dailyHabits.filter(habit => pendingHabits.includes(habit.id))
               .map(habit => (
-                <HabitBox key={habit.id} habit={habit} />
+                <HabitBox key={habit.id} habit={habit} checkDaily={onCheckDaily} uncheckDaily={onUncheckDaily}/>
               ))}
           </NewDayModal>
         )}
