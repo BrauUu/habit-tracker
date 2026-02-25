@@ -22,7 +22,7 @@ interface DragOverlayTodoBoxProps {
 
 function isDueDateExpired(dueDate: Date) {
     const today = new Date()
-    today.setHours(0, 0, 0, 0)
+    today.setHours(3, 0, 0, 0)
     return today.getTime() > dueDate.getTime()
 }
 
