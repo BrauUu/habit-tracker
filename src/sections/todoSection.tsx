@@ -45,7 +45,7 @@ export default function TodosSection({
   }, [todoFilter, todos])
 
   function checkIfItsDone(todo: Todo, isDone: boolean = true) {
-    return (todo?.doneDate !== null) === isDone
+    return (todo?.doneDate !== null && todo?.doneDate !== undefined) === isDone
   }             
 
   function createDefaultHabit(id:string, title: string): Partial<Todo> {

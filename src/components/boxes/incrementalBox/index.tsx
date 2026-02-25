@@ -23,7 +23,7 @@ export function IncrementalHabitBox({ habit, increaseIncremental, decreaseIncrem
 
     const toast = useToast()
 
-    const { id, title, resetFrequency, positiveCount, negativeCount } = habit
+    const { id, title, positiveCount, negativeCount } = habit
 
     const {
         attributes,

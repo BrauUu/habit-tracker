@@ -48,7 +48,9 @@ export default function UserSection({ user, setUser, onSynchronizeHabits, onAuth
                 await onAuthenticate()
             }
             closeModal()
-            verifyUnsynchronizedHabits()
+            if (!verifyUnsynchronizedHabits()) {
+                removeDataFromLocalStorage()
+            }
         } catch (error: any) {
             if (error.response?.status < 500 && error.response?.status >= 400) {
                 toast.error(error.response?.data.message)
@@ -144,31 +146,30 @@ export default function UserSection({ user, setUser, onSynchronizeHabits, onAuth
     }
 
     return (
-        <>
-            <div className="relative justify-end flex items-center gap-2 text-xl cursor-pointer p-2 h-12">
-                {user ?
-                    <div className="flex gap-2 items-center" onClick={() => setIsShowingDropdown(!isShowingDropdown)}>
-                        <h2 className="">hi, {user ? user.username : 'user'}! </h2>
-                        <UserCircleIcon className='h-12 w-12'></UserCircleIcon>
-                        {isShowingDropdown &&
-                            <div className="absolute top-12 right-0">
-                                <Dropdown>
-                                    <ul>
-                                        <li onClick={logout}>
-                                            logout
-                                        </li>
-                                    </ul>
-                                </Dropdown>
-                            </div>
-                        }
-                    </div>
-                    :
-                    <div className="flex gap-2 items-center">
-                        <Button type="secondary" action={openRegisterModal} key={'register'} text="register"></Button>
-                        <Button type="primary" action={openLoginModal} key={'login'} text="login" style=""></Button>
-                    </div>
-                }
-            </div>
+
+        <div className="relative justify-end flex shrink-0 items-center gap-2 text-xl cursor-pointer py-2 h-12">
+            {user ?
+                <div className="flex gap-2 items-center" onClick={() => setIsShowingDropdown(!isShowingDropdown)}>
+                    <h2 className="">hi, {user ? user.username : 'user'}! </h2>
+                    <UserCircleIcon className='h-12 w-12'></UserCircleIcon>
+                    {isShowingDropdown &&
+                        <div className="absolute top-12 right-0">
+                            <Dropdown>
+                                <ul>
+                                    <li onClick={logout}>
+                                        logout
+                                    </li>
+                                </ul>
+                            </Dropdown>
+                        </div>
+                    }
+                </div>
+                :
+                <div className="flex gap-2 items-center">
+                    <Button type="secondary" action={openRegisterModal} key={'register'} text="register"></Button>
+                    <Button type="primary" action={openLoginModal} key={'login'} text="login" style=""></Button>
+                </div>
+            }
             {modalState.type === 'login' && (
                 <Modal
                     title={`login`}
@@ -237,6 +238,7 @@ export default function UserSection({ user, setUser, onSynchronizeHabits, onAuth
                     </p>
                 </Modal>
             )}
-        </>
+        </div>
+
     )
 }

@@ -50,7 +50,7 @@ function App() {
       setIsUserCheckComplete(true)
     }
     fetchData()
-  }, [])
+  })
 
   useEffect(() => {
     habitsRef.current = habitsList
@@ -115,7 +115,7 @@ function App() {
       }
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [isUserCheckComplete, user]) // Adiciona user nas dependências
+  }, [isUserCheckComplete, user])
 
   useEffect(() => {
     if (!isUserCheckComplete) return
@@ -142,7 +142,7 @@ function App() {
     } else if (!user) {
       saveTodayDateOnLocalStorage()
     }
-  }, [isUserCheckComplete])
+  }, [isUserCheckComplete, user])
 
   useEffect(() => {
     if (!isUserCheckComplete) return
@@ -172,7 +172,7 @@ function App() {
     if (!user) {
       localStorage.setItem('habitsList', JSON.stringify(habitsList))
     }
-  }, [habitsList])
+  }, [isUserCheckComplete, user, habitsList])
 
 
   async function addDailyHabit(daily: Daily) {
@@ -679,7 +679,7 @@ function App() {
         onSynchronizeHabits={handleSynchronizeHabits}
         onAuthenticate={handleAuthentication}
       ></UserSection>
-      <div className='flex flex-col lg:flex-row gap-8 lg:pb-12 grow pb-20 box-border'>
+      <div className='flex flex-1 flex-col lg:flex-row gap-8 lg:pb-12 pb-20 box-border overflow-hidden'>
         <div className={`w-full lg:w-1/3 h-full ${activeSection === 'incremental' ? 'block' : 'hidden lg:block'}`}>
           <IncrementalHabitsSection
             incrementalHabits={habitsList.incrementalHabits}
