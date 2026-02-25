@@ -7,7 +7,6 @@ interface ResetFrequencySelectorProps {
 
 export default function ResetFrequencySelector({ resetFrequency, onChange }: ResetFrequencySelectorProps) {
 
-    // Usa a constante importada - totalmente dinâmico e type-safe
     const options : resetFrequencyType[] = ["daily", "weekly"]
 
     return (

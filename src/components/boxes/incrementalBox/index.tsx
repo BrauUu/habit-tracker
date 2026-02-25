@@ -2,26 +2,28 @@ import { PlusIcon, MinusIcon, TrashIcon } from '@heroicons/react/24/solid'
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-import type { IncrementalHabit } from '../../../types/habit'
+import type { Incremental } from '../../../types/habit'
 import type { ModalAction } from '../../../types/modal'
 
 import Button from '../../button'
 import { useToast } from '../../../hooks/useToast';
+import type { AxiosResponse } from 'axios';
 interface IncrementalHabitBoxProps {
-    habit: IncrementalHabit,
-    updateHabit: (id: string, key: string, value: any) => void,
+    habit: Incremental,
+    increaseIncremental?: (id: string, habit: Incremental) => Promise<AxiosResponse<Incremental> | void> | void
+    decreaseIncremental?: (id: string, habit: Incremental) => Promise<AxiosResponse<Incremental> | void> | void
     modalDispatch?: (action: ModalAction) => void
 }
 
 interface DragOverlayIncrementalHabitBoxProps {
-    habit: IncrementalHabit,
+    habit: Incremental,
 }
 
-export function IncrementalHabitBox({ habit, updateHabit, modalDispatch }: IncrementalHabitBoxProps) {
+export function IncrementalHabitBox({ habit, increaseIncremental, decreaseIncremental, modalDispatch }: IncrementalHabitBoxProps) {
 
     const toast = useToast()
 
-    const { id, title, resetFrequency, positiveCount, negativeCount, type } = habit
+    const { id, title, positiveCount, negativeCount } = habit
 
     const {
         attributes,
@@ -36,14 +38,36 @@ export function IncrementalHabitBox({ habit, updateHabit, modalDispatch }: Incre
         transition,
     };
 
-    function increaseHabitCount() {
-        updateHabit(id, "positiveCount", positiveCount + 1)
-        toast.habitCountIncreased(habit?.positiveCount)
+    async function increaseHabitCount() {
+        if (increaseIncremental) {
+            try {
+                const response = await increaseIncremental(id, habit)
+                if (response) {
+                    if (response.status != 200)
+                        throw response.data
+                }
+                toast.habitCountIncreased(habit?.positiveCount)
+            } catch (error) {
+                const errorMessage = error instanceof Error ? error.message : String(error)
+                toast.error(errorMessage)
+            }
+        }
     }
 
-    function decreaseHabitCount() {
-        updateHabit(id, "negativeCount", negativeCount + 1)
-        toast.habitCountDecreased(habit?.negativeCount)
+    async function decreaseHabitCount() {
+        if (decreaseIncremental) {
+            try {
+                const response = await decreaseIncremental(id, habit)
+                if (response) {
+                    if (response.status != 200)
+                        throw response.data
+                }
+                toast.habitCountIncreased(habit?.positiveCount)
+            } catch (error) {
+                const errorMessage = error instanceof Error ? error.message : String(error)
+                toast.error(errorMessage)
+            }
+        }
     }
 
     const total = positiveCount - negativeCount;
@@ -53,7 +77,7 @@ export function IncrementalHabitBox({ habit, updateHabit, modalDispatch }: Incre
             className={`w-full text-lg rounded-lg bg-primary-600 p-2 flex flex-row cursor-pointer items-center gap-2 min-h-20 shrink-0`}
             onClick={() => {
                 if (modalDispatch)
-                    modalDispatch({ type: "updateHabit", payload: { id, title, resetFrequency, type } })
+                    modalDispatch({ type: "updateHabit", payload: { ...habit } })
             }}
             ref={setNodeRef}
             {...listeners}

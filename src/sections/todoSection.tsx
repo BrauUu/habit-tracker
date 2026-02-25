@@ -3,24 +3,29 @@ import { useState, useMemo } from 'react'
 import type { Todo } from '../types/habit'
 
 import HabitSection from './habitSection'
-import { TodoBox, DragOverlayTodoBox } from '../components/boxes/todobox'
+import { TodoBox, DragOverlayTodoBox } from '../components/boxes/todoBox'
 import Filter from '../components/filter'
 import { useToast } from '../hooks/useToast';
 import DatePicker from '../components/datePicker'
 import { CheckCircleIcon } from '@heroicons/react/24/outline'
+import type { AxiosResponse } from 'axios'
 
 interface TodosSectionProps {
   todos: Todo[]
   setTodos: (updater: (todos: Todo[]) => Todo[]) => void
-  onUpdateTodo: (id: string, key: string, value: any) => void
-  onDeleteTodo: (id: string) => void
-  onAddTodo: (habit: Todo) => void
+  onUpdateTodo: (id: string, habit: Todo) => Promise<AxiosResponse<Todo> | void>
+  onCheckTodo: (id: string, habit: Todo) => Promise<AxiosResponse<Todo> | void>
+  onUncheckTodo: (id: string, habit: Todo) => Promise<AxiosResponse<Todo> | void>
+  onDeleteTodo: (id: string) => Promise<AxiosResponse | void>
+  onAddTodo: (habit: Todo) => Promise<AxiosResponse<Todo> | void>
 }
 
 export default function TodosSection({
   todos,
   setTodos,
   onUpdateTodo,
+  onCheckTodo,
+  onUncheckTodo,
   onDeleteTodo,
   onAddTodo,
 }: TodosSectionProps) {
@@ -40,15 +45,15 @@ export default function TodosSection({
   }, [todoFilter, todos])
 
   function checkIfItsDone(todo: Todo, isDone: boolean = true) {
-    return (todo?.doneDate !== undefined) === isDone
-  }
+    return (todo?.doneDate !== null && todo?.doneDate !== undefined) === isDone
+  }             
 
-  function createDefaultHabit(id: string, title: string): Todo {
+  function createDefaultHabit(id:string, title: string): Partial<Todo> {
     return {
       id,
       title,
-      type: 'to do',
-      dueDate: null
+      dueDate: null,
+      doneDate: null
     }
   }
 
@@ -64,19 +69,22 @@ export default function TodosSection({
   return (
     <>
       <HabitSection
-        title="to do's"
+        title="todo"
         habits={todosFiltered}
         setHabits={setTodos}
         onUpdateHabit={onUpdateTodo}
+        onCheckHabit={onCheckTodo}
+        onUncheckHabit={onUncheckTodo}
         onDeleteHabit={onDeleteTodo}
         onAddHabit={onAddTodo}
         createDefaultHabit={createDefaultHabit}
         validateHabit={validateHabit}
-        renderHabitBox={(todo, updateHabit, modalDispatch) => (
+        renderHabitBox={(todo, onCheckTodo, onUncheckTodo, modalDispatch) => (
           <TodoBox
             key={todo.id}
             todo={todo}
-            updateHabit={updateHabit}
+            checkTodo={onCheckTodo}
+            uncheckTodo={onUncheckTodo}
             modalDispatch={modalDispatch}
           />
         )}

@@ -2,29 +2,31 @@ import { CheckIcon, TrashIcon, ForwardIcon } from '@heroicons/react/24/solid'
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-import type { DailyHabit } from '../../../types/habit'
+import type { Daily } from '../../../types/habit'
 import type { ModalAction } from '../../../types/modal'
+import type { AxiosResponse } from 'axios';
 
 import Button from '../../button'
 import { useState } from 'react';
 import { useToast } from '../../../hooks/useToast';
 
 interface HabitBoxProps {
-    habit: DailyHabit,
+    habit: Daily,
     onlyVisible?: boolean,
-    updateHabit: (id: string, key: string, value: any) => void,
+    checkDaily?: (id: string, habit: Daily) => Promise<AxiosResponse<Daily> | void> | void
+    uncheckDaily?: (id: string, habit: Daily) => Promise<AxiosResponse<Daily> | void> | void
     modalDispatch?: (action: ModalAction) => void
 }
 
 interface DragOverlayHabitBoxProps {
-    habit: DailyHabit,
+    habit: Daily,
 }
 
-export function HabitBox({ habit, onlyVisible = true, updateHabit, modalDispatch }: HabitBoxProps) {
+export function HabitBox({ habit, onlyVisible = true, checkDaily, uncheckDaily, modalDispatch }: HabitBoxProps) {
 
     const toast = useToast()
 
-    const { id, title, done, daysOfTheWeek, streak, type } = habit
+    const { id, title, done, streak } = habit
     const [isHover, setIsHover] = useState<boolean>(false)
 
     const {
@@ -40,13 +42,32 @@ export function HabitBox({ habit, onlyVisible = true, updateHabit, modalDispatch
         transition: transition && 'opacity 300ms',
     };
 
-    function checkHabit(){
+    async function checkHabit() {
         const isChecked = done
-        if(!isChecked){
-            toast.habitChecked(habit?.streak)
+        try {
+            if (!isChecked) {
+                if (checkDaily) {
+                    const response = await checkDaily(id, habit)
+                    if (response) {
+                        if (response.status != 200)
+                            throw response.data
+                    }
+                    toast.habitChecked(habit?.streak)
+                }
+            }
+            else {
+                if (uncheckDaily) {
+                    const response = await uncheckDaily(id, habit)
+                    if (response) {
+                        if (response.status != 200)
+                            throw response.data
+                    }
+                }
+            }
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : String(error)
+            toast.error(errorMessage)
         }
-        updateHabit(id, "streak", !done ? streak + 1 : streak - 1)
-        updateHabit(id, "done", !done)
     }
 
     return (
@@ -56,7 +77,7 @@ export function HabitBox({ habit, onlyVisible = true, updateHabit, modalDispatch
                 `}
             onClick={() => {
                 if (modalDispatch)
-                    modalDispatch({ type: "updateHabit", payload: { id, daysOfTheWeek, title, type } })
+                    modalDispatch({ type: "updateHabit", payload: { ...habit } })
             }
             }
             ref={setNodeRef}

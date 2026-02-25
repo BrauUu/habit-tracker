@@ -8,10 +8,10 @@ interface ModalProps {
     cancelButtonText?: string,
     children: any,
     onClose: () => void,
-    onSave: () => void
+    onConfirm: () => void
 }
 
-export default function Modal({title, children, onClose, onSave, confirmButtonText = 'save', cancelButtonText = 'cancel' }: ModalProps) {
+export default function Modal({title, children, onClose, onConfirm, confirmButtonText = 'save', cancelButtonText = 'cancel' }: ModalProps) {
     const modalContentRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
@@ -42,7 +42,7 @@ export default function Modal({title, children, onClose, onSave, confirmButtonTe
                     <Title value={title} style="text-lg"></Title>
                     <div className="flex justify-end gap-2">
                        <Button action={onClose} type="secondary" text={cancelButtonText}/>
-                       <Button action={onSave} type="primary" text={confirmButtonText}/>
+                       <Button action={onConfirm} type="primary" text={confirmButtonText}/>
                     </div>
                 </div>
                 {children}

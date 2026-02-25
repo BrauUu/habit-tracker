@@ -20,7 +20,7 @@ export function modalReducer(state: ModalState, action: ModalAction): ModalState
         return {
           ...state,
           data: {
-            habit: { ...state.data.habit, ...action.payload } as Habit
+            habit: { ...state.data.habit, ...action.payload }
           }
         }
       }
@@ -28,7 +28,7 @@ export function modalReducer(state: ModalState, action: ModalAction): ModalState
         return {
           ...state,
           data: {
-            habit: { ...state.data.habit, ...action.payload } as Habit
+            habit: { ...state.data.habit, ...action.payload }
           }
         }
       }
@@ -46,6 +46,36 @@ export function modalReducer(state: ModalState, action: ModalAction): ModalState
           habit: { ...action.payload } as Habit
         }
       }
+    case 'login':
+      return {
+        type: 'login',
+        data: {
+          user: {}
+        }
+      }
+
+    case 'register':
+      return {
+        type: 'register',
+        data: {
+          user: {}
+        }
+      }
+
+    case 'updateUser':
+      return {
+        ...state,
+        data: {
+          user: { ...state.data.user, ...action.payload } as Habit
+        }
+      }
+
+    case 'syncHabits':
+      return {
+        type: 'syncHabits',
+        data: {habits: action.payload}
+      }
+
     case 'hideModal':
       return { type: null }
 

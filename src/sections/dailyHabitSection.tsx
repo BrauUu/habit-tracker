@@ -1,21 +1,24 @@
 import { useState, useMemo } from 'react'
 
-import type { DailyHabit } from '../types/habit'
+import type { Daily } from '../types/habit'
 
 import HabitSection from './habitSection'
-import { HabitBox, DragOverlayHabitBox } from '../components/boxes/habitbox'
+import { HabitBox, DragOverlayHabitBox } from '../components/boxes/dailyBox'
 import Filter from '../components/filter'
 import NewDayModal from '../components/modal/new-day';
 import DayOfWeekSelector from '../components/dayOfWeekSelector';
 import { useToast } from '../hooks/useToast';
 import { CalendarIcon } from '@heroicons/react/24/outline'
+import type { AxiosResponse } from 'axios'
 
 interface DailyHabitsSectionProps {
-  dailyHabits: DailyHabit[]
-  setDailyHabits: (updater: (dailyHabits: DailyHabit[]) => DailyHabit[]) => void
-  onUpdateDailyHabit: (id: string, key: string, value: any) => void
-  onDeleteDailyHabit: (id: string) => void
-  onAddDailyHabit: (habit: DailyHabit) => void
+  dailyHabits: Daily[]
+  setDailyHabits: (updater: (dailyHabits: Daily[]) => Daily[]) => void
+  onUpdateDailyHabit: (id: string, habit: Daily) => Promise<AxiosResponse<Daily> | void>
+  onCheckDaily: (id: string, habit: Daily) => Promise<AxiosResponse<Daily> | void>
+  onUncheckDaily: (id: string, habit: Daily) => Promise<AxiosResponse<Daily> | void>
+  onDeleteDailyHabit: (id: string) => Promise<AxiosResponse | void>
+  onAddDailyHabit: (daily: Daily) => Promise<AxiosResponse<Daily> | void>
   onResetDailyHabits: () => void
   pendingHabits: string[]
 }
@@ -24,6 +27,8 @@ export default function DailyHabitsSection({
   dailyHabits,
   setDailyHabits,
   onUpdateDailyHabit,
+  onCheckDaily,
+  onUncheckDaily,
   onDeleteDailyHabit,
   onAddDailyHabit,
   onResetDailyHabits,
@@ -44,23 +49,22 @@ export default function DailyHabitsSection({
     return [...dailyHabits]
   }, [dailyHabitFilter, dailyHabits])
 
-  function checkIfItsTodaysHabit(habit: DailyHabit) {
+  function checkIfItsTodaysHabit(habit: Daily) {
     const today = new Date().getDay()
     return habit?.daysOfTheWeek?.includes(today)
   }
 
-  function createDefaultHabit(id: string, title: string): DailyHabit {
+  function createDefaultHabit(id: string, title: string): Partial<Daily> {
     return {
       id,
       title,
       done: false,
       streak: 0,
-      type: 'daily',
-      daysOfTheWeek: [0, 1, 2, 3, 4, 5, 6],
+      daysOfTheWeek: [0, 1, 2, 3, 4, 5, 6]
     }
   }
 
-  function validateHabit(habit: DailyHabit): boolean {
+  function validateHabit(habit: Daily): boolean {
     if (!habit.title) {
       toast.validationError('title')
       return false
@@ -76,15 +80,18 @@ export default function DailyHabitsSection({
         habits={habitsListFiltered}
         setHabits={setDailyHabits}
         onUpdateHabit={onUpdateDailyHabit}
+        onCheckHabit={onCheckDaily}
+        onUncheckHabit={onUncheckDaily}
         onDeleteHabit={onDeleteDailyHabit}
         onAddHabit={onAddDailyHabit}
         createDefaultHabit={createDefaultHabit}
         validateHabit={validateHabit}
-        renderHabitBox={(habit, updateHabit, modalDispatch) => (
+        renderHabitBox={(habit, checkDaily, uncheckDaily, modalDispatch) => (
           <HabitBox
             key={habit.id}
             habit={habit}
-            updateHabit={updateHabit}
+            checkDaily={checkDaily}
+            uncheckDaily={uncheckDaily}
             onlyVisible={false}
             modalDispatch={modalDispatch}
           />
@@ -110,7 +117,7 @@ export default function DailyHabitsSection({
           <NewDayModal title='check yesterday habits' onStart={onResetDailyHabits}>
             {dailyHabits.filter(habit => pendingHabits.includes(habit.id))
               .map(habit => (
-                <HabitBox key={habit.id} habit={habit} updateHabit={onUpdateDailyHabit} />
+                <HabitBox key={habit.id} habit={habit} checkDaily={onCheckDaily} uncheckDaily={onUncheckDaily}/>
               ))}
           </NewDayModal>
         )}

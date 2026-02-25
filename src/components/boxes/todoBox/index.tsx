@@ -4,14 +4,15 @@ import { CSS } from '@dnd-kit/utilities';
 
 import type { Todo } from '../../../types/habit'
 import type { ModalAction } from '../../../types/modal'
+import type { AxiosResponse } from 'axios';
 
 import Button from '../../button'
 import { useState } from 'react';
 import { useToast } from '../../../hooks/useToast';
-
 interface TodoBoxProps {
     todo: Todo,
-    updateHabit: (id: string, key: string, value: any) => void,
+    checkTodo?: (id: string, habit: Todo) => Promise<AxiosResponse<Todo> | void> | void
+    uncheckTodo?: (id: string, habit: Todo) => Promise<AxiosResponse<Todo> | void> | void
     modalDispatch?: (action: ModalAction) => void
 }
 
@@ -21,15 +22,15 @@ interface DragOverlayTodoBoxProps {
 
 function isDueDateExpired(dueDate: Date) {
     const today = new Date()
-    today.setHours(0,0,0,0)
+    today.setHours(0, 0, 0, 0)
     return today.getTime() > dueDate.getTime()
 }
 
-export function TodoBox({ todo, updateHabit, modalDispatch }: TodoBoxProps) {
+export function TodoBox({ todo, checkTodo, uncheckTodo, modalDispatch }: TodoBoxProps) {
 
     const toast = useToast()
 
-    const { id, title, type, doneDate, dueDate } = todo
+    const { id, title, doneDate, dueDate } = todo
     const [isHover, setIsHover] = useState<boolean>(false)
 
     const {
@@ -45,15 +46,31 @@ export function TodoBox({ todo, updateHabit, modalDispatch }: TodoBoxProps) {
         transition: transition && 'opacity 300ms',
     };
 
-    function onCheck() {
-        if (todo?.doneDate) {
-            updateHabit(id, "doneDate", undefined)
-            return
+    async function onCheck() {
+        try {
+            if (!doneDate) {
+                if (checkTodo) {
+                    const response = await checkTodo(id, todo)
+                    if (response) {
+                        if (response.status != 200)
+                            throw response.data
+                    }
+                    toast.todoChecked()
+                }
+            }
+            else {
+                if (uncheckTodo) {
+                    const response = await uncheckTodo(id, todo)
+                    if (response) {
+                        if (response.status != 200)
+                            throw response.data
+                    }
+                }
+            }
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : String(error)
+            toast.error(errorMessage)
         }
-        toast.todoChecked()
-        const today = new Date()
-        today.setHours(0, 0, 0, 0)
-        updateHabit(id, "doneDate", today)
     }
 
     return (
@@ -63,7 +80,7 @@ export function TodoBox({ todo, updateHabit, modalDispatch }: TodoBoxProps) {
                 `}
             onClick={() => {
                 if (modalDispatch)
-                    modalDispatch({ type: "updateHabit", payload: { id, title, type, doneDate, dueDate } })
+                    modalDispatch({ type: "updateHabit", payload: { ...todo } })
             }
             }
             ref={setNodeRef}
@@ -104,7 +121,7 @@ export function TodoBox({ todo, updateHabit, modalDispatch }: TodoBoxProps) {
 
                 {
                     dueDate ?
-                    
+
                         <span className={`flex justify-end flex-row items-center gap-1 text-sm ${isDueDateExpired(new Date(dueDate)) ? 'text-ruby-500' : ''}`}><ClockIcon className='h-4' />{new Date(dueDate).toLocaleDateString()}</span>
                         :
                         undefined
@@ -142,7 +159,7 @@ export function DragOverlayTodoBox({ todo }: DragOverlayTodoBoxProps) {
                 <div className='flex justify-end items-center gap-1'>
                     {
                         dueDate ?
-                           <span className={`flex justify-end flex-row items-center gap-1 text-sm ${isDueDateExpired(new Date(dueDate)) ? 'text-ruby-500' : ''}`}><ClockIcon className='h-4' />{new Date(dueDate).toLocaleDateString()}</span>
+                            <span className={`flex justify-end flex-row items-center gap-1 text-sm ${isDueDateExpired(new Date(dueDate)) ? 'text-ruby-500' : ''}`}><ClockIcon className='h-4' />{new Date(dueDate).toLocaleDateString()}</span>
                             :
                             undefined
                     }
