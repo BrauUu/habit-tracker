@@ -50,7 +50,7 @@ function App() {
       setIsUserCheckComplete(true)
     }
     fetchData()
-  })
+  },[])
 
   useEffect(() => {
     habitsRef.current = habitsList
