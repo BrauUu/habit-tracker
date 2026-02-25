@@ -45,15 +45,15 @@ export default function TodosSection({
   }, [todoFilter, todos])
 
   function checkIfItsDone(todo: Todo, isDone: boolean = true) {
-    return (todo?.done_date !== null) === isDone
+    return (todo?.doneDate !== null) === isDone
   }             
 
   function createDefaultHabit(id:string, title: string): Partial<Todo> {
     return {
       id,
       title,
-      due_date: null,
-      done_date: null
+      dueDate: null,
+      doneDate: null
     }
   }
 
@@ -90,7 +90,7 @@ export default function TodosSection({
         )}
         renderModalFields={(habit, modalDispatch) => (
           <div className='flex justify-center'>
-            <DatePicker date={habit.due_date} placeholder='pick a deadline if needed' onChange={(v) => modalDispatch({ type: 'updateHabit', payload: { due_date: v } })} />
+            <DatePicker date={habit.dueDate} placeholder='pick a deadline if needed' onChange={(v) => modalDispatch({ type: 'updateHabit', payload: { dueDate: v } })} />
           </div>
         )}
         renderDragOverlay={(todo) => (

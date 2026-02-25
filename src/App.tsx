@@ -73,7 +73,7 @@ function App() {
     let timeoutId: NodeJS.Timeout
     const checkIfNeedsReset = () => {
       
-      const localLastDailyResetDate = user ? user.last_daily_reset_date : localStorage.getItem('lastDailyResetDate')
+      const localLastDailyResetDate = user ? user.lastDailyResetDate : localStorage.getItem('lastDailyResetDate')
       if (!localLastDailyResetDate) return
 
       const lastResetDate = new Date(localLastDailyResetDate)
@@ -134,7 +134,7 @@ function App() {
     }
 
 
-    const tempLastDailyResetDate = user ? user.last_daily_reset_date : localStorage.getItem('lastDailyResetDate')
+    const tempLastDailyResetDate = user ? user.lastDailyResetDate : localStorage.getItem('lastDailyResetDate')
     if (tempLastDailyResetDate) {
       const localLastDailyResetDate: Date = new Date(tempLastDailyResetDate)
       localLastDailyResetDate.setHours(0, 0, 0, 0)
@@ -348,14 +348,14 @@ function App() {
 
   async function increaseIncrementalHabit(id: string, habit: Incremental) {
     if (!user) {
-      habit.positive_count++
+      habit.positiveCount++
       updateIncrementalState(id, habit)
       return
     }
 
     const response = await increaseIncremental(id)
     if (response && response.status === 200) {
-      habit.positive_count++
+      habit.positiveCount++
       updateIncrementalState(id, habit)
     }
     return response
@@ -363,14 +363,14 @@ function App() {
 
   async function decreaseIncrementalHabit(id: string, habit: Incremental) {
     if (!user) {
-      habit.negative_count++
+      habit.negativeCount++
       updateIncrementalState(id, habit)
       return
     }
 
     const response = await decreaseIncremental(id)
     if (response && response.status === 200) {
-      habit.negative_count++
+      habit.negativeCount++
       updateIncrementalState(id, habit)
     }
     return response
@@ -451,7 +451,7 @@ function App() {
     if (!user) {
       const today = new Date()
       today.setHours(0, 0, 0, 0)
-      todo.done_date = today
+      todo.doneDate = today
       updateTodoState(id, todo)
       return
     }
@@ -460,7 +460,7 @@ function App() {
     if (response && response.status === 200) {
       const today = new Date()
       today.setHours(0, 0, 0, 0)
-      todo.done_date = today
+      todo.doneDate = today
       updateTodoState(id, todo)
     }
     return response
@@ -468,14 +468,14 @@ function App() {
 
   async function uncheckTodoHabit(id: string, todo: Todo) {
     if (!user) {
-      todo.done_date = null
+      todo.doneDate = null
       updateTodoState(id, todo)
       return
     }
 
     const response = await uncheckTodo(id)
     if (response && response.status === 200) {
-      todo.done_date = null
+      todo.doneDate = null
       updateTodoState(id, todo)
     }
     return response
@@ -521,8 +521,8 @@ function App() {
           const shouldReset = checkShouldResetIncrementalHabit(habit)
           return ({
             ...habit,
-            negative_count: shouldReset ? 0 : habit.negative_count,
-            positive_count: shouldReset ? 0 : habit.positive_count
+            negativeCount: shouldReset ? 0 : habit.negativeCount,
+            positiveCount: shouldReset ? 0 : habit.positiveCount
           })
         })
       }))
@@ -534,8 +534,8 @@ function App() {
         const sevenDaysAgo = new Date(today)
         sevenDaysAgo.setDate(today.getDate() - 7)
 
-        if (todo?.done_date) {
-          const doneDate = new Date(todo?.done_date)
+        if (todo?.doneDate) {
+          const doneDate = new Date(todo?.doneDate)
           if (doneDate <= sevenDaysAgo) {
             deleteTodo(todo.id)
           }
@@ -552,7 +552,7 @@ function App() {
       const response = await startNewDay()
       if (response && response.status == 200) {
 
-        const { dailiesUpdates, incrementalsUpdates, deletedTodos, last_daily_reset_date } = response.data
+        const { dailiesUpdates, incrementalsUpdates, deletedTodos, lastDailyResetDate } = response.data
 
         setHabitsList(prevState => ({
           ...prevState,
@@ -569,7 +569,7 @@ function App() {
           }),
         }))
         
-        setUser(prevState => prevState ? {...prevState, last_daily_reset_date} : null)
+        setUser(prevState => prevState ? {...prevState, lastDailyResetDate} : null)
       }
       toast.success('new day started with sucess')
     } catch (error) {
@@ -582,8 +582,8 @@ function App() {
 
   function checkShouldResetIncrementalHabit(habit: Incremental): boolean {
     const today = new Date()
-    if (habit.reset_frequency === 'daily') return true
-    if (habit.reset_frequency === 'weekly') return today.getDay() === 1
+    if (habit.resetFrequency === 'daily') return true
+    if (habit.resetFrequency === 'weekly') return today.getDay() === 1
     return false
   }
 
@@ -611,7 +611,7 @@ function App() {
   }
 
   function checkHabitByDay(habit: Daily, weekDay: number) {
-    return habit.days_of_the_week?.includes(weekDay)
+    return habit.daysOfTheWeek?.includes(weekDay)
   }
 
   const setDailyHabits = useCallback((updater: (dailyHabits: Daily[]) => Daily[]) => {

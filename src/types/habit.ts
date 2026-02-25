@@ -4,7 +4,7 @@ interface BaseHabit {
   id: string
   title: string
   description?: string
-  user_id?: string
+  userId?: string
   type: 'daily' | 'incremental' | 'todo' // discriminator field
 }
 
@@ -12,20 +12,19 @@ export interface Daily extends BaseHabit {
   type: 'daily'
   done: boolean
   streak: number
-  days_of_the_week?: number[]
+  daysOfTheWeek?: number[]
 }
 
 export interface Todo extends BaseHabit {
   type: 'todo'
-  done_date: Date | null,
-  due_date: Date | null
+  doneDate: Date | null,
+  dueDate: Date | null
 }
 
 export interface Incremental extends BaseHabit {
-  type: 'incremental'
-  reset_frequency: resetFrequencyType
-  positive_count: number
-  negative_count: number
+  resetFrequency: resetFrequencyType
+  positiveCount: number
+  negativeCount: number
 }
 
 export type Habit = Daily | Incremental | Todo

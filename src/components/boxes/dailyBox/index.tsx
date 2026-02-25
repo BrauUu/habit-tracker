@@ -26,7 +26,7 @@ export function HabitBox({ habit, onlyVisible = true, checkDaily, uncheckDaily, 
 
     const toast = useToast()
 
-    const { id, title, done, days_of_the_week, streak } = habit
+    const { id, title, done, daysOfTheWeek, streak } = habit
     const [isHover, setIsHover] = useState<boolean>(false)
 
     const {

@@ -60,7 +60,7 @@ export default function UserSection({ user, setUser, onSynchronizeHabits, onAuth
         try {
             const user = modalState.data?.user
 
-            if (user.password !== user.password_confirmation) {
+            if (user.password !== user.passwordConfirmation) {
                 toast.error('passwords should be equal')
                 return
             }
@@ -216,10 +216,10 @@ export default function UserSection({ user, setUser, onSynchronizeHabits, onAuth
                     <Input
                         placeholder="confirm your password"
                         style="pr-8"
-                        value={modalState.data?.user?.password_confirmation}
+                        value={modalState.data?.user?.passwordConfirmation}
                         type="password"
-                        onSubmit={(v) => modalDispatch({ type: 'updateUser', payload: { password_confirmation: v } })}
-                        onChange={(v) => modalDispatch({ type: 'updateUser', payload: { password_confirmation: v } })}
+                        onSubmit={(v) => modalDispatch({ type: 'updateUser', payload: { passwordConfirmation: v } })}
+                        onChange={(v) => modalDispatch({ type: 'updateUser', payload: { passwordConfirmation: v } })}
                     />
                 </Modal>
             )}

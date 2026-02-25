@@ -24,9 +24,9 @@ export type SynchronizeResponse = {
   todos: Todo[]
 }
 
-export type DailyRequest = Pick<Daily, 'title' | 'description' | 'days_of_the_week'>
-export type IncrementalRequest = Pick<Incremental, 'title' | 'description' | 'reset_frequency'>
-export type TodoRequest = Pick<Todo, 'title' | 'description' | 'due_date'>
+export type DailyRequest = Pick<Daily, 'title' | 'description' | 'daysOfTheWeek'>
+export type IncrementalRequest = Pick<Incremental, 'title' | 'description' | 'resetFrequency'>
+export type TodoRequest = Pick<Todo, 'title' | 'description' | 'dueDate'>
 
 export type GetAllDataResponse = {
   dailies: Daily[]
@@ -39,5 +39,5 @@ export type NewDayResponse = {
   dailiesUpdates: Partial<Daily[]>
   incrementalsUpdates: Partial<Incremental[]>
   deletedTodos: Partial<Todo[]>
-  last_daily_reset_date: Date
+  lastDailyResetDate: Date
 }

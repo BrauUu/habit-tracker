@@ -2,8 +2,8 @@ export interface User {
     id: string
     username: string
     password: string
-    password_confirmation?: string
-    last_daily_reset_date: Date | null
+    passwordConfirmation?: string
+    lastDailyResetDate: Date | null
 }
 
 export type ButtonType = 'primary' | 'secondary' | 'other';

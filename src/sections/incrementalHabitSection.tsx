@@ -46,17 +46,17 @@ export default function IncrementalHabitsSection({
   }, [incrementalHabitFilter, incrementalHabits])
 
   function checkHabitStrength(habit: Incremental, filter: number) {
-    const strength : number = habit.positive_count - habit.negative_count
+    const strength : number = habit.positiveCount - habit.negativeCount
     return strength > 0 && filter == 1 || strength < 0 && filter == -1
   }
 
   function createDefaultHabit(id: string, title: string): Partial<Incremental> {
     return {
       id,
-      reset_frequency: 'weekly',
+      resetFrequency: 'weekly',
       title,
-      positive_count: 0,
-      negative_count: 0
+      positiveCount: 0,
+      negativeCount: 0
     }
   }
 
@@ -65,7 +65,7 @@ export default function IncrementalHabitsSection({
       toast.validationError('title')
       return false
     }
-    if (!habit.reset_frequency) {
+    if (!habit.resetFrequency) {
       toast.validationError('reset frequency')
       return false
     }
@@ -99,8 +99,8 @@ export default function IncrementalHabitsSection({
       headerExtra={<Filter value={incrementalHabitFilter} onChange={setIncrementalHabitFilter} filters={filterOptions} />}
       renderModalFields={(habit, modalDispatch) => (
         <ResetFrequencySelector
-          resetFrequency={habit.reset_frequency}
-          onChange={(v) => modalDispatch({ type: 'updateHabit', payload: { reset_frequency: v } })}
+          resetFrequency={habit.resetFrequency}
+          onChange={(v) => modalDispatch({ type: 'updateHabit', payload: { resetFrequency: v } })}
         />
       )}
        withoutContent={{

@@ -20,17 +20,17 @@ interface DragOverlayTodoBoxProps {
     todo: Todo,
 }
 
-function isDueDateExpired(due_date: Date) {
+function isDueDateExpired(dueDate: Date) {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
-    return today.getTime() > due_date.getTime()
+    return today.getTime() > dueDate.getTime()
 }
 
 export function TodoBox({ todo, checkTodo, uncheckTodo, modalDispatch }: TodoBoxProps) {
 
     const toast = useToast()
 
-    const { id, title, done_date, due_date } = todo
+    const { id, title, doneDate, dueDate } = todo
     const [isHover, setIsHover] = useState<boolean>(false)
 
     const {
@@ -48,7 +48,7 @@ export function TodoBox({ todo, checkTodo, uncheckTodo, modalDispatch }: TodoBox
 
     async function onCheck() {
         try {
-            if (!done_date) {
+            if (!doneDate) {
                 if (checkTodo) {
                     const response = await checkTodo(id, todo)
                     if (response) {
@@ -76,7 +76,7 @@ export function TodoBox({ todo, checkTodo, uncheckTodo, modalDispatch }: TodoBox
     return (
         <div
             className={`w-full text-lg rounded-lg bg-primary-600 p-2 flex flex-row cursor-pointer items-center gap-2 min-h-20 shrink-0
-                ${done_date ? 'opacity-50' : 'opacity-100'}
+                ${doneDate ? 'opacity-50' : 'opacity-100'}
                 `}
             onClick={() => {
                 if (modalDispatch)
@@ -98,7 +98,7 @@ export function TodoBox({ todo, checkTodo, uncheckTodo, modalDispatch }: TodoBox
                 onMouseLeave={() => setIsHover(false)}
             >
                 {
-                    (done_date || isHover) && <CheckIcon />
+                    (doneDate || isHover) && <CheckIcon />
                 }
             </div>
             <div className='flex flex-col grow min-h-16 justify-between'>
@@ -120,9 +120,9 @@ export function TodoBox({ todo, checkTodo, uncheckTodo, modalDispatch }: TodoBox
                 </div>
 
                 {
-                    due_date ?
+                    dueDate ?
 
-                        <span className={`flex justify-end flex-row items-center gap-1 text-sm ${isDueDateExpired(new Date(due_date)) ? 'text-ruby-500' : ''}`}><ClockIcon className='h-4' />{new Date(due_date).toLocaleDateString()}</span>
+                        <span className={`flex justify-end flex-row items-center gap-1 text-sm ${isDueDateExpired(new Date(dueDate)) ? 'text-ruby-500' : ''}`}><ClockIcon className='h-4' />{new Date(dueDate).toLocaleDateString()}</span>
                         :
                         undefined
                 }
@@ -134,17 +134,17 @@ export function TodoBox({ todo, checkTodo, uncheckTodo, modalDispatch }: TodoBox
 
 export function DragOverlayTodoBox({ todo }: DragOverlayTodoBoxProps) {
 
-    const { title, done_date, due_date } = todo
+    const { title, doneDate, dueDate } = todo
 
     return (
         <div
             className={`w-full text-lg rounded-lg p-2 flex flex-row items-center gap-2 opacity-80 cursor-grabbing min-h-20 shrink-0
-            ${done_date ? 'bg-primary-700 *:opacity-50' : 'bg-primary-600'}
+            ${doneDate ? 'bg-primary-700 *:opacity-50' : 'bg-primary-600'}
             `}
         >
             <div className='h-7 w-7 shrink-0 rounded-sm border border-secondary-100'>
                 {
-                    done_date && <CheckIcon />
+                    doneDate && <CheckIcon />
                 }
             </div>
             <div className='flex flex-col grow justify-start min-w-0'>
@@ -158,8 +158,8 @@ export function DragOverlayTodoBox({ todo }: DragOverlayTodoBoxProps) {
                 </div>
                 <div className='flex justify-end items-center gap-1'>
                     {
-                        due_date ?
-                            <span className={`flex justify-end flex-row items-center gap-1 text-sm ${isDueDateExpired(new Date(due_date)) ? 'text-ruby-500' : ''}`}><ClockIcon className='h-4' />{new Date(due_date).toLocaleDateString()}</span>
+                        dueDate ?
+                            <span className={`flex justify-end flex-row items-center gap-1 text-sm ${isDueDateExpired(new Date(dueDate)) ? 'text-ruby-500' : ''}`}><ClockIcon className='h-4' />{new Date(dueDate).toLocaleDateString()}</span>
                             :
                             undefined
                     }

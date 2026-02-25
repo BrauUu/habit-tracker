@@ -23,7 +23,7 @@ export function IncrementalHabitBox({ habit, increaseIncremental, decreaseIncrem
 
     const toast = useToast()
 
-    const { id, title, reset_frequency, positive_count, negative_count } = habit
+    const { id, title, resetFrequency, positiveCount, negativeCount } = habit
 
     const {
         attributes,
@@ -46,7 +46,7 @@ export function IncrementalHabitBox({ habit, increaseIncremental, decreaseIncrem
                     if (response.status != 200)
                         throw response.data
                 }
-                toast.habitCountIncreased(habit?.positive_count)
+                toast.habitCountIncreased(habit?.positiveCount)
             } catch (error) {
                 const errorMessage = error instanceof Error ? error.message : String(error)
                 toast.error(errorMessage)
@@ -62,7 +62,7 @@ export function IncrementalHabitBox({ habit, increaseIncremental, decreaseIncrem
                     if (response.status != 200)
                         throw response.data
                 }
-                toast.habitCountIncreased(habit?.positive_count)
+                toast.habitCountIncreased(habit?.positiveCount)
             } catch (error) {
                 const errorMessage = error instanceof Error ? error.message : String(error)
                 toast.error(errorMessage)
@@ -70,7 +70,7 @@ export function IncrementalHabitBox({ habit, increaseIncremental, decreaseIncrem
         }
     }
 
-    const total = positive_count - negative_count;
+    const total = positiveCount - negativeCount;
 
     return (
         <div
@@ -123,9 +123,9 @@ export function IncrementalHabitBox({ habit, increaseIncremental, decreaseIncrem
                 </div>
                 <div className='flex items-center gap-2 text-sm'>
                     <div className='flex items-center gap-1'>
-                        <span className='text-emerald-400'>+{positive_count}</span>
+                        <span className='text-emerald-400'>+{positiveCount}</span>
                         <span className='text-secondary/50'>/</span>
-                        <span className='text-ruby-500'>-{negative_count}</span>
+                        <span className='text-ruby-500'>-{negativeCount}</span>
                     </div>
                     <span className='text-secondary/50'>•</span>
                     <span className={`font-bold ${total >= 0 ? 'text-emerald-400' : 'text-ruby-500'}`}>
@@ -139,8 +139,8 @@ export function IncrementalHabitBox({ habit, increaseIncremental, decreaseIncrem
 
 export function DragOverlayIncrementalHabitBox({ habit }: DragOverlayIncrementalHabitBoxProps) {
 
-    const { title, positive_count, negative_count } = habit
-    const total = positive_count - negative_count;
+    const { title, positiveCount, negativeCount } = habit
+    const total = positiveCount - negativeCount;
 
     return (
         <div className={`w-full text-lg rounded-lg bg-primary-600 p-2 flex flex-row items-center gap-2 opacity-80 cursor-grabbing min-h-20 shrink-0`}>
@@ -165,9 +165,9 @@ export function DragOverlayIncrementalHabitBox({ habit }: DragOverlayIncremental
 
                 <div className='flex items-center gap-2 text-sm'>
                     <div className='flex items-center gap-1'>
-                        <span className='text-emerald-400'>+{positive_count}</span>
+                        <span className='text-emerald-400'>+{positiveCount}</span>
                         <span className='text-secondary/50'>/</span>
-                        <span className='text-ruby-500'>-{negative_count}</span>
+                        <span className='text-ruby-500'>-{negativeCount}</span>
                     </div>
                     <span className='text-secondary/50'>•</span>
                     <span className={`font-bold ${total >= 0 ? 'text-emerald-400' : 'text-ruby-500'}`}>

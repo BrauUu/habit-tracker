@@ -51,7 +51,7 @@ export default function DailyHabitsSection({
 
   function checkIfItsTodaysHabit(habit: Daily) {
     const today = new Date().getDay()
-    return habit?.days_of_the_week?.includes(today)
+    return habit?.daysOfTheWeek?.includes(today)
   }
 
   function createDefaultHabit(id: string, title: string): Partial<Daily> {
@@ -60,7 +60,7 @@ export default function DailyHabitsSection({
       title,
       done: false,
       streak: 0,
-      days_of_the_week: [0, 1, 2, 3, 4, 5, 6]
+      daysOfTheWeek: [0, 1, 2, 3, 4, 5, 6]
     }
   }
 
@@ -101,8 +101,8 @@ export default function DailyHabitsSection({
         )}
         renderModalFields={(habit, modalDispatch) => (
           <DayOfWeekSelector
-            selectedDaysProps={habit.days_of_the_week}
-            onChange={(days) => modalDispatch({ type: 'updateHabit', payload: { days_of_the_week: days } })}
+            selectedDaysProps={habit.daysOfTheWeek}
+            onChange={(days) => modalDispatch({ type: 'updateHabit', payload: { daysOfTheWeek: days } })}
           />
         )}
         headerExtra={<Filter value={dailyHabitFilter} onChange={setDailyHabitFilter} filters={filterOptions} />}
