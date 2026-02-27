@@ -50,12 +50,12 @@ export function TodoBox({ todo, checkTodo, uncheckTodo, modalDispatch }: TodoBox
         try {
             if (!doneDate) {
                 if (checkTodo) {
+                    toast.todoChecked()
                     const response = await checkTodo(id, todo)
                     if (response) {
                         if (response.status != 200)
                             throw response.data
                     }
-                    toast.todoChecked()
                 }
             }
             else {
@@ -137,7 +137,7 @@ export function DragOverlayTodoBox({ todo }: DragOverlayTodoBoxProps) {
     const { title, doneDate, dueDate } = todo
 
     return (
-        <div
+        <div 
             className={`w-full text-lg rounded-lg p-2 flex flex-row items-center gap-2 opacity-80 cursor-grabbing min-h-20 shrink-0
             ${doneDate ? 'bg-primary-700 *:opacity-50' : 'bg-primary-600'}
             `}
@@ -147,7 +147,7 @@ export function DragOverlayTodoBox({ todo }: DragOverlayTodoBoxProps) {
                     doneDate && <CheckIcon />
                 }
             </div>
-            <div className='flex flex-col grow justify-start min-w-0'>
+            <div className='flex flex-col grow min-h-16 justify-between'>
                 <div className='flex items-start gap-2 min-w-0'>
                     <p className='grow break-words min-w-0'>
                         {title}
