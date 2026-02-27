@@ -5,18 +5,16 @@ interface BaseHabit {
   title: string
   description?: string
   userId?: string
-  type: 'daily' | 'incremental' | 'todo' // discriminator field
+  order: number
 }
 
 export interface Daily extends BaseHabit {
-  type: 'daily'
   done: boolean
   streak: number
   daysOfTheWeek?: number[]
 }
 
 export interface Todo extends BaseHabit {
-  type: 'todo'
   doneDate: Date | null,
   dueDate: Date | null
 }

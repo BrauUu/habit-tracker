@@ -9,11 +9,13 @@ import Filter from '../components/filter';
 import { useMemo, useState } from 'react';
 import { ChartBarIcon } from '@heroicons/react/24/outline';
 import type { AxiosResponse } from 'axios';
+import type { OrderResponse } from '../types/api';
 
 interface IncrementalHabitsSectionProps {
   incrementalHabits: Incremental[]
   setIncrementalHabits: (updater: (incrementalHabits: Incremental[]) => Incremental[]) => void
   onUpdateIncrementalHabit: (id: string, habit: Incremental) => Promise<AxiosResponse<Incremental> | void>
+  onOrderIncremental: (id: string, oldPosition: number, newPosition: number) => Promise<AxiosResponse<OrderResponse> | void>
   onIncreaseIncremental: (id: string, habit: Incremental) => Promise<AxiosResponse<Incremental> | void>
   onDecreaseIncremental: (id: string, habit: Incremental) => Promise<AxiosResponse<Incremental> | void>
   onDeleteIncrementalHabit: (id: string) => Promise<AxiosResponse | void>
@@ -24,6 +26,7 @@ export default function IncrementalHabitsSection({
   incrementalHabits,
   setIncrementalHabits,
   onUpdateIncrementalHabit,
+  onOrderIncremental,
   onIncreaseIncremental,
   onDecreaseIncremental,
   onDeleteIncrementalHabit,
@@ -38,15 +41,20 @@ export default function IncrementalHabitsSection({
     { 'label': 'weak', 'value': -1 }
   ]
 
-  const habitsListFiltered = useMemo(() => {
+  function getHabitsFiltered() {
     if (incrementalHabitFilter === 0) return [...incrementalHabits]
     if (incrementalHabitFilter === 1) return incrementalHabits.filter(habit => checkHabitStrength(habit, incrementalHabitFilter))
     if (incrementalHabitFilter === -1) return incrementalHabits.filter(habit => checkHabitStrength(habit, incrementalHabitFilter))
     return [...incrementalHabits]
+  }
+
+  const habitsListFilteredAndSorted = useMemo(() => {
+    const filtered = getHabitsFiltered()
+    return filtered.sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
   }, [incrementalHabitFilter, incrementalHabits])
 
   function checkHabitStrength(habit: Incremental, filter: number) {
-    const strength : number = habit.positiveCount - habit.negativeCount
+    const strength: number = habit.positiveCount - habit.negativeCount
     return strength > 0 && filter == 1 || strength < 0 && filter == -1
   }
 
@@ -56,7 +64,8 @@ export default function IncrementalHabitsSection({
       resetFrequency: 'weekly',
       title,
       positiveCount: 0,
-      negativeCount: 0
+      negativeCount: 0,
+      order: incrementalHabits.length + 1 || 1
     }
   }
 
@@ -75,9 +84,10 @@ export default function IncrementalHabitsSection({
   return (
     <HabitSection
       title="incremental"
-      habits={habitsListFiltered}
+      habits={habitsListFilteredAndSorted}
       setHabits={setIncrementalHabits}
       onUpdateHabit={onUpdateIncrementalHabit}
+      onOrderHabit={onOrderIncremental}
       onCheckHabit={onIncreaseIncremental}
       onUncheckHabit={onDecreaseIncremental}
       onDeleteHabit={onDeleteIncrementalHabit}
@@ -103,11 +113,11 @@ export default function IncrementalHabitsSection({
           onChange={(v) => modalDispatch({ type: 'updateHabit', payload: { resetFrequency: v } })}
         />
       )}
-       withoutContent={{
+      withoutContent={{
         icon: ChartBarIcon,
         title: 'incremental habits will show here',
-        text: 'incremental habits can be tracked whenever they happen. multiple checks build your positive or negative score.'         
-        }}
+        text: 'incremental habits can be tracked whenever they happen. multiple checks build your positive or negative score.'
+      }}
     />
   )
 }

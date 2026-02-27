@@ -11,9 +11,9 @@ import MobileNav, { type Section } from './components/mobileNav'
 
 import { useToast } from './hooks/useToast'
 import { getAllDataFromUser, startNewDay } from './services/user.service'
-import { createDaily, deleteDaily, getPendingDailies, updateDaily, checkDaily, uncheckDaily } from './services/daily.service'
-import { createIncremental, deleteIncremental, updateIncremental, increaseIncremental, decreaseIncremental } from './services/incremental.service'
-import { createTodo, updateTodo as updateTodoService, deleteTodo as deleteTodoService, checkTodo, uncheckTodo } from './services/todo.service'
+import { createDaily, deleteDaily, getPendingDailies, updateDaily, checkDaily, uncheckDaily, orderDaily } from './services/daily.service'
+import { createIncremental, deleteIncremental, updateIncremental, increaseIncremental, decreaseIncremental, orderIncremental } from './services/incremental.service'
+import { createTodo, updateTodo as updateTodoService, deleteTodo as deleteTodoService, checkTodo, uncheckTodo, orderTodo } from './services/todo.service'
 
 function App() {
   const [activeSection, setActiveSection] = useState<Section>('daily')
@@ -50,7 +50,7 @@ function App() {
       setIsUserCheckComplete(true)
     }
     fetchData()
-  },[])
+  }, [])
 
   useEffect(() => {
     habitsRef.current = habitsList
@@ -72,7 +72,7 @@ function App() {
 
     let timeoutId: NodeJS.Timeout
     const checkIfNeedsReset = () => {
-      
+
       const localLastDailyResetDate = user ? user.lastDailyResetDate : localStorage.getItem('lastDailyResetDate')
       if (!localLastDailyResetDate) return
 
@@ -156,9 +156,7 @@ function App() {
       }
     }
 
-    console.log('verificou')
     if (!hasResetToday.current && habitsList.dailyHabits.length > 0 && !hasCheckedPendingHabits.current) {
-      console.log('entrou')
       handleDailyReset()
     }
   }, [habitsList, isUserCheckComplete])
@@ -177,6 +175,7 @@ function App() {
   }, [isUserCheckComplete, user, habitsList])
 
 
+  // DAILY SECTION
   async function addDailyHabit(daily: Daily) {
     if (!user) {
       setHabitsList(prevState => ({
@@ -228,6 +227,42 @@ function App() {
     }))
   }
 
+  async function orderDailyHabit(id: string, oldPosition: number, newPosition: number) {
+    if (!user) {
+      const start = oldPosition < newPosition ? oldPosition + 1 : newPosition
+      const end = oldPosition < newPosition ? newPosition : oldPosition - 1
+      const step = oldPosition < newPosition ? -1 : 1
+  
+      setHabitsList(prevState => ({
+        ...prevState,
+        dailyHabits: prevState.dailyHabits.map((habit) => {
+          if(habit.id === id)
+            return  { ...habit, order: newPosition }
+          else if(habit.order >= start && habit.order <= end)
+            return { ...habit, order: habit.order + step }
+          else
+            return habit
+        })
+      }))
+      return
+    }
+
+    const response = await orderDaily(id, { oldPosition, newPosition })
+    if (response && response.status == 200) {
+      const orderMap = new Map(response.data.map(h => [h.id, h.order]))
+
+      setHabitsList(prevState => ({
+        ...prevState,
+        dailyHabits: prevState.dailyHabits.map(habit =>
+          orderMap.has(habit.id)
+            ? { ...habit, order: orderMap.get(habit.id)! }
+            : habit
+        )
+      }))
+    }
+    return response
+  }
+
   async function checkDailyHabit(id: string, daily: Daily) {
     if (!user) {
       daily.done = true
@@ -277,7 +312,6 @@ function App() {
 
   }
 
-
   async function deleteDailyHabit(id: string) {
     if (!user) {
       setHabitsList(prevState => ({
@@ -297,6 +331,7 @@ function App() {
     return response
   }
 
+  //INCREMENTAL SECTION
   async function addIncrementalHabit(incremental: Incremental) {
     if (!user) {
       setHabitsList(prevState => ({
@@ -346,6 +381,42 @@ function App() {
         habit.id === id ? { ...incremental } : habit
       )
     }))
+  }
+
+  async function orderIncrementalHabit(id: string, oldPosition: number, newPosition: number) {
+    if (!user) {
+      const start = oldPosition < newPosition ? oldPosition + 1 : newPosition
+      const end = oldPosition < newPosition ? newPosition : oldPosition - 1
+      const step = oldPosition < newPosition ? -1 : 1
+  
+      setHabitsList(prevState => ({
+        ...prevState,
+        incrementalHabits: prevState.incrementalHabits.map((habit) => {
+          if(habit.id === id)
+            return  { ...habit, order: newPosition }
+          else if(habit.order >= start && habit.order <= end)
+            return { ...habit, order: habit.order + step }
+          else
+            return habit
+        })
+      }))
+      return
+    }
+
+    const response = await orderIncremental(id, { oldPosition, newPosition })
+    if (response && response.status == 200) {
+      const orderMap = new Map(response.data.map(h => [h.id, h.order]))
+
+      setHabitsList(prevState => ({
+        ...prevState,
+        incrementalHabits: prevState.incrementalHabits.map(habit =>
+          orderMap.has(habit.id)
+            ? { ...habit, order: orderMap.get(habit.id)! }
+            : habit
+        )
+      }))
+    }
+    return response
   }
 
   async function increaseIncrementalHabit(id: string, habit: Incremental) {
@@ -398,6 +469,7 @@ function App() {
     return response
   }
 
+  //TODO SECTION
   async function addTodo(todo: Todo) {
     if (!user) {
       setHabitsList(prevState => ({
@@ -447,6 +519,42 @@ function App() {
         habit.id === id ? { ...todo } : habit
       )
     }))
+  }
+
+  async function orderTodoHabit(id: string, oldPosition: number, newPosition: number) {
+    if (!user) {
+      const start = oldPosition < newPosition ? oldPosition + 1 : newPosition
+      const end = oldPosition < newPosition ? newPosition : oldPosition - 1
+      const step = oldPosition < newPosition ? -1 : 1
+  
+      setHabitsList(prevState => ({
+        ...prevState,
+        todos: prevState.todos.map((habit) => {
+          if(habit.id === id)
+            return  { ...habit, order: newPosition }
+          else if(habit.order >= start && habit.order <= end)
+            return { ...habit, order: habit.order + step }
+          else
+            return habit
+        })
+      }))
+      return
+    }
+
+    const response = await orderTodo(id, { oldPosition, newPosition })
+    if (response && response.status == 200) {
+      const orderMap = new Map(response.data.map(h => [h.id, h.order]))
+
+      setHabitsList(prevState => ({
+        ...prevState,
+        todos: prevState.todos.map(habit =>
+          orderMap.has(habit.id)
+            ? { ...habit, order: orderMap.get(habit.id)! }
+            : habit
+        )
+      }))
+    }
+    return response
   }
 
   async function checkTodoHabit(id: string, todo: Todo) {
@@ -570,8 +678,8 @@ function App() {
             return !deletedTodos.find((dt) => dt && dt.id === todo.id)
           }),
         }))
-        
-        setUser(prevState => prevState ? {...prevState, lastDailyResetDate} : null)
+
+        setUser(prevState => prevState ? { ...prevState, lastDailyResetDate } : null)
       }
       toast.success('new day started with sucess')
     } catch (error) {
@@ -687,6 +795,7 @@ function App() {
             incrementalHabits={habitsList.incrementalHabits}
             setIncrementalHabits={setIncrementalHabits}
             onUpdateIncrementalHabit={updateIncrementalHabit}
+            onOrderIncremental={orderIncrementalHabit}
             onIncreaseIncremental={increaseIncrementalHabit}
             onDecreaseIncremental={decreaseIncrementalHabit}
             onDeleteIncrementalHabit={deleteIncrementalHabit}
@@ -698,6 +807,7 @@ function App() {
             dailyHabits={habitsList.dailyHabits}
             setDailyHabits={setDailyHabits}
             onUpdateDailyHabit={updateDailyHabit}
+            onOrderDaily={orderDailyHabit}
             onCheckDaily={checkDailyHabit}
             onUncheckDaily={uncheckDailyHabit}
             onDeleteDailyHabit={deleteDailyHabit}
@@ -711,6 +821,7 @@ function App() {
             todos={habitsList.todos}
             setTodos={setTodos}
             onUpdateTodo={updateTodo}
+            onOrderTodo={orderTodoHabit}
             onCheckTodo={checkTodoHabit}
             onUncheckTodo={uncheckTodoHabit}
             onDeleteTodo={deleteTodo}

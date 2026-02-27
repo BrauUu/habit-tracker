@@ -2,7 +2,7 @@ import { useState, useReducer, type ReactNode } from 'react'
 import { v4 as uuidv4 } from 'uuid';
 
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragOverlay, type DragEndEvent, type DragStartEvent } from '@dnd-kit/core';
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 
 import type { Habit } from '../types/habit'
 import type { ModalAction } from '../types/modal'
@@ -14,6 +14,7 @@ import Input from '../components/input'
 import Modal from '../components/modal/default';
 import { useToast } from '../hooks/useToast';
 import type { AxiosResponse } from 'axios';
+import type { OrderResponse } from '../types/api';
 
 
 interface HabitSectionProps<HabitType extends Habit> {
@@ -21,6 +22,7 @@ interface HabitSectionProps<HabitType extends Habit> {
     habits: HabitType[]
     setHabits: (updater: (habits: HabitType[]) => HabitType[]) => void
     onUpdateHabit: (id: string, habit: HabitType) => Promise<AxiosResponse<HabitType> | void>
+    onOrderHabit: (id: string, oldPosition: number, newPosition: number) => Promise<AxiosResponse<OrderResponse> | void>
     onCheckHabit: (id: string, habit: HabitType) => Promise<AxiosResponse<HabitType> | void>
     onUncheckHabit: (id: string, habit: HabitType) => Promise<AxiosResponse<HabitType> | void>
     onDeleteHabit: (id: string) => Promise<AxiosResponse | void>
@@ -39,8 +41,8 @@ interface HabitSectionProps<HabitType extends Habit> {
 export default function HabitSection<HabitType extends Habit>({
     title,
     habits,
-    setHabits,
     onUpdateHabit,
+    onOrderHabit,
     onCheckHabit,
     onUncheckHabit,
     onDeleteHabit,
@@ -157,11 +159,11 @@ export default function HabitSection<HabitType extends Habit>({
         const { active, over } = event;
 
         if (active.id !== over?.id) {
-            setHabits((habits) => {
-                const oldIndex = habits.findIndex(h => h.id === active.id);
-                const newIndex = habits.findIndex(h => h.id === over?.id);
-                return arrayMove(habits, oldIndex, newIndex);
-            });
+                const oldPosition = habits.find(h => h.id === active.id)?.order
+                const newPosition = habits.find(h => h.id === over?.id)?.order
+
+            if(oldPosition && newPosition && oldPosition !== newPosition)
+                onOrderHabit(active.id as string, Number(oldPosition), Number(newPosition))
         }
 
         setDragHabit(null);

@@ -1,4 +1,4 @@
-import type { DailyRequest } from "../types/api";
+import type { OrderResponse, DailyRequest, OrderRequest } from "../types/api";
 import type { Daily } from "../types/habit";
 import { api } from "./api";
 
@@ -10,6 +10,10 @@ export async function createDaily(data: DailyRequest) {
 
 export async function getPendingDailies() {
     return api.get<string[]>(`${basePath}/pendingHabits`)
+}
+
+export async function orderDaily(dailyId: string, data: OrderRequest) {
+    return api.post<OrderResponse>(`${basePath}/${dailyId}/order`, data)
 }
 
 export async function checkDaily(dailyId: string) {
