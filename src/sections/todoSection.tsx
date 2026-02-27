@@ -9,11 +9,13 @@ import { useToast } from '../hooks/useToast';
 import DatePicker from '../components/datePicker'
 import { CheckCircleIcon } from '@heroicons/react/24/outline'
 import type { AxiosResponse } from 'axios'
+import type { OrderResponse } from '../types/api'
 
 interface TodosSectionProps {
   todos: Todo[]
   setTodos: (updater: (todos: Todo[]) => Todo[]) => void
   onUpdateTodo: (id: string, habit: Todo) => Promise<AxiosResponse<Todo> | void>
+  onOrderTodo: (id: string, oldPosition: number, newPosition: number) => Promise<AxiosResponse<OrderResponse> | void>
   onCheckTodo: (id: string, habit: Todo) => Promise<AxiosResponse<Todo> | void>
   onUncheckTodo: (id: string, habit: Todo) => Promise<AxiosResponse<Todo> | void>
   onDeleteTodo: (id: string) => Promise<AxiosResponse | void>
@@ -24,6 +26,7 @@ export default function TodosSection({
   todos,
   setTodos,
   onUpdateTodo,
+  onOrderTodo,
   onCheckTodo,
   onUncheckTodo,
   onDeleteTodo,
@@ -38,10 +41,12 @@ export default function TodosSection({
     { 'label': 'completed', 'value': 1 },
   ]
 
-  const todosFiltered = useMemo(() => {
-    if (todoFilter === 0) return todos.filter(todo => checkIfItsDone(todo, false))
-    if (todoFilter === 1) return todos.filter(todo => checkIfItsDone(todo))
-    return [...todos]
+  const todosFilteredAndSorted = useMemo(() => {
+     const filtered = todoFilter === 0 
+     ? todos.filter(todo => checkIfItsDone(todo, false)) 
+     : todos.filter(todo => checkIfItsDone(todo))
+
+     return filtered.sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
   }, [todoFilter, todos])
 
   function checkIfItsDone(todo: Todo, isDone: boolean = true) {
@@ -53,7 +58,8 @@ export default function TodosSection({
       id,
       title,
       dueDate: null,
-      doneDate: null
+      doneDate: null,
+      order: todos.length + 1 || 1
     }
   }
 
@@ -70,9 +76,10 @@ export default function TodosSection({
     <>
       <HabitSection
         title="todo"
-        habits={todosFiltered}
+        habits={todosFilteredAndSorted}
         setHabits={setTodos}
         onUpdateHabit={onUpdateTodo}
+        onOrderHabit={onOrderTodo}
         onCheckHabit={onCheckTodo}
         onUncheckHabit={onUncheckTodo}
         onDeleteHabit={onDeleteTodo}

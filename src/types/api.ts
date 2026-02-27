@@ -25,6 +25,10 @@ export type SynchronizeResponse = {
 }
 
 export type DailyRequest = Pick<Daily, 'title' | 'description' | 'daysOfTheWeek'>
+export type OrderRequest = {
+  oldPosition: number,
+  newPosition: number
+}
 export type IncrementalRequest = Pick<Incremental, 'title' | 'description' | 'resetFrequency'>
 export type TodoRequest = Pick<Todo, 'title' | 'description' | 'dueDate'>
 
@@ -34,7 +38,7 @@ export type GetAllDataResponse = {
   todos: Todo[]
   user: User
 }
-
+export type OrderResponse = Pick<Daily, 'id' | 'order'>[]
 export type NewDayResponse = {
   dailiesUpdates: Partial<Daily[]>
   incrementalsUpdates: Partial<Incremental[]>

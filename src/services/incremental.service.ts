@@ -1,4 +1,4 @@
-import type { IncrementalRequest } from "../types/api";
+import type { IncrementalRequest, OrderRequest, OrderResponse } from "../types/api";
 import type { Incremental } from "../types/habit";
 import { api } from "./api";
 
@@ -6,6 +6,10 @@ const basePath = '/incremental'
 
 export async function createIncremental(data: IncrementalRequest) {
     return api.post<Incremental>(`${basePath}/`, data)
+}
+
+export async function orderIncremental(incrementalId: string, data: OrderRequest) {
+    return api.post<OrderResponse>(`${basePath}/${incrementalId}/order`, data)
 }
 
 export async function increaseIncremental(incrementalId: string) {

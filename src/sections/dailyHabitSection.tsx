@@ -10,11 +10,13 @@ import DayOfWeekSelector from '../components/dayOfWeekSelector';
 import { useToast } from '../hooks/useToast';
 import { CalendarIcon } from '@heroicons/react/24/outline'
 import type { AxiosResponse } from 'axios'
+import type { OrderResponse } from '../types/api'
 
 interface DailyHabitsSectionProps {
   dailyHabits: Daily[]
   setDailyHabits: (updater: (dailyHabits: Daily[]) => Daily[]) => void
   onUpdateDailyHabit: (id: string, habit: Daily) => Promise<AxiosResponse<Daily> | void>
+  onOrderDaily: (id: string, oldPosition: number, newPosition: number) => Promise<AxiosResponse<OrderResponse> | void>
   onCheckDaily: (id: string, habit: Daily) => Promise<AxiosResponse<Daily> | void>
   onUncheckDaily: (id: string, habit: Daily) => Promise<AxiosResponse<Daily> | void>
   onDeleteDailyHabit: (id: string) => Promise<AxiosResponse | void>
@@ -27,6 +29,7 @@ export default function DailyHabitsSection({
   dailyHabits,
   setDailyHabits,
   onUpdateDailyHabit,
+  onOrderDaily,
   onCheckDaily,
   onUncheckDaily,
   onDeleteDailyHabit,
@@ -43,10 +46,13 @@ export default function DailyHabitsSection({
     { 'label': 'today', 'value': 1 }
   ]
 
-  const habitsListFiltered = useMemo(() => {
-    if (dailyHabitFilter === 0) return [...dailyHabits]
-    if (dailyHabitFilter === 1) return dailyHabits.filter(habit => checkIfItsTodaysHabit(habit))
-    return [...dailyHabits]
+  const habitsListFilteredAndSorted = useMemo(() => {
+    console.log(dailyHabits)
+    const filtered = dailyHabitFilter === 0
+      ? [...dailyHabits]
+      : dailyHabits.filter(habit => checkIfItsTodaysHabit(habit))
+
+    return filtered.sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
   }, [dailyHabitFilter, dailyHabits])
 
   function checkIfItsTodaysHabit(habit: Daily) {
@@ -60,7 +66,8 @@ export default function DailyHabitsSection({
       title,
       done: false,
       streak: 0,
-      daysOfTheWeek: [0, 1, 2, 3, 4, 5, 6]
+      daysOfTheWeek: [0, 1, 2, 3, 4, 5, 6],
+      order: dailyHabits.length + 1 || 1
     }
   }
 
@@ -77,8 +84,9 @@ export default function DailyHabitsSection({
     <>
       <HabitSection
         title="daily"
-        habits={habitsListFiltered}
+        habits={habitsListFilteredAndSorted}
         setHabits={setDailyHabits}
+        onOrderHabit={onOrderDaily}
         onUpdateHabit={onUpdateDailyHabit}
         onCheckHabit={onCheckDaily}
         onUncheckHabit={onUncheckDaily}
@@ -117,7 +125,7 @@ export default function DailyHabitsSection({
           <NewDayModal title='check yesterday habits' onStart={onResetDailyHabits}>
             {dailyHabits.filter(habit => pendingHabits.includes(habit.id))
               .map(habit => (
-                <HabitBox key={habit.id} habit={habit} checkDaily={onCheckDaily} uncheckDaily={onUncheckDaily}/>
+                <HabitBox key={habit.id} habit={habit} checkDaily={onCheckDaily} uncheckDaily={onUncheckDaily} />
               ))}
           </NewDayModal>
         )}

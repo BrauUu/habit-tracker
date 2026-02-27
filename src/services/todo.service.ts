@@ -1,4 +1,4 @@
-import type { TodoRequest } from "../types/api";
+import type { OrderRequest, OrderResponse, TodoRequest } from "../types/api";
 import type { Todo } from "../types/habit";
 import { api } from "./api";
 
@@ -6,6 +6,10 @@ const basePath = '/todo'
 
 export async function createTodo(data: TodoRequest) {
     return api.post<Todo>(`${basePath}/`, data)
+}
+
+export async function orderTodo(todoId: string, data: OrderRequest) {
+    return api.post<OrderResponse>(`${basePath}/${todoId}/order`, data)
 }
 
 export async function checkTodo(todoId: string) {
