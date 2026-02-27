@@ -78,7 +78,7 @@ function App() {
 
       const lastResetDate = new Date(localLastDailyResetDate)
       const today = new Date()
-      today.setHours(3, 0, 0, 0)
+      today.setHours(0, 0, 0, 0)
 
       if (lastResetDate < today) {
         handleDailyReset()
@@ -88,7 +88,7 @@ function App() {
     const scheduleNextCheck = () => {
       const now = new Date()
       const targetTime = new Date(now)
-      targetTime.setHours(3, 0, 0, 0)
+      targetTime.setHours(0, 0, 0, 0)
       targetTime.setDate(targetTime.getDate() + 1)
 
       const timeUntilTarget = targetTime.getTime() - now.getTime()
@@ -137,7 +137,7 @@ function App() {
     const tempLastDailyResetDate = user ? user.lastDailyResetDate : localStorage.getItem('lastDailyResetDate')
     if (tempLastDailyResetDate) {
       const localLastDailyResetDate: Date = new Date(tempLastDailyResetDate)
-      localLastDailyResetDate.setHours(3, 0, 0, 0)
+      localLastDailyResetDate.setHours(0, 0, 0, 0)
       hasResetToday.current = getHasResetToday(localLastDailyResetDate)
     } else if (!user) {
       saveTodayDateOnLocalStorage()
@@ -560,7 +560,7 @@ function App() {
   async function checkTodoHabit(id: string, todo: Todo) {
     if (!user) {
       const today = new Date()
-      today.setHours(3, 0, 0, 0)
+      today.setHours(0, 0, 0, 0)
       todo.doneDate = today
       updateTodoState(id, todo)
       return
@@ -569,7 +569,7 @@ function App() {
     const response = await checkTodo(id)
     if (response && response.status === 200) {
       const today = new Date()
-      today.setHours(3, 0, 0, 0)
+      today.setHours(0, 0, 0, 0)
       todo.doneDate = today
       updateTodoState(id, todo)
     }
@@ -612,7 +612,7 @@ function App() {
 
   function saveTodayDateOnLocalStorage() {
     const now: Date = new Date()
-    now.setHours(3, 0, 0, 0)
+    now.setHours(0, 0, 0, 0)
     localStorage.setItem('lastDailyResetDate', now.toISOString())
   }
 
@@ -639,7 +639,7 @@ function App() {
 
       habitsList.todos.forEach((todo) => {
         const today = new Date()
-        today.setHours(3, 0, 0, 0)
+        today.setHours(0, 0, 0, 0)
 
         const sevenDaysAgo = new Date(today)
         sevenDaysAgo.setDate(today.getDate() - 7)
@@ -700,7 +700,7 @@ function App() {
 
   function getHasResetToday(lastResetTimestamp: Date) {
     const now: Date = new Date()
-    now.setHours(3, 0, 0, 0)
+    now.setHours(0, 0, 0, 0)
     return !(now.getTime() > lastResetTimestamp.getTime())
   }
 
