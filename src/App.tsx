@@ -10,7 +10,7 @@ import TodosSection from './sections/todoSection'
 import MobileNav, { type Section } from './components/mobileNav'
 
 import { useToast } from './hooks/useToast'
-import { getAllDataFromUser, startNewDay } from './services/user.service'
+import { getAllDataFromUser, startNewDay, refreshToken } from './services/user.service'
 import { createDaily, deleteDaily, getPendingDailies, updateDaily, checkDaily, uncheckDaily, orderDaily } from './services/daily.service'
 import { createIncremental, deleteIncremental, updateIncremental, increaseIncremental, decreaseIncremental, orderIncremental } from './services/incremental.service'
 import { createTodo, updateTodo as updateTodoService, deleteTodo as deleteTodoService, checkTodo, uncheckTodo, orderTodo } from './services/todo.service'
@@ -37,14 +37,22 @@ function App() {
   useEffect(() => {
     const fetchData = async () => {
       if (getTokenOnLocalStorage()) {
-        const data = await getUserData()
-        if (data) {
-          setUser(data.user)
+        const [allUserData, newToken] = await Promise.all([
+          getUserData(),
+          getRedreshToken()
+        ])
+
+        if (allUserData) {
+          setUser(allUserData.user)
           setHabitsList({
-            dailyHabits: data.dailies,
-            incrementalHabits: data.incrementals,
-            todos: data.todos
+            dailyHabits: allUserData.dailies,
+            incrementalHabits: allUserData.incrementals,
+            todos: allUserData.todos
           })
+        }
+
+        if (newToken) {
+          window.localStorage.setItem('token', newToken)
         }
       }
       setIsUserCheckComplete(true)
@@ -672,7 +680,7 @@ function App() {
 
         setUser(prevState => prevState ? { ...prevState, lastDailyResetDate } : null)
       }
-      toast.success('new day started with sucess')
+      toast.success('new day started with success')
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error)
       toast.error(errorMessage)
@@ -748,6 +756,17 @@ function App() {
     }
   }
 
+  async function getRedreshToken() {
+    try {
+      const response = await refreshToken()
+      return response.data.token
+    } catch (error: any) {
+      if (error.response?.status < 500 && error.response?.status >= 400) {
+        toast.error(error.response?.data.message)
+      }
+    }
+  }
+
   function getTokenOnLocalStorage() {
     return window.localStorage.getItem('token')
   }
@@ -774,56 +793,56 @@ function App() {
 
   return (
     isUserCheckComplete ?
-    <div className='flex flex-col w-dvw h-dvh px-4 lg:px-16'>
-      <UserSection
-        user={user}
-        setUser={setUser}
-        onSynchronizeHabits={handleSynchronizeHabits}
-        onAuthenticate={handleAuthentication}
-      ></UserSection>
-      <div className='flex flex-1 flex-col lg:flex-row gap-8 lg:pb-12 pb-20 box-border overflow-hidden'>
-        <div className={`w-full lg:w-1/3 h-full ${activeSection === 'incremental' ? 'block' : 'hidden lg:block'}`}>
-          <IncrementalHabitsSection
-            incrementalHabits={habitsList.incrementalHabits}
-            setIncrementalHabits={setIncrementalHabits}
-            onUpdateIncrementalHabit={updateIncrementalHabit}
-            onOrderIncremental={orderIncrementalHabit}
-            onIncreaseIncremental={increaseIncrementalHabit}
-            onDecreaseIncremental={decreaseIncrementalHabit}
-            onDeleteIncrementalHabit={deleteIncrementalHabit}
-            onAddIncrementalHabit={addIncrementalHabit}
-          />
+      <div className='flex flex-col w-dvw h-dvh px-4 lg:px-16'>
+        <UserSection
+          user={user}
+          setUser={setUser}
+          onSynchronizeHabits={handleSynchronizeHabits}
+          onAuthenticate={handleAuthentication}
+        ></UserSection>
+        <div className='flex flex-1 flex-col lg:flex-row gap-8 lg:pb-12 pb-20 box-border overflow-hidden'>
+          <div className={`w-full lg:w-1/3 h-full ${activeSection === 'incremental' ? 'block' : 'hidden lg:block'}`}>
+            <IncrementalHabitsSection
+              incrementalHabits={habitsList.incrementalHabits}
+              setIncrementalHabits={setIncrementalHabits}
+              onUpdateIncrementalHabit={updateIncrementalHabit}
+              onOrderIncremental={orderIncrementalHabit}
+              onIncreaseIncremental={increaseIncrementalHabit}
+              onDecreaseIncremental={decreaseIncrementalHabit}
+              onDeleteIncrementalHabit={deleteIncrementalHabit}
+              onAddIncrementalHabit={addIncrementalHabit}
+            />
+          </div>
+          <div className={`w-full lg:w-1/3 h-full ${activeSection === 'daily' ? 'block' : 'hidden lg:block'}`}>
+            <DailyHabitsSection
+              dailyHabits={habitsList.dailyHabits}
+              setDailyHabits={setDailyHabits}
+              onUpdateDailyHabit={updateDailyHabit}
+              onOrderDaily={orderDailyHabit}
+              onCheckDaily={checkDailyHabit}
+              onUncheckDaily={uncheckDailyHabit}
+              onDeleteDailyHabit={deleteDailyHabit}
+              onAddDailyHabit={addDailyHabit}
+              onResetDailyHabits={resetHabits}
+              pendingHabits={pendingDailyHabits}
+            />
+          </div>
+          <div className={`w-full lg:w-1/3 h-full ${activeSection === 'todo' ? 'block' : 'hidden lg:block'}`}>
+            <TodosSection
+              todos={habitsList.todos}
+              setTodos={setTodos}
+              onUpdateTodo={updateTodo}
+              onOrderTodo={orderTodoHabit}
+              onCheckTodo={checkTodoHabit}
+              onUncheckTodo={uncheckTodoHabit}
+              onDeleteTodo={deleteTodo}
+              onAddTodo={addTodo}
+            />
+          </div>
         </div>
-        <div className={`w-full lg:w-1/3 h-full ${activeSection === 'daily' ? 'block' : 'hidden lg:block'}`}>
-          <DailyHabitsSection
-            dailyHabits={habitsList.dailyHabits}
-            setDailyHabits={setDailyHabits}
-            onUpdateDailyHabit={updateDailyHabit}
-            onOrderDaily={orderDailyHabit}
-            onCheckDaily={checkDailyHabit}
-            onUncheckDaily={uncheckDailyHabit}
-            onDeleteDailyHabit={deleteDailyHabit}
-            onAddDailyHabit={addDailyHabit}
-            onResetDailyHabits={resetHabits}
-            pendingHabits={pendingDailyHabits}
-          />
-        </div>
-        <div className={`w-full lg:w-1/3 h-full ${activeSection === 'todo' ? 'block' : 'hidden lg:block'}`}>
-          <TodosSection
-            todos={habitsList.todos}
-            setTodos={setTodos}
-            onUpdateTodo={updateTodo}
-            onOrderTodo={orderTodoHabit}
-            onCheckTodo={checkTodoHabit}
-            onUncheckTodo={uncheckTodoHabit}
-            onDeleteTodo={deleteTodo}
-            onAddTodo={addTodo}
-          />
-        </div>
-      </div>
 
-      <MobileNav activeSection={activeSection} onSectionChange={setActiveSection} />
-    </div> : <div className='w-dvw h-dvh flex justify-center items-center'><span className='loader'></span></div>
+        <MobileNav activeSection={activeSection} onSectionChange={setActiveSection} />
+      </div> : <div className='w-dvw h-dvh flex justify-center items-center'><span className='loader'></span></div>
   )
 }
 

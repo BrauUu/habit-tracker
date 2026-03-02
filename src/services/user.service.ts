@@ -1,4 +1,4 @@
-import type { AuthRequest, AuthResponse, GetAllDataResponse, NewDayResponse, SynchronizeRequest, SynchronizeResponse } from "../types/api";
+import type { AuthRequest, AuthResponse, GetAllDataResponse, NewDayResponse, SynchronizeRequest, SynchronizeResponse, RefreshTokenResponse } from "../types/api";
 import { api } from "./api";
 
 export function login(data: AuthRequest) {
@@ -19,6 +19,10 @@ export function startNewDay() {
 
 export function getAllDataFromUser() {
     return api.get<GetAllDataResponse>('/user')
+}
+
+export function refreshToken() {
+    return api.post<RefreshTokenResponse>('/user/refreshToken')
 }
 
 export function deleteUser() {
