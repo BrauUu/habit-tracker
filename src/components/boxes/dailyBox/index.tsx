@@ -47,12 +47,12 @@ export function HabitBox({ habit, onlyVisible = true, checkDaily, uncheckDaily, 
         try {
             if (!isChecked) {
                 if (checkDaily) {
+                    toast.habitChecked(habit?.streak)
                     const response = await checkDaily(id, habit)
                     if (response) {
                         if (response.status != 200)
                             throw response.data
                     }
-                    toast.habitChecked(habit?.streak)
                 }
             }
             else {

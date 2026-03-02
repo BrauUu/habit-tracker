@@ -41,12 +41,12 @@ export function IncrementalHabitBox({ habit, increaseIncremental, decreaseIncrem
     async function increaseHabitCount() {
         if (increaseIncremental) {
             try {
+                toast.habitCountIncreased(habit?.positiveCount)
                 const response = await increaseIncremental(id, habit)
                 if (response) {
                     if (response.status != 200)
                         throw response.data
                 }
-                toast.habitCountIncreased(habit?.positiveCount)
             } catch (error) {
                 const errorMessage = error instanceof Error ? error.message : String(error)
                 toast.error(errorMessage)
@@ -57,12 +57,12 @@ export function IncrementalHabitBox({ habit, increaseIncremental, decreaseIncrem
     async function decreaseHabitCount() {
         if (decreaseIncremental) {
             try {
+                toast.habitCountIncreased(habit?.positiveCount)
                 const response = await decreaseIncremental(id, habit)
                 if (response) {
                     if (response.status != 200)
                         throw response.data
                 }
-                toast.habitCountIncreased(habit?.positiveCount)
             } catch (error) {
                 const errorMessage = error instanceof Error ? error.message : String(error)
                 toast.error(errorMessage)

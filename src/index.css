@@ -119,3 +119,14 @@ body.dragging * {
   color: var(--color-secondary-100);
   font-weight: 600;
 }
+
+.loader {
+  width: 50px;
+  display: flex;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 8px solid;
+  border-color: var(--color-primary-600) transparent;
+  animation: l1 1s infinite;
+}
+@keyframes l1 {to{transform: rotate(.5turn)}}

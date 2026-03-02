@@ -45,3 +45,7 @@ export type NewDayResponse = {
   deletedTodos: Partial<Todo[]>
   lastDailyResetDate: Date
 }
+
+export type RefreshTokenResponse = {
+  token: string
+}

@@ -163,6 +163,8 @@ export default function HabitSection<HabitType extends Habit>({
                 const newPosition = habits.find(h => h.id === over?.id)?.order
 
             if(oldPosition && newPosition && oldPosition !== newPosition)
+                console.log('handleDragEnd-new:', newPosition)
+                console.log('handleDragEnd-old:', oldPosition)
                 onOrderHabit(active.id as string, Number(oldPosition), Number(newPosition))
         }
 

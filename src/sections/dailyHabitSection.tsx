@@ -47,7 +47,7 @@ export default function DailyHabitsSection({
   ]
 
   const habitsListFilteredAndSorted = useMemo(() => {
-    console.log(dailyHabits)
+
     const filtered = dailyHabitFilter === 0
       ? [...dailyHabits]
       : dailyHabits.filter(habit => checkIfItsTodaysHabit(habit))
