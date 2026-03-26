@@ -73,6 +73,7 @@ function App() {
 
       if (pendingHabits && pendingHabits?.length > 0) {
         setPendingDailyHabits(pendingHabits)
+        console.log('pending habits 1')
       } else {
         resetHabits()
       }
@@ -159,6 +160,7 @@ function App() {
       const pendingHabits = await getPendingHabits()
       if (pendingHabits && pendingHabits?.length > 0) {
         setPendingDailyHabits(pendingHabits)
+        console.log('pending habits 2')
       } else {
         resetHabits()
       }
