@@ -9,7 +9,7 @@ A modern, minimalist habit tracking application built with React, TypeScript, an
 
 ## 📝 Future Enhancements
 
-- [ ] Cloud sync across devices
+- [x] Cloud sync across devices
 
 ## 🤝 Contributing
 
