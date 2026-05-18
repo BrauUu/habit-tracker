@@ -73,7 +73,6 @@ function App() {
 
       if (pendingHabits && pendingHabits?.length > 0) {
         setPendingDailyHabits(pendingHabits)
-        console.log('pending habits 1')
       } else {
         resetHabits()
       }
@@ -160,7 +159,6 @@ function App() {
       const pendingHabits = await getPendingHabits()
       if (pendingHabits && pendingHabits?.length > 0) {
         setPendingDailyHabits(pendingHabits)
-        console.log('pending habits 2')
       } else {
         resetHabits()
       }
@@ -529,8 +527,6 @@ function App() {
   }
 
   async function orderTodoHabit(id: string, oldPosition: number, newPosition: number) {
-    console.log('orderTodoHabit-new:', newPosition)
-    console.log('orderTodoHabit-old:', oldPosition)
     const backupTodos = { ...habitsList.todos }
     const start = oldPosition < newPosition ? oldPosition + 1 : newPosition
     const end = oldPosition < newPosition ? newPosition : oldPosition - 1
