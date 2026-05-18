@@ -37,10 +37,7 @@ function App() {
   useEffect(() => {
     const fetchData = async () => {
       if (getTokenOnLocalStorage()) {
-        const [allUserData, newToken] = await Promise.all([
-          getUserData(),
-          getRedreshToken()
-        ])
+        const allUserData = await getUserData();
 
         if (allUserData) {
           setUser(allUserData.user)
@@ -49,11 +46,13 @@ function App() {
             incrementalHabits: allUserData.incrementals,
             todos: allUserData.todos
           })
+
+          const newToken = await getRedreshToken()
+          if (newToken) {
+            window.localStorage.setItem('token', newToken)
+          }
         }
 
-        if (newToken) {
-          window.localStorage.setItem('token', newToken)
-        }
       }
       setIsUserCheckComplete(true)
     }
@@ -101,9 +100,18 @@ function App() {
 
       const timeUntilTarget = targetTime.getTime() - now.getTime()
 
+      // const now = new Date()
+      // const targetTime = new Date(now)
+      // targetTime.setHours(19, 54, 0, 0)
+      // targetTime.setDate(targetTime.getDate())
+
+      // const timeUntilTarget = targetTime.getTime() - now.getTime()
+
+
       timeoutId = setTimeout(() => {
         checkIfNeedsReset()
         scheduleNextCheck()
+        console.log('rodou')
       }, timeUntilTarget)
     }
 
