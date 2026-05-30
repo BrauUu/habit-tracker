@@ -47,7 +47,7 @@ function App() {
             todos: allUserData.todos
           })
 
-          const newToken = await getRedreshToken()
+          const newToken = await getRefreshToken()
           if (newToken) {
             window.localStorage.setItem('token', newToken)
           }
@@ -623,7 +623,6 @@ function App() {
 
   async function resetHabits() {
 
-    setPendingDailyHabits([])
     if (!user) {
       setHabitsList(prevState => ({
         ...prevState,
@@ -659,6 +658,7 @@ function App() {
       })
 
       saveTodayDateOnLocalStorage()
+      setPendingDailyHabits([])
 
       return
     }
@@ -685,8 +685,9 @@ function App() {
         }))
 
         setUser(prevState => prevState ? { ...prevState, lastDailyResetDate } : null)
+        setPendingDailyHabits([])
+        toast.success('new day started with success')
       }
-      toast.success('new day started with success')
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error)
       toast.error(errorMessage)
@@ -762,7 +763,7 @@ function App() {
     }
   }
 
-  async function getRedreshToken() {
+  async function getRefreshToken() {
     try {
       const response = await refreshToken()
       return response.data.token

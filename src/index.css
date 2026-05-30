@@ -129,4 +129,12 @@ body.dragging * {
   border-color: var(--color-primary-600) transparent;
   animation: l1 1s infinite;
 }
+
+.button-loader {
+  position: absolute;
+  width: 1em;
+  border-width: 2px;
+  border-color: currentColor transparent;
+}
+
 @keyframes l1 {to{transform: rotate(.5turn)}}

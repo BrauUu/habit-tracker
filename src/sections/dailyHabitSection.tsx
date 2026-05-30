@@ -21,7 +21,7 @@ interface DailyHabitsSectionProps {
   onUncheckDaily: (id: string, habit: Daily) => Promise<AxiosResponse<Daily> | void>
   onDeleteDailyHabit: (id: string) => Promise<AxiosResponse | void>
   onAddDailyHabit: (daily: Daily) => Promise<AxiosResponse<Daily> | void>
-  onResetDailyHabits: () => void
+  onResetDailyHabits: () => void | Promise<void>
   pendingHabits: string[]
 }
 
