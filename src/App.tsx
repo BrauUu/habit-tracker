@@ -100,18 +100,10 @@ function App() {
 
       const timeUntilTarget = targetTime.getTime() - now.getTime()
 
-      // const now = new Date()
-      // const targetTime = new Date(now)
-      // targetTime.setHours(19, 54, 0, 0)
-      // targetTime.setDate(targetTime.getDate())
-
-      // const timeUntilTarget = targetTime.getTime() - now.getTime()
-
 
       timeoutId = setTimeout(() => {
         checkIfNeedsReset()
         scheduleNextCheck()
-        console.log('rodou')
       }, timeUntilTarget)
     }
 
@@ -190,8 +182,6 @@ function App() {
     }
   }, [isUserCheckComplete, user, habitsList])
 
-
-  // DAILY SECTION
   async function addDailyHabit(daily: Daily) {
     if (!user) {
       setHabitsList(prevState => ({

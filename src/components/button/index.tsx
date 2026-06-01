@@ -49,9 +49,11 @@ export default function Button({ text, type, children, style, action}: ButtonPro
         disabled={isLoading}
         aria-busy={isLoading}
         >
-            <span className={isLoading ? 'invisible' : ''}>
-                {content}
-            </span>
+            {isLoading ? (
+                <span className="invisible">
+                    {content}
+                </span>
+            ) : content}
             {isLoading && <span className="loader button-loader" />}
         </button>
     )
