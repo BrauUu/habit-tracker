@@ -16,7 +16,7 @@ interface DailyHabitsSectionProps {
   dailyHabits: Daily[]
   setDailyHabits: (updater: (dailyHabits: Daily[]) => Daily[]) => void
   onUpdateDailyHabit: (id: string, habit: Daily) => Promise<AxiosResponse<Daily> | void>
-  onOrderDaily: (id: string, oldPosition: number, newPosition: number) => Promise<AxiosResponse<OrderResponse> | void>
+  onOrderDaily: (id: string, newPosition: number) => Promise<AxiosResponse<OrderResponse> | void>
   onCheckDaily: (id: string, habit: Daily) => Promise<AxiosResponse<Daily> | void>
   onUncheckDaily: (id: string, habit: Daily) => Promise<AxiosResponse<Daily> | void>
   onDeleteDailyHabit: (id: string) => Promise<AxiosResponse | void>
