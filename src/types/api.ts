@@ -26,7 +26,6 @@ export type SynchronizeResponse = {
 
 export type DailyRequest = Pick<Daily, 'title' | 'description' | 'daysOfTheWeek'>
 export type OrderRequest = {
-  oldPosition: number,
   newPosition: number
 }
 export type IncrementalRequest = Pick<Incremental, 'title' | 'description' | 'resetFrequency'>

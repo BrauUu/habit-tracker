@@ -1,12 +1,12 @@
-import { useEffect } from "react"
+import { useEffect, type ReactNode } from "react"
 import Button from "../../button"
 import Title from "../../title"
 import Whiteboard from "../../whiteboard"
 
 interface ModalProps {
     title: string,
-    children: any,
-    onStart: () => void,
+    children: ReactNode,
+    onStart: () => void | Promise<void>
 }
 
 export default function NewDayModal({ title, children, onStart }: ModalProps) {

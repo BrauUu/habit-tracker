@@ -22,7 +22,7 @@ interface HabitSectionProps<HabitType extends Habit> {
     habits: HabitType[]
     setHabits: (updater: (habits: HabitType[]) => HabitType[]) => void
     onUpdateHabit: (id: string, habit: HabitType) => Promise<AxiosResponse<HabitType> | void>
-    onOrderHabit: (id: string, oldPosition: number, newPosition: number) => Promise<AxiosResponse<OrderResponse> | void>
+    onOrderHabit: (id: string, newPosition: number) => Promise<AxiosResponse<OrderResponse> | void>
     onCheckHabit: (id: string, habit: HabitType) => Promise<AxiosResponse<HabitType> | void>
     onUncheckHabit: (id: string, habit: HabitType) => Promise<AxiosResponse<HabitType> | void>
     onDeleteHabit: (id: string) => Promise<AxiosResponse | void>
@@ -159,13 +159,10 @@ export default function HabitSection<HabitType extends Habit>({
         const { active, over } = event;
 
         if (active.id !== over?.id) {
-                const oldPosition = habits.find(h => h.id === active.id)?.order
-                const newPosition = habits.find(h => h.id === over?.id)?.order
-
-            if(oldPosition && newPosition && oldPosition !== newPosition)
-                console.log('handleDragEnd-new:', newPosition)
-                console.log('handleDragEnd-old:', oldPosition)
-                onOrderHabit(active.id as string, Number(oldPosition), Number(newPosition))
+            const newPosition = habits.find(h => h.id === over?.id)?.order
+            if (newPosition) {
+                onOrderHabit(active.id as string, Number(newPosition))
+            }
         }
 
         setDragHabit(null);

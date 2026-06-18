@@ -15,7 +15,7 @@ interface IncrementalHabitsSectionProps {
   incrementalHabits: Incremental[]
   setIncrementalHabits: (updater: (incrementalHabits: Incremental[]) => Incremental[]) => void
   onUpdateIncrementalHabit: (id: string, habit: Incremental) => Promise<AxiosResponse<Incremental> | void>
-  onOrderIncremental: (id: string, oldPosition: number, newPosition: number) => Promise<AxiosResponse<OrderResponse> | void>
+  onOrderIncremental: (id: string, newPosition: number) => Promise<AxiosResponse<OrderResponse> | void>
   onIncreaseIncremental: (id: string, habit: Incremental) => Promise<AxiosResponse<Incremental> | void>
   onDecreaseIncremental: (id: string, habit: Incremental) => Promise<AxiosResponse<Incremental> | void>
   onDeleteIncrementalHabit: (id: string) => Promise<AxiosResponse | void>

@@ -40,6 +40,9 @@ api.interceptors.response.use(
         case 404:
           console.error('Recurso não encontrado')
           break
+        case 429:
+          console.error('Você atingiu o nosso limite de acessos, tente novamente mais tarde!')
+          break
         case 500:
           console.error('Erro no servidor')
           break

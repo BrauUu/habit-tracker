@@ -15,6 +15,29 @@ import { createDaily, deleteDaily, getPendingDailies, updateDaily, checkDaily, u
 import { createIncremental, deleteIncremental, updateIncremental, increaseIncremental, decreaseIncremental, orderIncremental } from './services/incremental.service'
 import { createTodo, updateTodo as updateTodoService, deleteTodo as deleteTodoService, checkTodo, uncheckTodo, orderTodo } from './services/todo.service'
 
+function reorderHabitsByPosition<HabitType extends { id: string, order: number }>(
+  habits: HabitType[],
+  id: string,
+  newPosition: number
+) {
+  const currentPosition = habits.find(habit => habit.id === id)?.order
+
+  if (!currentPosition || currentPosition === newPosition) return habits
+
+  const start = currentPosition < newPosition ? currentPosition + 1 : newPosition
+  const end = currentPosition < newPosition ? newPosition : currentPosition - 1
+  const step = currentPosition < newPosition ? -1 : 1
+
+  return habits.map((habit) => {
+    if (habit.id === id)
+      return { ...habit, order: newPosition }
+    else if (habit.order >= start && habit.order <= end)
+      return { ...habit, order: habit.order + step }
+    else
+      return habit
+  })
+}
+
 function App() {
   const [activeSection, setActiveSection] = useState<Section>('daily')
 
@@ -37,10 +60,7 @@ function App() {
   useEffect(() => {
     const fetchData = async () => {
       if (getTokenOnLocalStorage()) {
-        const [allUserData, newToken] = await Promise.all([
-          getUserData(),
-          getRedreshToken()
-        ])
+        const allUserData = await getUserData();
 
         if (allUserData) {
           setUser(allUserData.user)
@@ -49,11 +69,13 @@ function App() {
             incrementalHabits: allUserData.incrementals,
             todos: allUserData.todos
           })
+
+          const newToken = await getRefreshToken()
+          if (newToken) {
+            window.localStorage.setItem('token', newToken)
+          }
         }
 
-        if (newToken) {
-          window.localStorage.setItem('token', newToken)
-        }
       }
       setIsUserCheckComplete(true)
     }
@@ -100,6 +122,7 @@ function App() {
       targetTime.setDate(targetTime.getDate() + 1)
 
       const timeUntilTarget = targetTime.getTime() - now.getTime()
+
 
       timeoutId = setTimeout(() => {
         checkIfNeedsReset()
@@ -182,8 +205,6 @@ function App() {
     }
   }, [isUserCheckComplete, user, habitsList])
 
-
-  // DAILY SECTION
   async function addDailyHabit(daily: Daily) {
     if (!user) {
       setHabitsList(prevState => ({
@@ -235,27 +256,16 @@ function App() {
     }))
   }
 
-  async function orderDailyHabit(id: string, oldPosition: number, newPosition: number) {
+  async function orderDailyHabit(id: string, newPosition: number) {
     if (!user) {
-      const start = oldPosition < newPosition ? oldPosition + 1 : newPosition
-      const end = oldPosition < newPosition ? newPosition : oldPosition - 1
-      const step = oldPosition < newPosition ? -1 : 1
-
       setHabitsList(prevState => ({
         ...prevState,
-        dailyHabits: prevState.dailyHabits.map((habit) => {
-          if (habit.id === id)
-            return { ...habit, order: newPosition }
-          else if (habit.order >= start && habit.order <= end)
-            return { ...habit, order: habit.order + step }
-          else
-            return habit
-        })
+        dailyHabits: reorderHabitsByPosition(prevState.dailyHabits, id, newPosition)
       }))
       return
     }
 
-    const response = await orderDaily(id, { oldPosition, newPosition })
+    const response = await orderDaily(id, { newPosition })
     if (response && response.status == 200) {
       const orderMap = new Map(response.data.map(h => [h.id, h.order]))
 
@@ -388,27 +398,16 @@ function App() {
     }))
   }
 
-  async function orderIncrementalHabit(id: string, oldPosition: number, newPosition: number) {
+  async function orderIncrementalHabit(id: string, newPosition: number) {
     if (!user) {
-      const start = oldPosition < newPosition ? oldPosition + 1 : newPosition
-      const end = oldPosition < newPosition ? newPosition : oldPosition - 1
-      const step = oldPosition < newPosition ? -1 : 1
-
       setHabitsList(prevState => ({
         ...prevState,
-        incrementalHabits: prevState.incrementalHabits.map((habit) => {
-          if (habit.id === id)
-            return { ...habit, order: newPosition }
-          else if (habit.order >= start && habit.order <= end)
-            return { ...habit, order: habit.order + step }
-          else
-            return habit
-        })
+        incrementalHabits: reorderHabitsByPosition(prevState.incrementalHabits, id, newPosition)
       }))
       return
     }
 
-    const response = await orderIncremental(id, { oldPosition, newPosition })
+    const response = await orderIncremental(id, { newPosition })
     if (response && response.status == 200) {
       const orderMap = new Map(response.data.map(h => [h.id, h.order]))
 
@@ -526,36 +525,29 @@ function App() {
     }))
   }
 
-  async function orderTodoHabit(id: string, oldPosition: number, newPosition: number) {
-    console.log('orderTodoHabit-new:', newPosition)
-    console.log('orderTodoHabit-old:', oldPosition)
-    const backupTodos = { ...habitsList.todos }
-    const start = oldPosition < newPosition ? oldPosition + 1 : newPosition
-    const end = oldPosition < newPosition ? newPosition : oldPosition - 1
-    const step = oldPosition < newPosition ? -1 : 1
-
-    setHabitsList(prevState => ({
-      ...prevState,
-      todos: prevState.todos.map((habit) => {
-        if (habit.id === id)
-          return { ...habit, order: newPosition }
-        else if (habit.order >= start && habit.order <= end)
-          return { ...habit, order: Number(habit.order) + step }
-        else
-          return habit
-      })
-    }))
-
-    try {
-      const response = await orderTodo(id, { oldPosition, newPosition })
-      return response
-    } catch (error) {
+  async function orderTodoHabit(id: string, newPosition: number) {
+    if (!user) {
       setHabitsList(prevState => ({
         ...prevState,
-        todos: backupTodos
+        todos: reorderHabitsByPosition(prevState.todos, id, newPosition)
       }))
-      throw error
+      return
     }
+
+    const response = await orderTodo(id, { newPosition })
+    if (response && response.status == 200) {
+      const orderMap = new Map(response.data.map(h => [h.id, h.order]))
+
+      setHabitsList(prevState => ({
+        ...prevState,
+        todos: prevState.todos.map(habit =>
+          orderMap.has(habit.id)
+            ? { ...habit, order: orderMap.get(habit.id)! }
+            : habit
+        )
+      }))
+    }
+    return response
   }
 
   async function checkTodoHabit(id: string, todo: Todo) {
@@ -617,7 +609,6 @@ function App() {
 
   async function resetHabits() {
 
-    setPendingDailyHabits([])
     if (!user) {
       setHabitsList(prevState => ({
         ...prevState,
@@ -653,6 +644,7 @@ function App() {
       })
 
       saveTodayDateOnLocalStorage()
+      setPendingDailyHabits([])
 
       return
     }
@@ -679,8 +671,9 @@ function App() {
         }))
 
         setUser(prevState => prevState ? { ...prevState, lastDailyResetDate } : null)
+        setPendingDailyHabits([])
+        toast.success('new day started with success')
       }
-      toast.success('new day started with success')
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error)
       toast.error(errorMessage)
@@ -756,7 +749,7 @@ function App() {
     }
   }
 
-  async function getRedreshToken() {
+  async function getRefreshToken() {
     try {
       const response = await refreshToken()
       return response.data.token

@@ -15,7 +15,7 @@ interface TodosSectionProps {
   todos: Todo[]
   setTodos: (updater: (todos: Todo[]) => Todo[]) => void
   onUpdateTodo: (id: string, habit: Todo) => Promise<AxiosResponse<Todo> | void>
-  onOrderTodo: (id: string, oldPosition: number, newPosition: number) => Promise<AxiosResponse<OrderResponse> | void>
+  onOrderTodo: (id: string, newPosition: number) => Promise<AxiosResponse<OrderResponse> | void>
   onCheckTodo: (id: string, habit: Todo) => Promise<AxiosResponse<Todo> | void>
   onUncheckTodo: (id: string, habit: Todo) => Promise<AxiosResponse<Todo> | void>
   onDeleteTodo: (id: string) => Promise<AxiosResponse | void>
