@@ -5,7 +5,8 @@ import { api } from "./api";
 const basePath = '/daily'
 
 export async function createDaily(data: DailyRequest) {
-    return api.post<Daily>(`${basePath}/`, data)
+    const { title, description, daysOfTheWeek } = data
+    return api.post<Daily>(`${basePath}/`, { title, description, daysOfTheWeek })
 }
 
 export async function getPendingDailies() {

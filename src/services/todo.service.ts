@@ -5,7 +5,8 @@ import { api } from "./api";
 const basePath = '/todo'
 
 export async function createTodo(data: TodoRequest) {
-    return api.post<Todo>(`${basePath}/`, data)
+    const { title, description, dueDate } = data
+    return api.post<Todo>(`${basePath}/`, { title, description, dueDate })
 }
 
 export async function orderTodo(todoId: string, data: OrderRequest) {

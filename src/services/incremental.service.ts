@@ -5,7 +5,8 @@ import { api } from "./api";
 const basePath = '/incremental'
 
 export async function createIncremental(data: IncrementalRequest) {
-    return api.post<Incremental>(`${basePath}/`, data)
+    const { title, description, resetFrequency } = data
+    return api.post<Incremental>(`${basePath}/`, { title, description, resetFrequency })
 }
 
 export async function orderIncremental(incrementalId: string, data: OrderRequest) {
