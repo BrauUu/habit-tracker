@@ -68,8 +68,7 @@ export function TodoBox({ todo, checkTodo, uncheckTodo, modalDispatch }: TodoBox
                 }
             }
         } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : String(error)
-            toast.error(errorMessage)
+            toast.error(error)
         }
     }
 

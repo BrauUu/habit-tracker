@@ -51,10 +51,8 @@ export default function UserSection({ user, setUser, onSynchronizeHabits, onAuth
             if (!verifyUnsynchronizedHabits()) {
                 removeDataFromLocalStorage()
             }
-        } catch (error: any) {
-            if (error.response?.status < 500 && error.response?.status >= 400) {
-                toast.error(error.response?.data.message)
-            }
+        } catch (error) {
+            toast.error(error)
         }
     }
 
@@ -78,10 +76,8 @@ export default function UserSection({ user, setUser, onSynchronizeHabits, onAuth
             if (!verifyUnsynchronizedHabits()) {
                 removeDataFromLocalStorage()
             }
-        } catch (error: any) {
-            if (error.response?.status < 500 && error.response?.status >= 400) {
-                toast.error(error.response?.data.message)
-            }
+        } catch (error) {
+            toast.error(error)
         }
     }
 
@@ -114,10 +110,8 @@ export default function UserSection({ user, setUser, onSynchronizeHabits, onAuth
             }
             removeDataFromLocalStorage()
             closeModal()
-        } catch (error: any) {
-            if (error.response?.status < 500 && error.response?.status >= 400) {
-                toast.error(error.response?.data.message)
-            }
+        } catch (error) {
+            toast.error(error)
         }
     }
 

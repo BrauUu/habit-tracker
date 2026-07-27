@@ -675,8 +675,7 @@ function App() {
         toast.success('new day started with success')
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error)
-      toast.error(errorMessage)
+      toast.error(error)
     }
 
     return
@@ -742,10 +741,8 @@ function App() {
       const response = await getAllDataFromUser()
       toast.success('user data get with success')
       return response.data
-    } catch (error: any) {
-      if (error.response?.status < 500 && error.response?.status >= 400) {
-        toast.error(error.response?.data.message)
-      }
+    } catch (error) {
+      toast.error(error)
     }
   }
 
@@ -753,10 +750,8 @@ function App() {
     try {
       const response = await refreshToken()
       return response.data.token
-    } catch (error: any) {
-      if (error.response?.status < 500 && error.response?.status >= 400) {
-        toast.error(error.response?.data.message)
-      }
+    } catch (error) {
+      toast.error(error)
     }
   }
 

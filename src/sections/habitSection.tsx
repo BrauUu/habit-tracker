@@ -98,8 +98,7 @@ export default function HabitSection<HabitType extends Habit>({
                 closeModal()
 
             } catch (error) {
-                const errorMessage = error instanceof Error ? error.message : String(error)
-                toast.error(errorMessage)
+                toast.error(error)
             }
         }
     }
@@ -119,8 +118,7 @@ export default function HabitSection<HabitType extends Habit>({
             closeModal()
 
         } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : String(error)
-            toast.error(errorMessage)
+            toast.error(error)
         }
     }
 
@@ -139,15 +137,14 @@ export default function HabitSection<HabitType extends Habit>({
 
             if (response) {
                 if (response.status != 200)
-                    throw new Error()
+                    throw response.data
             }
 
             toast.habitUpdated()
             closeModal()
 
         } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : String(error)
-            toast.error(errorMessage)
+            toast.error(error)
         }
     }
 

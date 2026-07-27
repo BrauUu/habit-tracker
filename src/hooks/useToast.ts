@@ -1,11 +1,12 @@
 import toast from 'react-hot-toast'
 import { dailyHabitTemplates, incrementalHabitTemplates, todoTemplates } from '../constants/messageTemplates'
+import { getErrorMessage } from '../utils/errorMessage'
 
 export function useToast() {
 
   return {
     success: (message: string) => toast(message, {icon: '✅'}),
-    error: (message: string) => toast(message, {icon: '❌'}),
+    error: (error: unknown) => toast(getErrorMessage(error), {icon: '❌'}),
 
     habitCreated: () => toast('habit created with success', {icon: '✅'}),
     habitUpdated: () => toast('habit updated with success', {icon: '✅'}),

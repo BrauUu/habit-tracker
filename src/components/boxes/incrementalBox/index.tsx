@@ -48,8 +48,7 @@ export function IncrementalHabitBox({ habit, increaseIncremental, decreaseIncrem
                         throw response.data
                 }
             } catch (error) {
-                const errorMessage = error instanceof Error ? error.message : String(error)
-                toast.error(errorMessage)
+                toast.error(error)
             }
         }
     }
@@ -64,8 +63,7 @@ export function IncrementalHabitBox({ habit, increaseIncremental, decreaseIncrem
                         throw response.data
                 }
             } catch (error) {
-                const errorMessage = error instanceof Error ? error.message : String(error)
-                toast.error(errorMessage)
+                toast.error(error)
             }
         }
     }
