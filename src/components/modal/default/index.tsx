@@ -33,6 +33,8 @@ export default function Modal({title, children, onClose, onConfirm, confirmButto
           onClick={(e) => {
             e.stopPropagation()
           }}
+          role="dialog"
+          aria-modal="true"
         >
             <div
               ref={modalContentRef}

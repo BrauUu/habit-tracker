@@ -22,6 +22,8 @@ export default function NewDayModal({ title, children, onStart }: ModalProps) {
             onClick={(e) => {
                 e.stopPropagation()
             }}
+            role="dialog"
+            aria-modal="true"
         >
             <div
                 className="w-full max-h-11/12 max-w-lg bg-primary-600 sm:p-6 p-4 rounded-lg flex flex-col items-center gap-4"
