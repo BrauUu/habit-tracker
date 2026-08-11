@@ -28,6 +28,8 @@ createRoot(document.getElementById('root')!).render(
               opacity: t.visible ? 1 : 0,
               transition: 'opacity 300ms ease-in-out',
             }}
+            aria-live="polite"
+            role='status'
           >
             {t.icon && <span style={{ fontSize: '20px' }}>{t.icon}</span>}
             <span style={{ flex: 1 }}>{resolveValue(t.message, t)}</span>
