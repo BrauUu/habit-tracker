@@ -1,7 +1,9 @@
 name: Notify E2E after DEV deployment
 
 on:
-  deployment_status:
+  repository_dispatch:
+    types:
+    - vercel.deployment.success
 
 permissions:
   contents: read
@@ -9,25 +11,23 @@ permissions:
 jobs:
   notify-e2e:
     name: Trigger E2E tests
-    if: >-
-      github.event.deployment_status.state == 'success' &&
-      github.event.deployment.ref == 'dev'
+    if: github.event.client_payload.environment == 'preview'
     runs-on: ubuntu-latest
 
     steps:
-      - name: Trigger QA workflow
-        env:
-          GH_TOKEN: ${{ secrets.QA_DISPATCH_TOKEN }}
-          DEPLOYMENT_SHA: ${{ github.event.deployment.sha }}
-        run: |
-          if [ -z "$GH_TOKEN" ]; then
-            echo "::error::The QA_DISPATCH_TOKEN secret is not configured"
-            exit 1
-          fi
+    - name: Trigger QA workflow
+      env:
+        GH_TOKEN: ${{ secrets.QA_DISPATCH_TOKEN }}
+      run: |
+        if [ -z "$GH_TOKEN" ]; then
+          echo "::error::The QA_DISPATCH_TOKEN secret is not configured"
+          exit 1
+        fi
 
-          curl --fail-with-body --request POST \
-            --url https://api.github.com/repos/BrauUu/habit-tracker-qa/dispatches \
-            --header "Accept: application/vnd.github+json" \
-            --header "Authorization: Bearer $GH_TOKEN" \
-            --header "X-GitHub-Api-Version: 2022-11-28" \
-            --data "{\"event_type\":\"dev_deployment_succeeded\",\"client_payload\":{\"component\":\"frontend\",\"sha\":\"$DEPLOYMENT_SHA\"}}"
+        curl --fail-with-body --request POST \
+          --url https://api.github.com/repos/BrauUu/habit-tracker-qa/actions/workflows/328240552/dispatches \
+          --header "Accept: application/vnd.github+json" \
+          --header "Authorization: Bearer $GH_TOKEN" \
+          --header "Content-Type: application/json" \
+          --header "X-GitHub-Api-Version: 2026-03-10" \
+          --data "{\"ref\":\"main\",\"inputs\":{\"component\":\"frontend\"}}"
