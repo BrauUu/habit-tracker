@@ -26,7 +26,7 @@ export function HabitBox({ habit, onlyVisible = true, checkDaily, uncheckDaily, 
 
     const toast = useToast()
 
-    const { id, title, done, streak } = habit
+    const { id, title, done, streak, description } = habit
     const [isHover, setIsHover] = useState<boolean>(false)
 
     const {
@@ -116,6 +116,7 @@ export function HabitBox({ habit, onlyVisible = true, checkDaily, uncheckDaily, 
                         </Button>
                     }
                 </div>
+                <p className='text-sm'>{description}</p>
                 <div className='flex justify-end items-center gap-1'>
                     <ForwardIcon className='h-4 w-4' ></ForwardIcon>
                     {streak}
@@ -127,7 +128,7 @@ export function HabitBox({ habit, onlyVisible = true, checkDaily, uncheckDaily, 
 
 export function DragOverlayHabitBox({ habit }: DragOverlayHabitBoxProps) {
 
-    const { title, done, streak } = habit
+    const { title, done, streak, description } = habit
 
     return (
         <div
@@ -149,6 +150,7 @@ export function DragOverlayHabitBox({ habit }: DragOverlayHabitBoxProps) {
                         <TrashIcon />
                     </Button>
                 </div>
+                <p className='text-sm'>{description}</p>
                 <div className='flex justify-end items-center gap-1'>
                     <ForwardIcon className='h-4 w-4' ></ForwardIcon>
                     {streak}
