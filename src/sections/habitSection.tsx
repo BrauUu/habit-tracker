@@ -11,6 +11,7 @@ import { modalReducer } from '../reducers/modalReducer'
 import Whiteboard from '../components/whiteboard'
 import Title from '../components/title'
 import Input from '../components/input'
+import Textarea from '../components/textarea'
 import Modal from '../components/modal/default';
 import { useToast } from '../hooks/useToast';
 import type { AxiosResponse } from 'axios';
@@ -228,6 +229,11 @@ export default function HabitSection<HabitType extends Habit>({
                         onSubmit={(v) => modalDispatch({ type: 'updateHabit', payload: { title: v } })}
                         onChange={(v) => modalDispatch({ type: 'updateHabit', payload: { title: v } })}
                     />
+                    <Textarea
+                        value={modalState.data.habit.description}
+                        placeholder='type your description'
+                        onChange={(v) => modalDispatch({ type: 'updateHabit', payload: { description: v } })}
+                    />
                     {renderModalFields?.(modalState.data.habit as HabitType, modalDispatch)}
                 </Modal>
             )}
@@ -243,6 +249,11 @@ export default function HabitSection<HabitType extends Habit>({
                         placeholder='type your habit'
                         onSubmit={(v) => modalDispatch({ type: 'updateHabit', payload: { title: v } })}
                         onChange={(v) => modalDispatch({ type: 'updateHabit', payload: { title: v } })}
+                    />
+                    <Textarea
+                        value={modalState.data.habit.description}
+                        placeholder='type your description'
+                        onChange={(v) => modalDispatch({ type: 'updateHabit', payload: { description: v } })}
                     />
                     {renderModalFields?.(modalState.data.habit as HabitType, modalDispatch)}
                 </Modal>

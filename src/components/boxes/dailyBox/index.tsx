@@ -116,9 +116,12 @@ export function HabitBox({ habit, onlyVisible = true, checkDaily, uncheckDaily, 
                         </Button>
                     }
                 </div>
-                <div className='flex justify-end items-center gap-1'>
-                    <ForwardIcon className='h-4 w-4' ></ForwardIcon>
-                    {streak}
+                <div className='flex justify-between items-end gap-1'>
+                    <p className='text-sm'>{habit.description}</p>
+                    <div className='flex flex-1 justify-end items-center gap-1'>
+                        <ForwardIcon className='h-4 w-4' ></ForwardIcon>
+                        {streak}
+                    </div>
                 </div>
             </div>
         </div>

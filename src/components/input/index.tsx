@@ -1,7 +1,7 @@
 import { ArrowTurnDownLeftIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"
 import { useState } from "react"
 
-interface PlaceholderProps {
+interface InputProps {
     value?: string,
     placeholder: string,
     submitOnEnter?: boolean,
@@ -11,7 +11,7 @@ interface PlaceholderProps {
     style?: string
 }
 
-export default function Input({ value, placeholder, submitOnEnter = false, type = 'text', onSubmit, onChange, style }: PlaceholderProps) {
+export default function Input({ value, placeholder, submitOnEnter = false, type = 'text', onSubmit, onChange, style }: InputProps) {
 
     const [inputValue, setInputValue] = useState(value ?? '')
     const [currentType, setCurrentType] = useState(type)
