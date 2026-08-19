@@ -21,6 +21,7 @@ export default function Input({ value, placeholder, onChange, style }: TextareaP
                     onChange?.(e.target.value)
                 }}
                 placeholder={placeholder}
+                maxLength={500}
             >
             </textarea>
         </div>

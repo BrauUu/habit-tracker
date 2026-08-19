@@ -30,7 +30,7 @@ export function TodoBox({ todo, checkTodo, uncheckTodo, modalDispatch }: TodoBox
 
     const toast = useToast()
 
-    const { id, title, doneDate, dueDate } = todo
+    const { id, title, doneDate, dueDate, description } = todo
     const [isHover, setIsHover] = useState<boolean>(false)
 
     const {
@@ -100,7 +100,7 @@ export function TodoBox({ todo, checkTodo, uncheckTodo, modalDispatch }: TodoBox
                     (doneDate || isHover) && <CheckIcon />
                 }
             </div>
-            <div className='flex flex-col grow min-h-16 justify-between'>
+            <div className='flex flex-col grow min-h-16 justify-between gap-1'>
                 <div className='flex items-start gap-2 min-w-0'>
                     <p className='grow break-words min-w-0'>
                         {title}
@@ -117,7 +117,7 @@ export function TodoBox({ todo, checkTodo, uncheckTodo, modalDispatch }: TodoBox
                         <TrashIcon />
                     </Button>
                 </div>
-
+                <p className='text-sm'>{description}</p>
                 {
                     dueDate ?
 
@@ -133,10 +133,10 @@ export function TodoBox({ todo, checkTodo, uncheckTodo, modalDispatch }: TodoBox
 
 export function DragOverlayTodoBox({ todo }: DragOverlayTodoBoxProps) {
 
-    const { title, doneDate, dueDate } = todo
+    const { title, doneDate, dueDate, description} = todo
 
     return (
-        <div 
+        <div
             className={`w-full text-lg rounded-lg p-2 flex flex-row items-center gap-2 opacity-80 cursor-grabbing min-h-20 shrink-0
             ${doneDate ? 'bg-primary-700 *:opacity-50' : 'bg-primary-600'}
             `}
@@ -146,7 +146,7 @@ export function DragOverlayTodoBox({ todo }: DragOverlayTodoBoxProps) {
                     doneDate && <CheckIcon />
                 }
             </div>
-            <div className='flex flex-col grow min-h-16 justify-between'>
+            <div className='flex flex-col grow min-h-16 justify-between gap-1'>
                 <div className='flex items-start gap-2 min-w-0'>
                     <p className='grow break-words min-w-0'>
                         {title}
@@ -155,14 +155,14 @@ export function DragOverlayTodoBox({ todo }: DragOverlayTodoBoxProps) {
                         <TrashIcon />
                     </Button>
                 </div>
-                <div className='flex justify-end items-center gap-1'>
-                    {
-                        dueDate ?
-                            <span className={`flex justify-end flex-row items-center gap-1 text-sm ${isDueDateExpired(new Date(dueDate)) ? 'text-ruby-500' : ''}`}><ClockIcon className='h-4' />{new Date(dueDate).toLocaleDateString()}</span>
-                            :
-                            undefined
-                    }
-                </div>
+                <p className='text-sm'>{description}</p>
+                {
+                    dueDate ?
+
+                        <span className={`flex justify-end flex-row items-center gap-1 text-sm ${isDueDateExpired(new Date(dueDate)) ? 'text-ruby-500' : ''}`}><ClockIcon className='h-4' />{new Date(dueDate).toLocaleDateString()}</span>
+                        :
+                        undefined
+                }
             </div>
         </div>
     )

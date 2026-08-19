@@ -23,7 +23,7 @@ export function IncrementalHabitBox({ habit, increaseIncremental, decreaseIncrem
 
     const toast = useToast()
 
-    const { id, title, positiveCount, negativeCount } = habit
+    const { id, title, positiveCount, negativeCount, description } = habit
 
     const {
         attributes,
@@ -119,6 +119,7 @@ export function IncrementalHabitBox({ habit, increaseIncremental, decreaseIncrem
                         <TrashIcon />
                     </Button>
                 </div>
+                <p className='text-sm'>{description}</p>
                 <div className='flex items-center gap-2 text-sm'>
                     <div className='flex items-center gap-1'>
                         <span className='text-emerald-400'>+{positiveCount}</span>
@@ -137,7 +138,7 @@ export function IncrementalHabitBox({ habit, increaseIncremental, decreaseIncrem
 
 export function DragOverlayIncrementalHabitBox({ habit }: DragOverlayIncrementalHabitBoxProps) {
 
-    const { title, positiveCount, negativeCount } = habit
+    const { title, positiveCount, negativeCount, description } = habit
     const total = positiveCount - negativeCount;
 
     return (
@@ -160,6 +161,8 @@ export function DragOverlayIncrementalHabitBox({ habit }: DragOverlayIncremental
                         <TrashIcon />
                     </Button>
                 </div>
+
+                <p className='text-sm'>{description}</p>
 
                 <div className='flex items-center gap-2 text-sm'>
                     <div className='flex items-center gap-1'>
