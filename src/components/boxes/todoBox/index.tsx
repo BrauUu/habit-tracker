@@ -117,7 +117,7 @@ export function TodoBox({ todo, checkTodo, uncheckTodo, modalDispatch }: TodoBox
                         <TrashIcon />
                     </Button>
                 </div>
-                <p className='text-sm'>{description}</p>
+                <p className='text-sm whitespace-pre-wrap break-words'>{description}</p>
                 {
                     dueDate ?
 
@@ -155,7 +155,7 @@ export function DragOverlayTodoBox({ todo }: DragOverlayTodoBoxProps) {
                         <TrashIcon />
                     </Button>
                 </div>
-                <p className='text-sm'>{description}</p>
+                <p className='text-sm whitespace-pre-wrap break-words'>{description}</p>
                 {
                     dueDate ?
 

@@ -116,7 +116,7 @@ export function HabitBox({ habit, onlyVisible = true, checkDaily, uncheckDaily, 
                         </Button>
                     }
                 </div>
-                <p className='text-sm'>{description}</p>
+                <p className='text-sm whitespace-pre-wrap break-words'>{description}</p>
                 <div className='flex justify-end items-center gap-1'>
                     <ForwardIcon className='h-4 w-4' ></ForwardIcon>
                     {streak}
@@ -150,7 +150,7 @@ export function DragOverlayHabitBox({ habit }: DragOverlayHabitBoxProps) {
                         <TrashIcon />
                     </Button>
                 </div>
-                <p className='text-sm'>{description}</p>
+                <p className='text-sm whitespace-pre-wrap break-words'>{description}</p>
                 <div className='flex justify-end items-center gap-1'>
                     <ForwardIcon className='h-4 w-4' ></ForwardIcon>
                     {streak}
