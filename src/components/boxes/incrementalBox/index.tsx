@@ -119,7 +119,7 @@ export function IncrementalHabitBox({ habit, increaseIncremental, decreaseIncrem
                         <TrashIcon />
                     </Button>
                 </div>
-                <p className='text-sm'>{description}</p>
+                <p className='text-sm whitespace-pre-wrap break-words'>{description}</p>
                 <div className='flex items-center gap-2 text-sm'>
                     <div className='flex items-center gap-1'>
                         <span className='text-emerald-400'>+{positiveCount}</span>
@@ -161,9 +161,7 @@ export function DragOverlayIncrementalHabitBox({ habit }: DragOverlayIncremental
                         <TrashIcon />
                     </Button>
                 </div>
-
-                <p className='text-sm'>{description}</p>
-
+                <p className='text-sm whitespace-pre-wrap break-words'>{description}</p>
                 <div className='flex items-center gap-2 text-sm'>
                     <div className='flex items-center gap-1'>
                         <span className='text-emerald-400'>+{positiveCount}</span>
